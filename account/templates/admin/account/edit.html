@@ -1,0 +1,105 @@
+{% extends "admin/account/page.html" %}{% load i18n %}
+{% block title %}
+    {% if object %}
+        {% trans "Edit User" %}
+    {% else %}
+        {% trans "Add a User" %}
+    {% endif %}
+{% endblock title %}
+
+{% block toolbar %}
+    <span class="toolbar__title">{% trans "Profile" %}</span>
+{% endblock toolbar %}
+
+{% block content %}
+<div class="[ content__inner ]">
+    <p class="breadcrumb">
+        <a href="{% url 'account-admin:dashboard' %}">{% trans "Dashboard" %}</a>  
+        &nbsp;<span class="fa fa-angle-right"></span>&nbsp;
+        {% trans "Update Profile" %}
+    </p>
+</div>
+<form action="" method="post" class="form">
+{% csrf_token %}
+{% if form.non_field_errors %}
+    <div class="alert alert--error">
+    {% for error in form.non_field_errors %}
+        {{error}}<br>
+    {% endfor %}
+    </div>
+{% endif %}
+
+<div class="[ content__inner ] [ box box--padded box--bordered ]">
+    <fieldset>
+        <legend>{% trans "Contact details" %}</legend>
+        <div class="grid">
+            <div class="grid__span-2">
+                <span class="form__label--inline">
+                    {% trans "Full name" %}
+                </span>
+            </div>
+            <div class="grid__span-3">
+                {% with form.first_name as field %}
+                    {% include "admin/includes/text-field.html" %}
+                {% endwith %}
+            </div>
+            <div class="grid__span-3">
+                {% with form.last_name as field %}
+                    {% include "admin/includes/text-field.html" %}
+                {% endwith %}
+            </div>      
+        </div>
+        <div class="grid">
+            <div class="grid__span-2">
+                <span class="form__label--inline">
+                    {% trans "Email" %}
+                </span>
+            </div>
+            <div class="grid__span-3">
+                {% with form.email as field %}
+                    {% include "admin/includes/text-field.html" %}
+                {% endwith %}
+            </div>  
+        </div>
+    </fieldset>
+</div>
+
+<div class="[ content__inner ] [ box box--padded box--bordered ]">
+    <fieldset>
+        <legend>{% trans "Security" %}</legend>
+        <div class="grid">
+            <div class="grid__span-2">
+                <span class="form__label--inline">
+                    {% trans "Username" %}
+                </span>
+            </div>
+            <div class="grid__span-3">
+                {% with form.username as field %}
+                    {% include "admin/includes/text-field.html" %}
+                {% endwith %}
+            </div>
+        </div>
+        <div class="grid">
+            <div class="grid__span-2">
+                <span class="form__label form__label--inline">
+                    &nbsp;
+                </span>
+            </div>
+            <div class="grid__span-3">
+                <a href="{% url 'account-admin:password_change' %}" class="btn btn--transparent btn--small">
+                    {% trans "Change Password" %}
+                </a>
+            </div>
+        </div>
+    </fieldset>
+</div>
+
+
+<div class="content__inner">
+    <button type="submit" class="btn btn--primary">
+        {% trans "Save" %}
+    </button>
+</div>
+
+</form>
+{% endblock content %}

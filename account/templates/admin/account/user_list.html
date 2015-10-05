@@ -1,0 +1,65 @@
+{% extends "admin/account/page.html" %}{% load i18n %}
+{% block title %}
+	{% trans "Users" %}
+{% endblock title %}
+
+{% block toolbar %}
+	<span class="toolbar__title">{% trans "Users" %}</span>
+{% endblock toolbar %}
+
+{% block content %}
+<div class="grid grid--collapse">
+	<div class="grid__span-9">
+		<div class="content__inner">
+			<table class="table  table--clickable">
+				<tr class="table-row">
+					<th class="table-head-cell">{% trans "Name" %}</th>
+					<th class="table-head-cell">{% trans "Email" %}</th>
+					<th class="table-head-cell">{% trans "Superuser" %}</th>
+					<th class="table-head-cell">{% trans "Staff" %}</th>
+					<th class="table-head-cell">{% trans "Active" %}</th>
+					<th class="table-head-cell">{% trans "Date joined" %}</th>
+				</tr>
+				{% for user in object_list %}
+				<tr class="table-row" 
+					onClick="window.location = '{% url 'account-admin:user_detail' user.uuid %}'">
+					<td class="table-cell">
+						<a href="{% url 'account-admin:user_detail' user.uuid %}">{{user}}</a></td>
+					<td class="table-cell">{{user.email}}</td>
+					<td class="table-cell">{% if user.is_superuser %}
+							<span class="fa fa-check fa-green"></span>
+						{% else %}
+							<span class="fa fa-remove fa-red"></span>
+						{% endif %}
+					</td>
+					<td class="table-cell">{% if user.is_staff %}
+							<span class="fa fa-check fa-green"></span>
+						{% else %}
+							<span class="fa fa-remove fa-red"></span>
+						{% endif %}
+					</td>
+					<td class="table-cell">{% if user.is_active %}
+							<span class="fa fa-check fa-green"></span>
+						{% else %}
+							<span class="fa fa-remove fa-red"></span>
+						{% endif %}
+					</td>
+					<td class="table-cell">
+						{{user.date_joined|date:"d F Y - g:i a"}}
+					</td>
+				</tr>
+				{% endfor %}
+			</table>
+		</div>
+	</div>
+	<div class="grid__span-3">
+		<div class="content__inner box box--padded box--bordered">
+			{% if perms.account.add_user %}
+			<p>
+				<a href="{% url 'account-admin:user_add' %}"><span class="fa fa-plus"></span> {% trans "Add a User" %}</a>
+			</p>
+			{% endif %}
+		</div>
+	</div>
+</div>
+{% endblock content %}

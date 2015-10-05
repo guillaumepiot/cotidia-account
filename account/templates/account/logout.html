@@ -1,0 +1,29 @@
+{% extends "admin/account/base.html" %}
+{% load url from future %}
+{% load i18n %}
+
+{% block title %}{% trans "Logged out" %}{% endblock %}
+
+{% block main %}
+<form method="post" action="?next={{success_url}}">
+    <div class="modal modal--open">
+        <div class="modal__wrapper">
+            <div class="modal__content modal__content--small">
+                <div class="modal__header">
+                    <h3>{{SITE_NAME}} (Public)</h3>
+                </div>
+                <div class="modal__body">
+                    <h4>{% trans "See you soon." %}</h4>
+                    <p>{% trans "You have now been logged out." %}</p>
+                </div>
+            </div>
+            <div class="modal__sub-footer modal__sub-footer--small text-center">
+                <p>
+                    <a href="{% url "account-public:login" %}">{% trans "Login again?" %}</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+

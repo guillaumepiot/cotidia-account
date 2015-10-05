@@ -1,0 +1,17 @@
+{% extends "admin/account/base.html" %}{% load i18n %}
+{% block title %}
+	{% trans "Dashboard" %}
+{% endblock title %}
+{% block main %}
+	{% include "admin/account/menu.html" %}
+
+	<div class="toolbar toolbar--menu-open" id="toolbar">
+		<span class="toolbar__title">{% trans "Dashboard" %}</span>
+	</div>
+
+	<div class="content content--menu-open" id="content">
+		<div class="content__inner box box--padded box--bordered">
+			<p>Welcome to the {{SITE_NAME}} dashboard.</p>
+		</div>
+	</div>
+{% endblock main %}

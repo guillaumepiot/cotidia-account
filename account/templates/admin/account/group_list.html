@@ -1,0 +1,50 @@
+{% extends "admin/account/page.html" %}{% load i18n %}
+{% block title %}
+	{% trans "Roles" %}
+{% endblock title %}
+
+{% block toolbar %}
+	<span class="toolbar__title">{% trans "Roles" %}</span>
+{% endblock toolbar %}
+
+{% block content %}
+<div class="grid grid--collapse">
+	<div class="grid__span-9">
+		<div class="content__inner">
+			<table class="table  table--clickable">
+				<tr class="table-row">
+					<th class="table-head-cell">{% trans "Role description" %}</th>
+				</tr>
+				{% for group in object_list %}
+				<tr class="table-row"
+					onClick="window.location = '{% url 'account-admin:group_detail' group.id %}'">
+					<td class="table-cell">
+						<a href="{% url 'account-admin:group_detail' group.id %}">
+							{{group}}
+						</a>
+					</td>
+				</tr>
+				{% empty %}
+				<tr class="table-row">
+					<td class="table-cell">
+						{% trans "No roles have been created yet." %}
+					</td>
+				</tr>
+				{% endfor %}
+			</table>
+		</div>
+	</div>
+	<div class="grid__span-3">
+		<div class="content__inner box box--padded box--bordered">
+			{% if perms.auth.add_group %}
+			<p>
+				<a href="{% url 'account-admin:group_add' %}">
+					<span class="fa fa-plus"></span> 
+					{% trans "Add a Role" %}
+				</a>
+			</p>
+			{% endif %}
+		</div>
+	</div>
+</div>
+{% endblock content %}
