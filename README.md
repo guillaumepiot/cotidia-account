@@ -50,7 +50,24 @@ There's two set of urls, one for the admin management of users, role and dashboa
 Each set can be loaded independently, under their own urls, for example:
 
     urlpatterns = [
-        url(r'^admin/', include('account.urls.admin')),
-        url(r'^account/', include('account.urls.public')),
+        url(r'^admin/account/', include('account.urls.admin', 
+            namespace="account-admin")),
+        url(r'^account/', include('account.urls.public', 
+            namespace="account-public")),
     ]
 
+## User models override
+
+On a project basis, you may want to add your own fields to the user models.
+You can override which model class is used on a project basis by declaring a 
+path to another `User` model class.
+
+    ACCOUNT_USER_MODEL = "my_project.models"
+
+In your `models.py` file, create your own `User` class:
+
+    from account.models import BaseUser
+
+    class User(BaseUser):
+        # My fields
+        #...

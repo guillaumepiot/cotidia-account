@@ -1,6 +1,8 @@
-{% extends "account/base.html" %}{% load i18n %}
+{% extends "admin/account/base.html" %}
+{% load url from future %}
+{% load i18n %}
 
-{% block title %}{% trans "Reset password" %}{% endblock %}
+{% block title %}{% trans "Sign up" %}{% endblock %}
 
 {% block main %}
 <form method="post" action="?next={{success_url}}">
@@ -8,40 +10,46 @@
         <div class="modal__wrapper">
             <div class="modal__content modal__content--small">
                 <div class="modal__header">
-                    <h3>{{SITE_NAME}}</h3>
+                    <h3>{{SITE_NAME}} (Public)</h3>
                 </div>
                 <div class="modal__body">
-                    <h4>{% trans "Reset your password" %}</h4>
-                    <p>{% trans "Please enter your email address below and we will send you a reset password link." %}</p>
-                        {% csrf_token %}
+                    <h4>{% trans "Sign up" %}</h4>
+                    <p>{% trans "Please enter your email address and choose a password." %}</p>
                         {% csrf_token %}
                         {% if form.non_field_errors %}
-                            <div class="alert alert-danger">
+                            <div class="alert alert--error">
                             {% for error in form.non_field_errors %}
                                 {{error}}<br>
                             {% endfor %}
                             </div>
                         {% endif %}
-
-                        {% for field in form %}
+                        
+                        {% with form.email as field %}
                             {% include 'admin/includes/text-field.html' %}
-                        {% endfor %}
+                        {% endwith %}
+                        {% with form.password1 as field %}
+                            {% include 'admin/includes/text-field.html' %}
+                        {% endwith %}
+                        {% with form.password2 as field %}
+                            {% include 'admin/includes/text-field.html' %}
+                        {% endwith %}
 
+                        <input type="hidden" name="next" value="{{ next }}" />
+                    
                 </div>
                 <div class="modal__footer">
                     <button class="btn btn--primary btn--full-width" type="submit">
-                        {% trans "Reset password" %}
+                        {% trans "Sign up" %}
                     </button>
                 </div>
             </div>
             <div class="modal__sub-footer modal__sub-footer--small text-center">
                 
                 <p>
-                    <a href="{% url "account-public:login" %}">{% trans "Back to login" %}</a>
+                    <a href="{% url "account-public:login" %}">{% trans "Login" %}</a>
                 </p>
             </div>
         </div>
     </div>
 </form>
 {% endblock %}
-

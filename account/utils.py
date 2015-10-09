@@ -1,3 +1,5 @@
+import importlib
+
 from django.core.urlresolvers import reverse_lazy
 from django.shortcuts import redirect
 from django.core.exceptions import PermissionDenied
@@ -30,3 +32,10 @@ class StaffPermissionRequiredMixin(UserCheckMixin):
     #
     def check_user(self, user):
         return user.is_staff and user.has_perm(self.permission_required)
+
+#
+# Import a model using a dotted string value
+#
+def import_model(name, clsName):
+    module = importlib.import_module(name)
+    return getattr(module, clsName)

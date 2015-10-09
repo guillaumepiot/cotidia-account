@@ -9,11 +9,12 @@ from django.contrib.auth import authenticate, login as auth_login
 from django.contrib import messages
 
 
-from account.forms import UpdateDetailsForm
+from account.forms import UpdateDetailsForm, AccountUserCreationForm
+from account.models import User
 
 @login_required
 def dashboard(request):
-    template = 'admin/account/dashboard.html'
+    template = 'account/dashboard.html'
     return render_to_response(template, {},
         context_instance=RequestContext(request))
     
@@ -25,7 +26,7 @@ def edit(request):
         if form.is_valid():
             form.save()
             messages.success(request, _('Your personal details have been saved'))
-            return HttpResponseRedirect(reverse('my_account'))
+            return HttpResponseRedirect(reverse('account-public:dashboard'))
     else:
         form = UpdateDetailsForm(instance=request.user)
 
@@ -43,3 +44,19 @@ def login_remember_me(request, *args, **kwargs):
         extra_context['success_url'] = request.GET['next']
 
     return login(request, extra_context=extra_context, *args, **kwargs)
+
+def sign_up(request):
+    template = 'account/sign_up.html'
+    form = AccountUserCreationForm()
+
+    if request.method == "POST":
+        form = AccountUserCreationForm(request.POST)
+        if form.is_valid():
+            user = User(
+                email=form.cleaned_data["email"],
+                is_active=True)
+            user.set_password(form.cleaned_data["password1"])
+            user.username = form.cleaned_data["email"]
+            user.save()
+    return render_to_response(template, {'form': form},
+        context_instance=RequestContext(request))

@@ -1,43 +1,43 @@
-{% extends "registration/registration_base.html" %}
-{% load url from future %}
-{% load i18n %}
+{% extends "account/base.html" %}{% load i18n %}
 
 {% block title %}{% trans "Update details" %}{% endblock %}
 
-{% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-md-12">
-            <h1>{% trans "Update my personal details" %}</h1>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-4">
-            
-            <div class="well">
-                <form method="post" action="." class="form">
+{% block main %}
+<form method="post">
+    <div class="modal modal--open">
+        <div class="modal__wrapper">
+            <div class="modal__content modal__content--small">
+                <div class="modal__header">
+                    <h3>{{SITE_NAME}} (Public)</h3>
+                </div>
+                <div class="modal__body">
+                    <h4>{% trans "Change my details" %}</h4>
                     {% csrf_token %}
                     {% if form.non_field_errors %}
-                        <div class="alert alert-danger">
+                        <div class="alert alert--error">
                         {% for error in form.non_field_errors %}
                             {{error}}<br>
                         {% endfor %}
                         </div>
                     {% endif %}
-
-                    {% for field in form %}
-                        {% include 'common/fields.html' %}
-                    {% endfor %}
-
-                    <input type="submit" value="{% trans "Save details" %}" class="btn btn-lg btn-primary">
-                </form>
+                    
+                    {% with form.email as field %}
+                        {% include 'admin/includes/text-field.html' %}
+                    {% endwith %}
+                </div>
+                <div class="modal__footer">
+                    <button class="btn btn--primary btn--full-width" type="submit">
+                        {% trans "Save" %}
+                    </button>
+                </div>
             </div>
-        </div>
-        <div class="col-md-4 col-md-offset-4">
-            <div class="well">
-                {% include "account/sidebar.html" %}
+            <div class="modal__sub-footer modal__sub-footer--small text-center">
+                
+                <p>
+                    <a href="{% url "account-public:dashboard" %}">{% trans "Cancel" %}</a>
+                </p>
             </div>
         </div>
     </div>
-</div>
+</form>
 {% endblock %}

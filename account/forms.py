@@ -139,14 +139,15 @@ class AccountPasswordChangeForm(PasswordChangeForm):
 
     old_password = forms.CharField(
         label="",
-        widget=forms.PasswordInput(attrs={'placeholder':"", 'class':'form__text'})
+        widget=forms.PasswordInput(attrs={'placeholder':_("Old password"), 'class':'form__text'})
         )
 
     def __init__(self, *args, **kwargs):
         super(AccountPasswordChangeForm, self).__init__(*args, **kwargs)
 
-        self.fields['new_password1'].label = ""
-        self.fields['new_password2'].label = ""
+        self.fields['new_password1'].label = ''
+        self.fields['new_password1'].widget.attrs['placeholder'] = _("New password")
+        self.fields['new_password2'].label = ''
         self.fields['new_password2'].widget.attrs['placeholder'] = _("New password confirmation")
 
         for field in self.fields:
@@ -154,18 +155,28 @@ class AccountPasswordChangeForm(PasswordChangeForm):
 
 
 class UpdateDetailsForm(forms.ModelForm):
-    required_css_class = 'required'
 
-    email = forms.EmailField(label=_('Email address'))
+    email = forms.EmailField(label='',
+        widget=forms.TextInput(attrs={'placeholder':_("Email address"), 'class':'form__text'}))
 
     class Meta:
         model = User
-        exclude = ()
+        fields = ('email',)
 
     def __init__(self, *args, **kwargs):
         super(UpdateDetailsForm, self).__init__(*args, **kwargs)
 
-class AccountUserCreationForm(forms.ModelForm):
+    def clean_email(self):
+        email = self.cleaned_data['email']
+
+        if User.objects.filter(email=email).count() > 0 and \
+            self.instance.email != email:
+            raise forms.ValidationError(_("This email is already used."))
+
+        return email
+
+
+class AccountUserCreationForm(forms.Form):
     """
     A form that creates a user, with no privileges, from the given username and
     password.
@@ -173,15 +184,15 @@ class AccountUserCreationForm(forms.ModelForm):
     error_messages = {
         'password_mismatch': _("The two password fields didn't match."),
     }
-    password1 = forms.CharField(label=_("Password"),
-        widget=forms.PasswordInput)
-    password2 = forms.CharField(label=_("Password confirmation"),
-        widget=forms.PasswordInput,
-        help_text=_("Enter the same password as above, for verification."))
+    email = forms.EmailField(label='',
+        widget=forms.TextInput(attrs={'placeholder':_("Email address"), 'class':'form__text'}))
 
-    class Meta:
-        model = User
-        fields = ("username",)
+    password1 = forms.CharField(label='',
+        widget=forms.PasswordInput(attrs={'placeholder':_("Password"), 'class':'form__text'}))
+
+    password2 = forms.CharField(label='',
+        widget=forms.PasswordInput(attrs={'placeholder':_("Password Confirmation"), 'class':'form__text'}),
+        help_text=_("Enter the same password as before, for verification."))
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
@@ -193,12 +204,13 @@ class AccountUserCreationForm(forms.ModelForm):
             )
         return password2
 
-    def save(self, commit=True):
-        user = super(AccountUserCreationForm, self).save(commit=False)
-        user.set_password(self.cleaned_data["password1"])
-        if commit:
-            user.save()
-        return user
+    def clean_email(self):
+        email = self.cleaned_data['email']
+
+        if User.objects.filter(email=email).count() > 0:
+            raise forms.ValidationError(_("This email is already used."))
+
+        return email
         
 class AccountUserChangeForm(forms.ModelForm):
     password = ReadOnlyPasswordHashField(label=_("Password"),

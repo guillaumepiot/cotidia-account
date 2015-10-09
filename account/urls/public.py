@@ -8,13 +8,18 @@ related templates in the same `/templates/registration/` folder.
 from django.conf.urls import url, patterns
 from django.contrib.auth import views as auth_views
 
-from account.forms import EmailAuthenticationForm, AccountPasswordResetForm, AccountSetPasswordForm, AccountPasswordChangeForm
-from account.views import dashboard, login_remember_me, edit
+from account.forms import (
+    EmailAuthenticationForm, 
+    AccountPasswordResetForm, 
+    AccountSetPasswordForm, 
+    AccountPasswordChangeForm)
+from account.views import dashboard, login_remember_me, edit, sign_up
 
 urlpatterns = patterns(
     '',
     url(r'^$', dashboard, name="dashboard"),
-    url(r'edit/$', edit, name="edit"),
+    url(r'^edit/$', edit, name="edit"),
+    url(r'^sign-up/$', sign_up, name='sign-up',),
     url(
         r'^login/$',
         login_remember_me,
@@ -32,7 +37,8 @@ urlpatterns = patterns(
         r'^password/change/$',
         auth_views.password_change,
         {'template_name': 'account/password_change_form.html',
-            'password_change_form':AccountPasswordChangeForm},
+            'post_change_redirect': 'account-public:password_change_done',
+            'password_change_form': AccountPasswordChangeForm},
         name='account_password_change',
     ),
     url(
@@ -45,22 +51,26 @@ urlpatterns = patterns(
         r'^password/reset/$',
         auth_views.password_reset,
         {'template_name': 'account/password_reset_form.html',
-            'password_reset_form':AccountPasswordResetForm,
-            'email_template_name':'account/password_reset_email.html',
-            'subject_template_name':'account/password_reset_subject.txt',},
+            'post_reset_redirect': 'account-public:password_reset_done',
+            'password_reset_form': AccountPasswordResetForm,
+            'email_template_name': 'account/password_reset_email.html',
+            'subject_template_name': 'account/password_reset_subject.txt',},
         name='password_reset',
     ),
     url(
         r'^password/reset/confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$',
         auth_views.password_reset_confirm,
-        {'template_name': 'account/password_reset_confirm.html',
-            'set_password_form':AccountSetPasswordForm},
+        {
+            'template_name': 'account/password_reset_confirm.html',
+            'post_reset_redirect': 'account-public:password_reset_complete',
+            'set_password_form':AccountSetPasswordForm
+        },
         name='password_reset_confirm',
     ),
     url(
         r'^password/reset/complete/$',
         auth_views.password_reset_complete,
-        {'template_name': 'account/password_reset_complete.html'},  # NOQA
+        {'template_name': 'account/password_reset_complete.html'},
         name='password_reset_complete',
     ),
     url(

@@ -2,9 +2,12 @@ import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
+
+from .utils import import_model
 
 
-class User(AbstractUser):
+class BaseUser(AbstractUser):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
 
     def __str__(self):
@@ -14,3 +17,18 @@ class User(AbstractUser):
 
     def get_absolute_url(self):
         return reverse('user-detail', kwargs={'uuid': self.uuid})
+
+    class Meta:
+        abstract = True
+
+
+if settings.AUTH_USER_MODEL:
+
+    cls = import_model(settings.ACCOUNT_USER_MODEL, "User")
+
+    class User(cls):
+        pass
+
+else:
+    class User(BaseUser):
+        pass
