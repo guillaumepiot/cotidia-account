@@ -1,3 +1,4 @@
+import hashlib
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect  
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import RequestContext              
@@ -7,7 +8,6 @@ from django.contrib.auth.decorators import permission_required, login_required
 from django.contrib.auth.views import login
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib import messages
-
 
 from account.forms import UpdateDetailsForm, AccountUserCreationForm
 from account.models import User
@@ -49,6 +49,8 @@ def sign_up(request):
     template = 'account/sign_up.html'
     form = AccountUserCreationForm()
 
+    success_url = request.GET.get('next')
+
     if request.method == "POST":
         form = AccountUserCreationForm(request.POST)
         if form.is_valid():
@@ -56,7 +58,21 @@ def sign_up(request):
                 email=form.cleaned_data["email"],
                 is_active=True)
             user.set_password(form.cleaned_data["password1"])
-            user.username = form.cleaned_data["email"]
+            # Hash the email address to generate a unique username
+            m = hashlib.md5()
+            m.update(form.cleaned_data["email"])
+            user.username = m.hexdigest()[0:30]
             user.save()
-    return render_to_response(template, {'form': form},
+
+            # Log the user straight away
+            new_user = authenticate(username=user.username, password=form.cleaned_data['password1'])
+            auth_login(request, new_user)
+
+            messages.success(request, _('Your have successfully signed up'))
+            if success_url:
+                return HttpResponseRedirect(success_url)
+            else:
+                return HttpResponseRedirect(reverse('account-public:dashboard'))
+
+    return render_to_response(template, {'form': form, 'success_url':success_url },
         context_instance=RequestContext(request))

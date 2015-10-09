@@ -24,7 +24,8 @@ class ManageDetailsTest(TestCase):
             'username':'test@test.com',
             'password':'demo1234',
         }
-        response = self.client.post(reverse("account_login"), data, HTTP_HOST=self.HTTP_HOST)
+        response = self.client.post(reverse("account-public:login"), 
+            data, HTTP_HOST=self.HTTP_HOST)
         self.assertEquals(response.status_code, 302)
 
         # Change password
@@ -33,7 +34,8 @@ class ManageDetailsTest(TestCase):
             'new_password1':'demo123',
             'new_password2':'demo123',
         }
-        response = self.client.post(reverse("account_password_change"), data, HTTP_HOST=self.HTTP_HOST)
+        response = self.client.post(reverse("account-public:password_change"), 
+            data, HTTP_HOST=self.HTTP_HOST)
         # Should not redirect as not allowed to login
         self.assertEquals(response.status_code, 302)
 
@@ -44,7 +46,8 @@ class ManageDetailsTest(TestCase):
             'username':'test@test.com',
             'password':'demo1234',
         }
-        response = self.client.post(reverse("account_login"), data, HTTP_HOST=self.HTTP_HOST)
+        response = self.client.post(reverse("account-public:login"), 
+            data, HTTP_HOST=self.HTTP_HOST)
         self.assertEquals(response.status_code, 302)
 
         data = {
@@ -57,8 +60,14 @@ class ManageDetailsTest(TestCase):
             'mobile_number':'0763362743',
             'fax_number':'712037123',
         }
-        response = self.client.post(reverse("account_update_details"), data, HTTP_HOST=self.HTTP_HOST)
+        response = self.client.post(reverse("account-public:edit"), 
+            data, HTTP_HOST=self.HTTP_HOST)
         # Should not redirect as not allowed to login
         self.assertEquals(response.status_code, 302)
-        self.assertEquals(response.url, '%s%s%s' % (self.PROTOCOL, self.HTTP_HOST, reverse("my_account")))
+        self.assertEquals(response.url, '%s%s%s' % \
+            (   
+                self.PROTOCOL, 
+                self.HTTP_HOST, 
+                reverse("account-public:dashboard"))
+            )
         

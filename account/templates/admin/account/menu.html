@@ -1,4 +1,4 @@
-{% load i18n %}<div class="menu menu--open" id="menu">
+{% load i18n account_tags %}<div class="menu menu--open" id="menu">
     <div class="menu__list">
         <a href="{% url 'account-admin:dashboard' %}" class="[ menu__item ] [ menu-item menu-item--header ]">
             {{SITE_NAME}}
@@ -26,7 +26,7 @@
         </a>
         {% endif %}
 
-        {% include "admin/cms/includes/menu.html" %}
+        {% menu %}
         
         <div class="menu__section-header">
             {% trans "Profile" %}

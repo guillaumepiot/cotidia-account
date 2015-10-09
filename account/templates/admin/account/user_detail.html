@@ -19,11 +19,32 @@
 <div class="[ content__inner ] [ box box--padded box--bordered ]">
 	<fieldset>
 		<legend>{% trans "Contact details" %}</legend>
-		<p>{{object.first_name}} {{object.last_name}}</p>
-		<p><a href="mailto:{{object.email}}">{{object.email}}</a></p>
+		<div class="grid">
+			<div class="grid__span-2">
+				<span class="form__label--inline">
+					{% trans "Full name" %}
+				</span>
+			</div>
+			<div class="grid__span-8">
+				<div class="form__control">
+					<p>{{object.first_name}} {{object.last_name}}</p>
+				</div>
+			</div>	
+		</div>
+		<div class="grid">
+			<div class="grid__span-2">
+				<span class="form__label--inline">
+					{% trans "Email" %}
+				</span>
+			</div>
+			<div class="grid__span-8">
+				<div class="form__control">
+					<p><a href="mailto:{{object.email}}">{{object.email}}</a></p>
+				</div>
+			</div>	
+		</div>
 	</fieldset>
 </div>
-
 <div class="[ content__inner ] [ box box--padded box--bordered ]">
 	<fieldset>
 		<legend>{% trans "Role & Permissions" %}</legend>

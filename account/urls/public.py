@@ -39,7 +39,7 @@ urlpatterns = patterns(
         {'template_name': 'account/password_change_form.html',
             'post_change_redirect': 'account-public:password_change_done',
             'password_change_form': AccountPasswordChangeForm},
-        name='account_password_change',
+        name='password_change',
     ),
     url(
         r'^password/change/done/$',

@@ -71,3 +71,9 @@ In your `models.py` file, create your own `User` class:
     class User(BaseUser):
         # My fields
         #...
+
+        class Meta:
+            abstract = True
+            db_table = 'account_user'
+
+The model must be an abstract, and the table name set as account_user.
