@@ -12,12 +12,12 @@ from django.template import RequestContext
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.views import login
 from django.http import HttpResponseRedirect 
+from django.conf import settings
 
 from account.models import User
 from account.user_forms import UserAddForm, UserUpdateForm, GroupForm, ProfileForm, UserChangePassword
-from account.utils import StaffPermissionRequiredMixin
+from account.utils import StaffPermissionRequiredMixin, import_model
 from account import settings as account_settings
-
 
 #########
 # Login #
@@ -102,6 +102,15 @@ class UserCreate(StaffPermissionRequiredMixin, CreateView):
         messages.success(self.request, _('User has been created.'))
         return reverse('account-admin:user_list')
 
+    def get_form_class(self):
+        if hasattr(settings, 'ACCOUNT_USER_ADD_FORM'):
+            form_class = import_model(settings.ACCOUNT_USER_ADD_FORM, "UserAddForm")
+        else:
+            form_class = UserAddForm
+
+        return form_class
+
+
 class UserUpdate(StaffPermissionRequiredMixin, UpdateView):
     model = User
     form_class = UserUpdateForm
@@ -112,6 +121,12 @@ class UserUpdate(StaffPermissionRequiredMixin, UpdateView):
     def get_success_url(self):
         messages.success(self.request, _('User details have been updated.'))
         return reverse('account-admin:user_list')
+
+    def get_form_class(self):
+        if hasattr(settings, 'ACCOUNT_USER_UPDATE_FORM'):
+            return import_model(settings.ACCOUNT_USER_UPDATE_FORM, "UserUpdateForm")
+        else:
+            return UserUpdateForm
 
 class UserDelete(StaffPermissionRequiredMixin, DeleteView):
     model = User

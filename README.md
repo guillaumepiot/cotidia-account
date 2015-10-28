@@ -77,3 +77,24 @@ In your `models.py` file, create your own `User` class:
             db_table = 'account_user'
 
 The model must be an abstract, and the table name set as account_user.
+
+## Add items to the menu
+
+You will need to register your app menu to the account menu. The register 
+function requires the menu name and template url.
+
+    from account.menu import menu
+    menu.register("my_menu", "path/to/menu.html")
+
+Example menu (do not forget access permissions):
+
+    {% load i18n %}
+    <div class="menu__section-header">
+        {% trans "Menu header" %}
+    </div>
+    {% if perms.app.change_model %}
+    <a href="{% url 'admin:path_to_view' %}" class="[ menu__item ] [ menu-item ]">
+        <span class="menu-item__icon fa fa-list"></span>
+        <span class="menu-item__text">{% trans "My menu" %}</span>
+    </a>
+    {% endif %}

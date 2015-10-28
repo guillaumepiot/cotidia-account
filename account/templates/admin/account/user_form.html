@@ -17,6 +17,8 @@
 		<a href="{% url 'account-admin:user_list' %}">{% trans "Users" %}</a>  
 		&nbsp;<span class="fa fa-angle-right"></span>&nbsp;
 		{% if object %}
+			<a href="{% url 'account-admin:user_detail' object.uuid %}">{{object}}</a>  
+			&nbsp;<span class="fa fa-angle-right"></span>&nbsp;
 			{% trans "Edit User" %}
 		{% else %}
 			{% trans "Add a User" %}

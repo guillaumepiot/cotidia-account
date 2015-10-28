@@ -1,14 +1,16 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
-from form_utils.forms import BetterModelForm
-
-from account.models import User
+from django.conf import settings
 from django.contrib.auth.models import Group, Permission
 from django.contrib.auth.forms import ( 
     UserCreationForm, UserChangeForm, ReadOnlyPasswordHashField, AdminPasswordChangeForm
     )
 
-class UserForm(forms.Form):
+from form_utils.forms import BetterModelForm
+
+from account.models import User
+
+class UserForm(forms.ModelForm):
 
     username = forms.CharField(
         label='', 
@@ -46,6 +48,10 @@ class UserForm(forms.Form):
         queryset=Permission.objects.all(),
         required=False)
 
+    class Meta:
+        model = User
+        exclude = []
+
 class UserAddForm(UserForm, UserCreationForm):
 
     password1 = forms.CharField(label='',
@@ -59,7 +65,6 @@ class UserAddForm(UserForm, UserCreationForm):
         model = User
         exclude = ('password', 'date_joined', 'last_login')
 
-
 class UserUpdateForm(UserForm, UserChangeForm):
 
     password = ReadOnlyPasswordHashField(label='',
@@ -69,6 +74,7 @@ class UserUpdateForm(UserForm, UserChangeForm):
     class Meta:
         model = User
         exclude = ('date_joined', 'last_login')
+
 
 class GroupForm(forms.ModelForm):
 
