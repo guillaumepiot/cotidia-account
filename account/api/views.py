@@ -9,6 +9,7 @@ from django.contrib.auth.models import Group
 from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth import authenticate, login as auth_login
 
 from rest_framework import status, generics
 from rest_framework import permissions
@@ -91,6 +92,8 @@ class SignUp(APIView):
 
             data = UserSerializer(user).data
 
+            auth_login(request, user)
+
             return Response(data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -110,9 +113,13 @@ class SignIn(APIView):
     @transaction.atomic
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
-        
+
         if serializer.is_valid():
-            return Response(serializer.data)
+            print serializer.data
+            user = authenticate(username=serializer.data['email'], password=serializer.data['password'])
+            data = UserSerializer(user).data
+            auth_login(request, user)
+            return Response(data)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

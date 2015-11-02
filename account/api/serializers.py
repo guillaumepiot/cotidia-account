@@ -20,7 +20,7 @@ class SignUpSerializer(serializers.Serializer):
         'required': _("Please enter a password."), 
         'invalid': _("This password is not valid.")
         })
-    
+
     def validate_email(self, value):
         email = value
 
@@ -94,3 +94,4 @@ class AuthenticateTokenSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
+        fields=['email', 'first_name', 'last_name']
