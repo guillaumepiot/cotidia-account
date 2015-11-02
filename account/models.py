@@ -21,8 +21,7 @@ class BaseUser(AbstractUser):
     class Meta:
         abstract = True
 
-
-if settings.AUTH_USER_MODEL:
+if hasattr(settings, 'ACCOUNT_USER_MODEL'):
 
     cls = import_model(settings.ACCOUNT_USER_MODEL, "User")
 
