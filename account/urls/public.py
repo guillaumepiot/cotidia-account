@@ -13,7 +13,7 @@ from account.forms import (
     AccountPasswordResetForm, 
     AccountSetPasswordForm, 
     AccountPasswordChangeForm)
-from account.views import dashboard, login_remember_me, edit, sign_up
+from account.views.public import dashboard, login_remember_me, edit, sign_up, activate
 
 urlpatterns = patterns(
     '',
@@ -26,6 +26,12 @@ urlpatterns = patterns(
         {'template_name': 'account/login.html',
          'authentication_form': EmailAuthenticationForm, },
         name='login',
+    ),
+    url(
+        r'^activate/(?P<uuid>[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/(?P<token>.+)/$',
+        activate,
+        {'template_name': 'account/activate.html'},
+        name='activate',
     ),
     url(
         r'^logout/$',

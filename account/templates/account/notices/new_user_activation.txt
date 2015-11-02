@@ -1,0 +1,7 @@
+{% load i18n %}{% blocktrans %}Thank you for signing up.{% endblocktrans %}
+
+{% trans "Please click or follow the URL below to confirm your registration." %}
+
+{{url}}
+
+{% trans "Your account will remain active for 30 days without confirmation." %}

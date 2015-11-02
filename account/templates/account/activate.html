@@ -1,0 +1,32 @@
+{% extends "admin/account/base.html" %}
+{% load url from future %}
+{% load i18n %}
+
+{% block title %}{% trans "Activate" %}{% endblock %}
+
+{% block main %}
+<div class="modal modal--open">
+    <div class="modal__wrapper">
+        <div class="modal__content modal__content--small">
+            <div class="modal__header">
+                <h3>{{SITE_NAME}}</h3>
+            </div>
+            <div class="modal__body">
+                <h4>{% trans "Activate" %}</h4>
+                {% if user.is_active %}
+                    <p>{% trans "Congratulations, you account has now been activated." %}</p>
+                {% else %}
+                    <p>{% trans "Sorry, your account could not be activated." %}</p>
+                {% endif %}
+            </div>
+            <div class="modal__footer">
+                {% if user.is_active %}
+                <a href="btn btn--primary btn--full-width">
+                    {% trans "Login" %}
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

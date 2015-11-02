@@ -1,4 +1,5 @@
 import hashlib
+
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect  
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import RequestContext              
@@ -6,6 +7,7 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.decorators import permission_required, login_required
 from django.contrib.auth.views import login
+from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib import messages
 
@@ -75,4 +77,21 @@ def sign_up(request):
                 return HttpResponseRedirect(reverse('account-public:dashboard'))
 
     return render_to_response(template, {'form': form, 'success_url':success_url },
+        context_instance=RequestContext(request))
+
+
+############
+# Activate #
+############
+
+def activate(request, uuid, token, template_name):
+
+    user = get_object_or_404(User, uuid=uuid)
+
+    if default_token_generator.check_token(user, token):
+        # Activate now
+        user.is_active = True
+        user.save()
+
+    return render_to_response(template_name, {},
         context_instance=RequestContext(request))

@@ -9,7 +9,7 @@ from django.conf.urls import url, patterns
 from django.contrib.auth import views as auth_views
 
 from account.forms import EmailAuthenticationForm, AccountPasswordResetForm, AccountSetPasswordForm, AccountPasswordChangeForm
-from account.user_views import *
+from account.views.admin import *
 
 urlpatterns = patterns(
     '',

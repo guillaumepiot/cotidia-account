@@ -3,10 +3,11 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.contrib.auth.models import Group, Permission
 from django.contrib.auth.forms import ( 
-    UserCreationForm, UserChangeForm, ReadOnlyPasswordHashField, AdminPasswordChangeForm
+    UserCreationForm, 
+    UserChangeForm, 
+    ReadOnlyPasswordHashField, 
+    AdminPasswordChangeForm
     )
-
-from form_utils.forms import BetterModelForm
 
 from account.models import User
 

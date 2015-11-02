@@ -110,7 +110,6 @@ class UserCreate(StaffPermissionRequiredMixin, CreateView):
 
         return form_class
 
-
 class UserUpdate(StaffPermissionRequiredMixin, UpdateView):
     model = User
     form_class = UserUpdateForm
@@ -204,7 +203,6 @@ class GroupDelete(StaffPermissionRequiredMixin, DeleteView):
     def get_success_url(self):
         messages.success(self.request, _('Role has been deleted.'))
         return reverse('account-admin:group_list')
-
 
 ########
 # Docs #
