@@ -31,6 +31,8 @@ class StaffPermissionRequiredMixin(UserCheckMixin):
     # The user must be staff and have the required permissions
     #
     def check_user(self, user):
+        if user.is_superuser:
+            return True
         return user.is_staff and user.has_perm(self.permission_required)
 
 #
