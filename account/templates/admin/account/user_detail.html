@@ -117,14 +117,23 @@
 
 <div class="content__inner">
 	{% if perms.account.delete_user %}
-	<a href="{% url 'account-admin:user_delete' object.uuid %}" class="btn btn--delete btn--transparent pull-right">
-		{% trans "Delete User" %}
-	</a>
+		{% if not request.user.is_superuser and object.is_superuser %}
+			{# Non superuser can't delete superusers #}
+		{% else %}
+			<a href="{% url 'account-admin:user_delete' object.uuid %}" class="btn btn--delete btn--transparent pull-right">
+				{% trans "Delete User" %}
+			</a>
+		{% endif %}
 	{% endif %}
 	{% if perms.account.change_user %}
-	<a href="{% url 'account-admin:user_update' object.uuid %}" class="btn btn--change">
-		{% trans "Edit User" %}
-	</a>
+	
+	{% if not request.user.is_superuser and object.is_superuser %}
+			{# Non superuser can't update superusers #}
+		{% else %}
+			<a href="{% url 'account-admin:user_update' object.uuid %}" class="btn btn--change">
+				{% trans "Edit User" %}
+			</a>
+		{% endif %}
 	{% endif %}
 </div>		
 {% endblock content %}

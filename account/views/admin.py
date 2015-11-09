@@ -117,6 +117,12 @@ class UserUpdate(StaffPermissionRequiredMixin, UpdateView):
     template_name = 'admin/account/user_form.html'
     permission_required = 'account.change_user'
 
+    def check_user(self, user):
+        if not user.is_superuser and self.get_object().is_superuser:
+            return False
+        else:
+            return True
+
     def get_success_url(self):
         messages.success(self.request, _('User details have been updated.'))
         return reverse('account-admin:user_list')
@@ -134,6 +140,12 @@ class UserDelete(StaffPermissionRequiredMixin, DeleteView):
     permission_required = 'account.delete_user'
     template_name = 'admin/account/user_confirm_delete.html'
 
+    def check_user(self, user):
+        if not user.is_superuser and self.get_object().is_superuser:
+            return False
+        else:
+            return True
+            
     def get_success_url(self):
         messages.success(self.request, _('User has been deleted.'))
         return reverse('account-admin:user_list')

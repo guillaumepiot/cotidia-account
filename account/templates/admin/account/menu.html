@@ -14,18 +14,22 @@
 
         {% render_menu %}
 
-        {% if request.user.is_superuser %}
+        {% if perms.account.add_user or perms.account.change_user or perms.auth.change_group or perms.auth.add_group %}
         <div class="menu__section-header">
             {% trans "Administration" %}
         </div>
+        {% if perms.account.add_user or perms.account.change_user %}
         <a href="{% url 'account-admin:user_list' %}" class="[ menu__item ] [ menu-item ]">
             <span class="menu-item__icon fa fa-user"></span>
             <span class="menu-item__text">Users</span>
         </a>
+        {% endif %}
+        {% if perms.auth.add_group or perms.auth.change_group %}
         <a href="{% url 'account-admin:group_list' %}" class="[ menu__item ] [ menu-item ]">
             <span class="menu-item__icon fa fa-cog"></span>
             <span class="menu-item__text">Roles</span>
         </a>
+        {% endif %}
         {% endif %}
         
         <div class="menu__section-header">
