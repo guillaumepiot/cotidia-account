@@ -15,7 +15,7 @@ installed.
     $ pip install -e git+git@bitbucket.org:guillaumepiot/cotidia-account.git#egg=account
 
 
-## Settings
+## Settings   
 
 Add 'account' to your INSTALLED_APPS:
 

@@ -13,6 +13,7 @@ from django.contrib import messages
 
 from account.forms import UpdateDetailsForm, AccountUserCreationForm
 from account.models import User
+from account.utils import send_activation_email
 
 @login_required
 def dashboard(request):
@@ -56,9 +57,7 @@ def sign_up(request):
     if request.method == "POST":
         form = AccountUserCreationForm(request.POST)
         if form.is_valid():
-            user = User(
-                email=form.cleaned_data["email"],
-                is_active=True)
+            user = User(email=form.cleaned_data["email"])
             user.set_password(form.cleaned_data["password1"])
             # Hash the email address to generate a unique username
             m = hashlib.md5()
@@ -69,6 +68,9 @@ def sign_up(request):
             # Log the user straight away
             new_user = authenticate(username=user.username, password=form.cleaned_data['password1'])
             auth_login(request, new_user)
+
+            # Create and send the confirmation email
+            send_activation_email(user)
 
             messages.success(request, _('Your have successfully signed up'))
             if success_url:
@@ -88,10 +90,15 @@ def activate(request, uuid, token, template_name):
 
     user = get_object_or_404(User, uuid=uuid)
 
+    print default_token_generator.check_token(user, token)
+
+    #
+    # Use PASSWORD_RESET_TIMEOUT_DAYS to set the confirmation date limit
+    #
     if default_token_generator.check_token(user, token):
         # Activate now
         user.is_active = True
         user.save()
 
-    return render_to_response(template_name, {},
+    return render_to_response(template_name, {'user': user},
         context_instance=RequestContext(request))

@@ -8,16 +8,16 @@ from .validators import is_alpha
 
 class SignUpSerializer(serializers.Serializer):
     full_name = serializers.CharField(max_length=100, min_length=2, error_messages={
-        'required': _("Please enter your full name."), 
+        'blank': _("Please enter your full name."), 
         'invalid': _("The full name is not valid.")
         })
     email = serializers.EmailField(error_messages={
-        'required': _("Please enter your email."), 
+        'blank': _("Please enter your email."), 
         'unique': _("This email is already used."), 
         'invalid': _("This email address is not valid.")
         })
     password = serializers.CharField(error_messages={
-        'required': _("Please enter a password."), 
+        'blank': _("Please enter a password."), 
         'invalid': _("This password is not valid.")
         })
 
@@ -52,14 +52,15 @@ class SignUpSerializer(serializers.Serializer):
 
 class SignInTokenSerializer(serializers.Serializer):
     email = serializers.EmailField(error_messages={
-        'required': _("Please enter your email."), 
+        'blank': _("Please enter your email."), 
         'unique': _("This email is already used."), 
         'invalid': _("This email address is not valid.")
         })
     password = serializers.CharField(error_messages={
-        'required': _("Please enter a password."), 
+        'blank': _("Please enter a password."), 
         'invalid': _("This password is not valid.")
         })
+    remember_me = serializers.CharField(required=False)
 
     def validate_password(self, value):
 

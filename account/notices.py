@@ -7,9 +7,9 @@ class NewUserActivationNotice(Notice):
 	identifier = 'new-user-activation'
 	html_template = 'account/notices/new_user_activation.html'
 	text_template = 'account/notices/new_user_activation.txt'
-	subject = u'%s' % _('Welcome to Cyan')
+	subject = u'%s' % _('Sign up confirmation')
 
-	context = {
+	default_context = {
 		'url':"url", 
 		'firstname': "Guillaume"
 		}
@@ -21,7 +21,7 @@ class ResetPasswordNotice(Notice):
 	text_template = 'account/notices/reset_password.txt'
 	subject = u'%s' % _('Password reset')
 
-	context = {
+	default_context = {
 		'url':"url", 
 		'firstname': "Guillaume",
 		}

@@ -8,7 +8,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import Group
 from django.core.urlresolvers import reverse
 from django.db import transaction
-from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import authenticate, login as auth_login
 
 from rest_framework import status, generics
@@ -24,8 +23,8 @@ from account.api.serializers import (
     AuthenticateTokenSerializer, 
     UserSerializer
     )
-from account.notices import NewUserActivationNotice
 from account.models import User
+from account.utils import send_activation_email
 
 
 class SignUp(APIView):
@@ -76,23 +75,9 @@ class SignUp(APIView):
 
 
             # Create and send the confirmation email
-            token = default_token_generator.make_token(user)
-            url = reverse('account-public:activate', kwargs={
-                'uuid':user.uuid,
-                'token':token
-                })
-            notice = NewUserActivationNotice(
-                recipients = ['%s <%s>' % (user.get_full_name(), user.email) ],
-                context = {
-                    'url':url,
-                    'first_name':user.first_name
-                }
-            )
-            notice.send(force_now=True)
+            send_activation_email(user)
 
             data = UserSerializer(user).data
-
-            auth_login(request, user)
 
             return Response(data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -115,7 +100,10 @@ class SignIn(APIView):
         serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid():
-            print serializer.data
+
+            if not serializer.data.get('remember_me'):
+                self.request.session.set_expiry(0)
+
             user = authenticate(username=serializer.data['email'], password=serializer.data['password'])
             data = UserSerializer(user).data
             auth_login(request, user)
