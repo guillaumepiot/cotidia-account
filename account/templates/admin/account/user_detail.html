@@ -4,6 +4,15 @@
 {% endblock title %}
 
 {% block toolbar %}
+	{% if not request.user.is_superuser and object.is_superuser %}
+		{# Non superuser can't update superusers #}
+	{% else %}
+		<a href="{% url 'account-admin:user_update' object.uuid %}"
+			class="[ toolbar__item ] [ btn btn--change btn--small pull-right ]">
+			<span class="fa fa-pencil"></span>
+			{% trans "Edit User" %}
+		</a>
+	{% endif %}
 	<span class="toolbar__title">{% trans "Users" %}</span>
 {% endblock toolbar %}
 

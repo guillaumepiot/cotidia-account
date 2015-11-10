@@ -48,22 +48,28 @@ urlpatterns = patterns(
         r'^password/reset/$',
         auth_views.password_reset,
         {'template_name': 'admin/account/password_reset_form.html',
+            'post_reset_redirect': 'account-admin:password_reset_done',
             'password_reset_form':AccountPasswordResetForm,
-            'email_template_name':'account/password_reset_email.html',
-            'subject_template_name':'account/password_reset_subject.txt',},
+            'email_template_name':'admin/account/password_reset_email.html',
+            'subject_template_name':'admin/account/password_reset_subject.txt',},
         name='password_reset',
     ),
     url(
         r'^password/reset/confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$',
         auth_views.password_reset_confirm,
-        {'template_name': 'admin/account/password_reset_confirm.html',
-            'set_password_form':AccountSetPasswordForm},
+        {   
+            'template_name': 'admin/account/password_reset_confirm.html',
+            'set_password_form':AccountSetPasswordForm,
+            'post_reset_redirect': 'account-admin:password_reset_complete'
+        },
         name='password_reset_confirm',
     ),
     url(
         r'^password/reset/complete/$',
         auth_views.password_reset_complete,
-        {'template_name': 'admin/account/password_reset_complete.html'},  # NOQA
+        {
+            'template_name': 'admin/account/password_reset_complete.html',
+        },
         name='password_reset_complete',
     ),
     url(
