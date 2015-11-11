@@ -90,8 +90,6 @@ def activate(request, uuid, token, template_name):
 
     user = get_object_or_404(User, uuid=uuid)
 
-    print default_token_generator.check_token(user, token)
-
     #
     # Use PASSWORD_RESET_TIMEOUT_DAYS to set the confirmation date limit
     #
