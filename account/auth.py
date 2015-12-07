@@ -7,8 +7,7 @@ Inspired by http://djangosnippets.org/snippets/2463/
 from django.contrib.auth.backends import ModelBackend
 from django.conf import settings
 from django.core.validators import validate_email
-from django.db.models.loading import get_model
-
+from django.apps import apps
 
 class EmailBackend(ModelBackend):
     """
@@ -23,7 +22,7 @@ class EmailBackend(ModelBackend):
     def authenticate(self, username=None, password=None):
 
         app_label, model_name = settings.AUTH_USER_MODEL.split('.')
-        User = get_model(app_label, model_name)
+        User = apps.get_model(app_label, model_name)
 
         try:
             validate_email(username)
@@ -48,7 +47,7 @@ class EmailBackend(ModelBackend):
 
     def get_user(self, user_id):
         app_label, model_name = settings.AUTH_USER_MODEL.split('.')
-        User = get_model(app_label, model_name)
+        User = apps.get_model(app_label, model_name)
         try:
             return User.objects.get(pk=user_id)
         except User.DoesNotExist:

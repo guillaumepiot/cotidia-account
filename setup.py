@@ -14,7 +14,7 @@ CLASSIFIERS = [
 ]
 
 install_requires = [
-    'Django==1.8.4',
+    'Django==1.9',
     'django-form-utils==1.0.3',
     'djangorestframework'
 ]
