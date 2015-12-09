@@ -5,14 +5,13 @@ This is done for convenience. It allows us to save all registration and auth
 related templates in the same `/templates/registration/` folder.
 
 """
-from django.conf.urls import url, patterns
+from django.conf.urls import url
 from django.contrib.auth import views as auth_views
 
 from account.forms import EmailAuthenticationForm, AccountPasswordResetForm, AccountSetPasswordForm, AccountPasswordChangeForm
 from account.views.admin import *
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(r'^$', dashboard, name="dashboard"),
     url(r'profile/edit/$', edit, name="edit"),
     url(
@@ -93,5 +92,4 @@ urlpatterns = patterns(
     url(r'^role/(?P<pk>[\d]+)/delete/$', GroupDelete.as_view(), name='group_delete'),
 
     url(r'^docs/$', docs, name='docs'),
-
-)
+]

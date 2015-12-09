@@ -5,7 +5,7 @@ This is done for convenience. It allows us to save all registration and auth
 related templates in the same `/templates/registration/` folder.
 
 """
-from django.conf.urls import url, patterns
+from django.conf.urls import url
 from django.contrib.auth import views as auth_views
 
 from account.forms import (
@@ -15,8 +15,7 @@ from account.forms import (
     AccountPasswordChangeForm)
 from account.views.public import dashboard, login_remember_me, edit, sign_up, activate
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(r'^$', dashboard, name="dashboard"),
     url(r'^edit/$', edit, name="edit"),
     url(r'^sign-up/$', sign_up, name='sign-up',),
@@ -85,4 +84,4 @@ urlpatterns = patterns(
         {'template_name': 'account/password_reset_done.html'},
         name='password_reset_done',
     ),
-)
+]
