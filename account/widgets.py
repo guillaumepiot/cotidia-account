@@ -45,7 +45,7 @@ class SelectDateWidget(Widget):
             year_val, month_val, day_val = value.year, value.month, value.day
         except AttributeError:
             year_val = month_val = day_val = None
-            if isinstance(value, basestring):
+            if isinstance(value, str):
                 match = RE_DATE.match(value)
                 if match:
                     year_val, month_val, day_val = [int(v) for v in match.groups()]
@@ -143,7 +143,7 @@ class SelectTimeWidget(Widget):
             hour_val, minute_val = value.hour, value.minute
         except AttributeError:
             hour_val = minute_val = None
-            if isinstance(value, basestring):
+            if isinstance(value, str):
                 match = RE_TIME.match(value)
                 if match:
                     hour_val, minute_val = [v for v in match.groups()]
@@ -235,7 +235,7 @@ class SelectDateTimeWidget(Widget):
             year_val, month_val, day_val, hour_val, minute_val = value.year, value.month, value.day, value.hour, value.minute
         except AttributeError:
             year_val = month_val = day_val = hour_val = minute_val = None
-            if isinstance(value, basestring):
+            if isinstance(value, str):
                 match = RE_DATE.match(value)
                 if match:
                     year_val, month_val, day_val, hour_val, minute_val = [int(v) for v in match.groups()]
