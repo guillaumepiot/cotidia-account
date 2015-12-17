@@ -1,6 +1,6 @@
 from django import template
 from django.utils.translation import get_language
-from django.template import loader, Context
+from django.template import loader
 from django.utils.safestring import mark_safe
 
 register = template.Library()
@@ -15,6 +15,8 @@ def render_menu(context):
     rendered = ""
     for template in menu.items():
         t = loader.get_template(template)
-        c = Context(context)
-        rendered += t.render(c)
+        rendered += t.render({
+        	'perms': context['perms']
+        	},
+        	context['request'])
     return mark_safe(rendered)
