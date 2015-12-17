@@ -131,7 +131,7 @@ class SelectTimeWidget(Widget):
         self.required = required
 
     def format_time_value(self, value):
-        if value < 10:
+        if int(value) < 10:
             return '0%s' % value
         else:
             return '%s' % value
