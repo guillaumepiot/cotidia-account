@@ -17,7 +17,6 @@ install_requires = [
     'Django==1.9',
     'django-form-utils==1.0.3',
     'djangorestframework',
-    '-e git+https://guillaumepiot@bitbucket.org/guillaumepiot/cotimail.git#egg=cotimail'
 ]
 
 # taken from django-registration
