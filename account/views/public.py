@@ -61,7 +61,7 @@ def sign_up(request):
             user.set_password(form.cleaned_data["password1"])
             # Hash the email address to generate a unique username
             m = hashlib.md5()
-            m.update(form.cleaned_data["email"])
+            m.update(form.cleaned_data["email"].encode('utf-8'))
             user.username = m.hexdigest()[0:30]
             user.save()
 

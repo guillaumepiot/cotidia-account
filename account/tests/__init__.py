@@ -1,2 +1,1 @@
-from signup import *
-from manage_details import *
+from .signup import *

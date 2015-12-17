@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse_lazy
 from django.shortcuts import redirect
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
+from django.apps import apps
 
 from account import settings as account_settings
 
@@ -49,22 +50,20 @@ def import_model(name, clsName):
 # Send the user activation email
 #
 def send_activation_email(user):
-    from django.contrib.sites.models import Site
     from django.contrib.auth.tokens import default_token_generator
     from account.notices import NewUserActivationNotice
+
     token = default_token_generator.make_token(user)
     url = reverse('account-public:activate', kwargs={
         'uuid':user.uuid,
         'token':token
         })
 
-    current_site = Site.objects.get(id=settings.SITE_ID)
-    domain = current_site.domain
 
     notice = NewUserActivationNotice(
         recipients = ['%s <%s>' % (user.get_full_name(), user.email) ],
         context = {
-            'url':"%s%s" % (domain, url),
+            'url':"%s%s" % (settings.SITE_URL, url),
             'first_name':user.first_name
         }
     )
