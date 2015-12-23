@@ -14,6 +14,10 @@ installed.
 
     $ pip install -e git+git@bitbucket.org:guillaumepiot/cotidia-account.git#egg=account
 
+Make your migrations (project basis):
+
+    $ python manage.py makemigrations account
+
 
 ## Settings   
 
