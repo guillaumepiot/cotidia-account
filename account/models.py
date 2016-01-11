@@ -24,7 +24,7 @@ class User(AbstractUser):
         abstract = True
 
 
-def build_user_model(user_model_definition):
+def build_user_model(user_model_definition=None):
     """ 
     Create a custom (dynamic) model class based on the given definition.
     """
@@ -39,13 +39,14 @@ def build_user_model(user_model_definition):
     
     attrs['Meta'] = Meta
 
-    # All of that was just getting the class ready, here is the magic
-    # Build your model by adding django database Field subclasses to the attrs dict
-    # What this looks like depends on how you store the users's definitions
-    # For now, I'll just make them all CharFields
-    for field in user_model_definition.__dict__.keys():
-        if not field.startswith('__'):
-            attrs[field] = getattr(user_model_definition, field)
+    if user_model_definition:
+        # All of that was just getting the class ready, here is the magic
+        # Build your model by adding django database Field subclasses to the attrs dict
+        # What this looks like depends on how you store the users's definitions
+        # For now, I'll just make them all CharFields
+        for field in user_model_definition.__dict__.keys():
+            if not field.startswith('__'):
+                attrs[field] = getattr(user_model_definition, field)
 
 
     # Create the new model class
@@ -60,4 +61,4 @@ if hasattr(settings, 'ACCOUNT_USER_MODEL'):
     CustomUser = import_model(settings.ACCOUNT_USER_MODEL, "User")
     User = build_user_model(CustomUser)
 else:
-    User = build_user_model({})
+    User = build_user_model()
