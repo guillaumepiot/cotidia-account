@@ -4,13 +4,28 @@
 {% endblock title %}
 
 {% block toolbar %}
+	{% if perms.account.add_user %}
+    <a href="{% url 'account-admin:user_add' %}"
+        class="[ toolbar__item ] [ btn btn--create btn--small pull-right ]">
+        <span class="fa fa-plus"></span> {% trans "Add a User" %}
+    </a>
+    {% endif %}
 	<span class="toolbar__title">{% trans "Users" %}</span>
 {% endblock toolbar %}
 
 {% block content %}
 <div class="grid grid--collapse">
-	<div class="grid__span-9">
+	<div class="grid__span-12">
 		<div class="content__inner">
+			<form action="" method="get" class="user-search-form">
+                <div class="form__control form__control--text">
+                    <input type="text" name="query" class="form__text" 
+                        value="{% if search_query %}{{search_query}}{% endif %}">
+                    <button type="submit" class="btn btn--transparent">
+                        <span class="fa fa-search"></span>
+                    </button>
+                </div>
+            </form>
 			<table class="table table--clickable">
 				<tr class="table-row">
 					<th class="table-head-cell">{% trans "Name" %}</th>
@@ -50,15 +65,7 @@
 				</tr>
 				{% endfor %}
 			</table>
-		</div>
-	</div>
-	<div class="grid__span-3">
-		<div class="content__inner box box--padded box--bordered">
-			{% if perms.account.add_user %}
-			<p>
-				<a href="{% url 'account-admin:user_add' %}"><span class="fa fa-plus"></span> {% trans "Add a User" %}</a>
-			</p>
-			{% endif %}
+			{% include 'admin/includes/pagination.html' %}
 		</div>
 	</div>
 </div>

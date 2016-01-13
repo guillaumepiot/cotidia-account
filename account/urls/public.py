@@ -13,7 +13,13 @@ from account.forms import (
     AccountPasswordResetForm, 
     AccountSetPasswordForm, 
     AccountPasswordChangeForm)
-from account.views.public import dashboard, login_remember_me, edit, sign_up, activate
+from account.views.public import (
+    dashboard, 
+    login_remember_me, 
+    edit, 
+    sign_up, 
+    activate, 
+    activation_pending)
 
 urlpatterns = [
     url(r'^$', dashboard, name="dashboard"),
@@ -32,6 +38,11 @@ urlpatterns = [
         {'template_name': 'account/activate.html'},
         name='activate',
     ),
+    url(
+        r'^activation-pending/$', 
+        activation_pending, 
+        {'template_name': 'account/activation-pending.html'}, 
+        name="activation-pending"),
     url(
         r'^logout/$',
         auth_views.logout,

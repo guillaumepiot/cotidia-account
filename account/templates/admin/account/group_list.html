@@ -4,12 +4,18 @@
 {% endblock title %}
 
 {% block toolbar %}
+	{% if perms.auth.add_group %}
+    <a href="{% url 'account-admin:group_add' %}"
+        class="[ toolbar__item ] [ btn btn--create btn--small pull-right ]">
+        <span class="fa fa-plus"></span> {% trans "Add a Role" %}
+    </a>
+    {% endif %}
 	<span class="toolbar__title">{% trans "Roles" %}</span>
 {% endblock toolbar %}
 
 {% block content %}
 <div class="grid grid--collapse">
-	<div class="grid__span-9">
+	<div class="grid__span-12">
 		<div class="content__inner">
 			<table class="table  table--clickable">
 				<tr class="table-row">
@@ -32,18 +38,6 @@
 				</tr>
 				{% endfor %}
 			</table>
-		</div>
-	</div>
-	<div class="grid__span-3">
-		<div class="content__inner box box--padded box--bordered">
-			{% if perms.auth.add_group %}
-			<p>
-				<a href="{% url 'account-admin:group_add' %}">
-					<span class="fa fa-plus"></span> 
-					{% trans "Add a Role" %}
-				</a>
-			</p>
-			{% endif %}
 		</div>
 	</div>
 </div>

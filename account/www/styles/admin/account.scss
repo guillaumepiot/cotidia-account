@@ -1,0 +1,24 @@
+.user-search-form{
+    position: relative;
+    margin-bottom: calc-em($vertical_padding);
+    button{
+        background-color: transparent;
+        border-color: transparent;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        position: absolute;
+        left: 0;
+        top: 0;
+        &:hover{
+            border-color: transparent;
+        }
+    }
+    .form__text{
+        padding-left: 3.5em;
+        &:focus, *:focus {
+            outline: none;
+            box-shadow: none;
+            border: 1px solid $input_border_color;
+        }
+    }
+}

@@ -14,6 +14,7 @@ from django.contrib import messages
 from account.forms import UpdateDetailsForm, AccountUserCreationForm
 from account.models import User
 from account.utils import send_activation_email
+from account.settings import ACCOUNT_FORCE_ACTIVATION
 
 @login_required
 def dashboard(request):
@@ -65,15 +66,22 @@ def sign_up(request):
             user.username = m.hexdigest()[0:30]
             user.save()
 
-            # Log the user straight away
-            new_user = authenticate(username=user.username, password=form.cleaned_data['password1'])
-            auth_login(request, new_user)
+            if ACCOUNT_FORCE_ACTIVATION:
+                user.is_active = False
+                user.save()
+            else:
+                # Log the user straight away
+                new_user = authenticate(username=user.username, password=form.cleaned_data['password1'])
+                auth_login(request, new_user)
 
             # Create and send the confirmation email
             send_activation_email(user)
 
             messages.success(request, _('Your have successfully signed up'))
-            if success_url:
+            
+            if ACCOUNT_FORCE_ACTIVATION:
+                return HttpResponseRedirect(reverse('account-public:activation-pending'))
+            elif success_url:
                 return HttpResponseRedirect(success_url)
             else:
                 return HttpResponseRedirect(reverse('account-public:dashboard'))
@@ -99,4 +107,11 @@ def activate(request, uuid, token, template_name):
         user.save()
 
     return render_to_response(template_name, {'user': user},
+        context_instance=RequestContext(request))
+
+def activation_pending(request, template_name):
+    if request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('account-public:dashboard'))
+
+    return render_to_response(template_name, {},
         context_instance=RequestContext(request))

@@ -38,9 +38,18 @@ Specify the following settings:
     )
 
 By default, the login urls for the admin and the public side are set as follows:
+    
+    LOGIN_REDIRECT_URL = '/account'
+    LOGIN_URL = '/account/login/'
+    LOGOUT_URL = '/account/logout/'
 
     ADMIN_LOGIN_URL = '/admin/login/'
     PUBLIC_LOGIN_URL = '/account/login/'
+
+Force the user to activate their account via email before being allowed to login.
+`False` by default.
+
+    ACCOUNT_FORCE_ACTIVATION = False
 
 Those settings can be overridden in `settings.py` if required.
 
@@ -52,12 +61,15 @@ There's two set of urls, one for the admin management of users, role and dashboa
 - `public.py` defines all the views for customer sign up, sign in and profile management
 
 Each set can be loaded independently, under their own urls, for example:
+    
+    from account.views.admin import dashboard
 
     urlpatterns = [
         url(r'^admin/account/', include('account.urls.admin', 
             namespace="account-admin")),
         url(r'^account/', include('account.urls.public', 
             namespace="account-public")),
+        url(r'^admin/$', dashboard, name="dashboard"),
     ]
 
 ## User models override
@@ -66,6 +78,7 @@ On a project basis, you may want to add your own fields to the user models.
 You can override which model class is used on a project basis by declaring a 
 path to another `User` model class.
 
+    AUTH_USER_MODEL = "account.User"
     ACCOUNT_USER_MODEL = "my_project.models"
 
 In your `models.py` file, create your own `User` class:
@@ -98,7 +111,7 @@ You will need to register your app menu to the account menu. The register
 function requires the menu name and template url.
 
     from account.menu import menu
-    menu.register("my_menu", "path/to/menu.html")
+    menu.register("my_menu", "path/to/menu.html", 1) #Number is order id
 
 Example menu (do not forget access permissions):
 

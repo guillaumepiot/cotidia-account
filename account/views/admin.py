@@ -12,6 +12,7 @@ from django.template import RequestContext
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.views import login
 from django.http import HttpResponseRedirect 
+from django.db.models import Q
 from django.conf import settings
 
 from account.models import User
@@ -82,9 +83,33 @@ class UserList(StaffPermissionRequiredMixin, ListView):
     model = User
     template_name = 'admin/account/user_list.html'
     permission_required = 'account.change_user'
+    paginate_by = 25
 
     def get_queryset(self):
         return User.objects.filter()
+
+    def get_queryset(self):
+        #
+        # Get filter params
+        #
+        is_staff = self.request.GET.get('is_staff')
+        search_query = self.request.GET.get('query')
+
+        query = User.objects.filter()
+
+        if is_staff:
+            query = query.filter(is_staff=is_staff)
+        
+        if search_query:
+            q_split = search_query.split(' ')
+            for q in q_split:
+                query = query.filter(
+                    Q(first_name__icontains=q) |
+                    Q(last_name__icontains=q) |
+                    Q(email__icontains=q)
+                    )
+
+        return query
 
 class UserDetail(StaffPermissionRequiredMixin, DetailView):
     model = User

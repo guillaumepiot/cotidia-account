@@ -9,16 +9,7 @@ from django.contrib.auth import authenticate, get_user_model
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm, SetPasswordForm, PasswordChangeForm, ReadOnlyPasswordHashField
 
-try:
-    from django.apps import apps
-    get_model = apps.get_model
-except ImportError:
-    from django.db.models.loading import get_model
-
-app_label, model_name = settings.AUTH_USER_MODEL.split('.')
-User = get_model(app_label, model_name)
-
-
+from account.models import User
 
 def get_md5_hexdigest(email):
     """
