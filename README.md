@@ -70,17 +70,27 @@ path to another `User` model class.
 
 In your `models.py` file, create your own `User` class:
 
-    from account.models import BaseUser
+    from django.db import models
 
-    class User(BaseUser):
-        # My fields
-        #...
+    class User(object):
+        title = models.CharField(max_length=100, choices=settings.USER_TITLE, blank=True, null=True)
+        company_name = models.CharField('Company name', max_length=100, blank=True, null=True)
 
-        class Meta:
-            abstract = True
-            db_table = 'account_user'
+        #Phones
+        phone_number = models.CharField(max_length=100, blank=True, null=True)
+        mobile_number = models.CharField(max_length=100, blank=True, null=True)
+        fax_number = models.CharField(max_length=100, blank=True, null=True)
 
-The model must be an abstract, and the table name set as account_user.
+        # Special instructions
+        special_instructions = models.TextField('Special instructions', max_length=1000, blank=True, null=True)
+
+        def __unicode__(self):
+            if self.first_name or self.last_name:
+                return '%s %s' % (self.first_name, self.last_name)
+            return self.username
+
+The model is only a standard Python object, it will get merged into a full User 
+model in the account models section on load.
 
 ## Add items to the menu
 
