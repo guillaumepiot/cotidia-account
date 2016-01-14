@@ -24,7 +24,7 @@ from account.views.public import (
 urlpatterns = [
     url(r'^$', dashboard, name="dashboard"),
     url(r'^edit/$', edit, name="edit"),
-    url(r'^sign-up/$', sign_up, name='sign-up',),
+    url(r'^sign-up/$', sign_up, name='sign-up'),
     url(
         r'^login/$',
         login_remember_me,

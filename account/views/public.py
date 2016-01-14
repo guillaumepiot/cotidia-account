@@ -73,11 +73,10 @@ def sign_up(request):
                 # Log the user straight away
                 new_user = authenticate(username=user.username, password=form.cleaned_data['password1'])
                 auth_login(request, new_user)
+                messages.success(request, _('Your have successfully signed up'))
 
             # Create and send the confirmation email
             send_activation_email(user)
-
-            messages.success(request, _('Your have successfully signed up'))
             
             if ACCOUNT_FORCE_ACTIVATION:
                 return HttpResponseRedirect(reverse('account-public:activation-pending'))

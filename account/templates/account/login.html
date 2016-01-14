@@ -7,6 +7,15 @@
 <form method="post" action="?next={{success_url}}">
     <div class="modal modal--open">
         <div class="modal__wrapper">
+            {% if messages %}
+            <div class="modal__pre-header modal__pre-header--small">
+                <div class="alert alert--success">
+                {% for message in messages %}
+                    {{ message }}<br>
+                {% endfor %}
+                </div>
+            </div>
+            {% endif %}
             <div class="modal__content modal__content--small">
                 <div class="modal__header">
                     <h3>{{SITE_NAME}} (Public)</h3>
