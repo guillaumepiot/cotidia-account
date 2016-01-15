@@ -1,7 +1,9 @@
 import uuid
+import types
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import ugettext_lazy as _
+from django.core.urlresolvers import reverse
 from django.conf import settings
 
 from .utils import import_model
@@ -18,7 +20,7 @@ class User(AbstractUser):
         return self.username
 
     def get_absolute_url(self):
-        return reverse('user-detail', kwargs={'uuid': self.uuid})
+        return reverse('account-admin:user_detail', kwargs={'slug': self.uuid})
 
     class Meta:
         abstract = True
@@ -40,17 +42,26 @@ def build_user_model(user_model_definition=None):
     attrs['Meta'] = Meta
 
     if user_model_definition:
-        # All of that was just getting the class ready, here is the magic
-        # Build your model by adding django database Field subclasses to the attrs dict
-        # What this looks like depends on how you store the users's definitions
-        # For now, I'll just make them all CharFields
+        # Assign all the properties and attributes from user_model_definition to
+        # the USer class.
+        # Instance method are added using the types.MethodType mechanism,
+        # pulling the method as straight function from the dict value of 
+        # user_model_definition
         for field in user_model_definition.__dict__.keys():
             if not field.startswith('__'):
-                attrs[field] = getattr(user_model_definition, field)
+                # If the attribute is a instance method, then we need to bound
+                # it to the class by decclaring it as MethodType. That way, it 
+                # will accept self as first argument
+                _type = type(getattr(user_model_definition, field))
+                if _type is types.MethodType:
+                    attrs[field] = types.MethodType(user_model_definition.__dict__[field], None, User)
+                else:
+                    attrs[field] = getattr(user_model_definition, field)
 
 
     # Create the new model class
     model_class = type('User', (User,), attrs)
+
 
     return model_class
 
