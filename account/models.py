@@ -52,6 +52,7 @@ def build_user_model(user_model_definition=None):
                 # If the attribute is a instance method, then we need to bound
                 # it to the class by decclaring it as MethodType. That way, it 
                 # will accept self as first argument
+                # Refer to: https://www.ianlewis.org/en/dynamically-adding-method-classes-or-class-instanc
                 _type = type(getattr(user_model_definition, field))
                 if _type is types.MethodType:
                     attrs[field] = types.MethodType(user_model_definition.__dict__[field], None, User)
