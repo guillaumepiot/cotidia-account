@@ -8,9 +8,6 @@ from django.conf import settings
 
 from .utils import import_model
 
-from django.db import models
-
-
 class User(AbstractUser):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
 
