@@ -43,7 +43,7 @@ def build_user_model(user_model_definition=None):
 
     if user_model_definition:
         # Assign all the properties and attributes from user_model_definition to
-        # the USer class.
+        # the User class.
         # Instance method are added using the types.MethodType mechanism,
         # pulling the method as straight function from the dict value of 
         # user_model_definition
