@@ -5,7 +5,7 @@ Generic account management (admin & public) for Django applications.
 
 The package has dependencies:
 
-- Django==1.8.4
+- Django==1.9
 - django-form-utils==1.0.3
 
 
