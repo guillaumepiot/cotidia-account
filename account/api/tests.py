@@ -184,4 +184,34 @@ class SignUpTests(APITestCase):
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_sign_up_one_name(self):
+        """
+        Check that the sign up works when user on submit one name
+        """
+
+        url = reverse('account-api:sign-up')
+
+        data = {
+            'full_name':'Ethan',
+            'email':'test@test.com',
+            'password':'demo1234'
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Check confirmation email
+        confirmation_email = str(mail.outbox[0].message())
+        confirmation_url, user_uuid, confirmation_code = \
+            self.get_confirmation_url_from_email(confirmation_email)
+
+        # Get the API confirmation url
+        url = reverse('account-public:activate', kwargs={
+            'uuid':user_uuid, 'token':confirmation_code})
+
+        response = self.client.get(url, HTTP_HOST=settings.SITE_DOMAIN)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+
+        user = User.objects.get(uuid=user_uuid)
+        self.assertEquals(user.is_active, True)
+
 

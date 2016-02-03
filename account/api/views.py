@@ -52,14 +52,14 @@ class SignUp(APIView):
                 last_name = ' '.join(full_name.split(' ')[1:])
             else:
                 first_name = full_name
-                last_name = None
+                last_name = ''
 
 
             email = serializer.data['email'].strip()
             password = serializer.data['password'].strip()
 
             m = hashlib.md5()
-            m.update(email)
+            m.update(email.encode('utf-8'))
             username = m.hexdigest()[0:30]
 
             # Create the user
