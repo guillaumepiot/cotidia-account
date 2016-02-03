@@ -8,6 +8,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from account.models import User
+from account import settings as account_settings
 
 class SignUpTests(APITestCase):
     fixtures = []
@@ -25,6 +26,10 @@ class SignUpTests(APITestCase):
         """
         Check that the sign up process works as expected
         """
+
+        if not account_settings.ACCOUNT_ALLOW_SIGN_UP:
+            print("Sign up is disabled")
+            return
 
         url = reverse('account-api:sign-up')
 
@@ -56,6 +61,10 @@ class SignUpTests(APITestCase):
         Check that the user can't sign up with an email already used
         """
 
+        if not account_settings.ACCOUNT_ALLOW_SIGN_UP:
+            print("Sign up is disabled")
+            return
+
         url = reverse('account-api:sign-up')
 
         data = {
@@ -79,6 +88,10 @@ class SignUpTests(APITestCase):
         """
         Check that the full name is valid
         """
+
+        if not account_settings.ACCOUNT_ALLOW_SIGN_UP:
+            print("Sign up is disabled")
+            return
 
         url = reverse('account-api:sign-up')
 
@@ -120,6 +133,10 @@ class SignUpTests(APITestCase):
         Check that the email is valid
         """
 
+        if not account_settings.ACCOUNT_ALLOW_SIGN_UP:
+            print("Sign up is disabled")
+            return
+
         url = reverse('account-api:sign-up')
 
         data = {
@@ -135,6 +152,10 @@ class SignUpTests(APITestCase):
         """
         Check that the password is valid
         """
+
+        if not account_settings.ACCOUNT_ALLOW_SIGN_UP:
+            print("Sign up is disabled")
+            return
 
         url = reverse('account-api:sign-up')
 
@@ -165,6 +186,10 @@ class SignUpTests(APITestCase):
         Check that the sign in works after signing up
         """
 
+        if not account_settings.ACCOUNT_ALLOW_SIGN_UP:
+            print("Sign up is disabled")
+            return
+
         url = reverse('account-api:sign-up')
 
         data = {
@@ -188,6 +213,10 @@ class SignUpTests(APITestCase):
         """
         Check that the sign up works when user on submit one name
         """
+
+        if not account_settings.ACCOUNT_ALLOW_SIGN_UP:
+            print("Sign up is disabled")
+            return
 
         url = reverse('account-api:sign-up')
 

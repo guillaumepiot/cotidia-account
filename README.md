@@ -51,6 +51,12 @@ Force the user to activate their account via email before being allowed to login
 
     ACCOUNT_FORCE_ACTIVATION = False
 
+You can decide wether you want to allow sign up and sign in indepently.
+This settings will disable the ULRs make the page and API hook unavailable.
+
+    ACCOUNT_ALLOW_SIGN_IN = True
+    ACCOUNT_ALLOW_SIGN_UP = True
+
 Those settings can be overridden in `settings.py` if required.
 
 ## URLs

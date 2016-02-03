@@ -20,18 +20,11 @@ from account.views.public import (
     sign_up, 
     activate, 
     activation_pending)
+from account import settings as account_settings
 
 urlpatterns = [
     url(r'^$', dashboard, name="dashboard"),
     url(r'^edit/$', edit, name="edit"),
-    url(r'^sign-up/$', sign_up, name='sign-up'),
-    url(
-        r'^login/$',
-        login_remember_me,
-        {'template_name': 'account/login.html',
-         'authentication_form': EmailAuthenticationForm, },
-        name='login',
-    ),
     url(
         r'^activate/(?P<uuid>[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/(?P<token>.+)/$',
         activate,
@@ -96,3 +89,24 @@ urlpatterns = [
         name='password_reset_done',
     ),
 ]
+
+
+
+
+urlpatterns = []
+
+if account_settings.ACCOUNT_ALLOW_SIGN_IN:
+    urlpatterns += [
+        url(
+            r'^login/$',
+            login_remember_me,
+            {'template_name': 'account/login.html',
+             'authentication_form': EmailAuthenticationForm, },
+            name='login',
+        ),
+    ]
+
+if account_settings.ACCOUNT_ALLOW_SIGN_UP:
+    urlpatterns += [
+        url(r'^sign-up/$', sign_up, name='sign-up'),
+    ]
