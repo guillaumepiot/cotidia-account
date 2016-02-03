@@ -90,11 +90,6 @@ urlpatterns = [
     ),
 ]
 
-
-
-
-urlpatterns = []
-
 if account_settings.ACCOUNT_ALLOW_SIGN_IN:
     urlpatterns += [
         url(
