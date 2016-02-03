@@ -45,7 +45,7 @@ def build_user_model(user_model_definition=None):
         # pulling the method as straight function from the dict value of 
         # user_model_definition
         for field in user_model_definition.__dict__.keys():
-            if not field.startswith('__'):
+            if not field.startswith('__') or field in ['__unicode__', '__str__']:
                 # If the attribute is a instance method, then we need to bound
                 # it to the class by decclaring it as MethodType. That way, it 
                 # will accept self as first argument
