@@ -198,6 +198,9 @@ class AccountUserCreationForm(forms.Form):
     def clean_email(self):
         email = self.cleaned_data['email']
 
+        # Force all emails to be lowercase
+        email = email.lower()
+        
         if User.objects.filter(email=email).count() > 0:
             raise forms.ValidationError(_("This email is already used."))
 
