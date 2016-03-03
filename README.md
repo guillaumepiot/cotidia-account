@@ -26,6 +26,8 @@ Add 'account' to your INSTALLED_APPS:
     INSTALLED_APPS = (
         ...
         'account',
+        'rest_framework',
+        'rest_framework.authtoken',
         ...
     )
 

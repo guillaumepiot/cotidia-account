@@ -1,7 +1,6 @@
 import datetime, time, hashlib
 
 from django.utils.text import slugify
-from django.contrib.sites.models import Site
 from django.conf import settings
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
@@ -77,7 +76,11 @@ class SignUp(APIView):
             # Create and send the confirmation email
             send_activation_email(user)
 
-            data = UserSerializer(user).data
+            token, created = Token.objects.get_or_create(user=user)
+            
+            data = {'token': token.key}
+            user = UserSerializer(token.user)
+            data.update(user.data)
 
             return Response(data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -90,7 +93,6 @@ class SignIn(APIView):
     authentication_classes = ()
     permission_classes = ()
     serializer_class = SignInTokenSerializer
-    model = Token
 
     def get_serializer_class(self):
         return self.serializer_class
@@ -105,9 +107,44 @@ class SignIn(APIView):
                 self.request.session.set_expiry(0)
 
             user = authenticate(username=serializer.data['email'], password=serializer.data['password'])
-            data = UserSerializer(user).data
             auth_login(request, user)
+
+            # Create token for native applications
+
+            token, created = Token.objects.get_or_create(user=user)
+
+            data = {'token': token.key}
+            user = UserSerializer(token.user)
+            data.update(user.data)
+            
             return Response(data)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class Authenticate(APIView):
+    """
+    Authenticate with a given token
+    """
+
+    authentication_classes = ()
+    permission_classes = ()
+    serializer_class = AuthenticateTokenSerializer
+
+    def get_serializer_class(self):
+        return self.serializer_class
+
+    @transaction.atomic
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+
+            try:
+                token = Token.objects.get(key=serializer.data['token'])
+            except Token.DoesNotExist:
+                return Response({'message':_('The token is not valid')}, status=status.HTTP_400_BAD_REQUEST)
+
+            user = UserSerializer(token.user)
+
+            return Response(user.data)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

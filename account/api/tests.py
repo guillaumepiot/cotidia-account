@@ -6,6 +6,7 @@ from django.conf import settings
 
 from rest_framework import status
 from rest_framework.test import APITestCase
+from rest_framework.renderers import JSONRenderer
 
 from account.models import User
 from account import settings as account_settings
@@ -38,7 +39,9 @@ class SignUpTests(APITestCase):
             'email':'test@test.com',
             'password':'demo1234'
         }
+        print("Sign up payload", JSONRenderer().render(data))
         response = self.client.post(url, data, format='json')
+        print("Sign up response", JSONRenderer().render(response.data))
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # Check confirmation email
@@ -50,7 +53,7 @@ class SignUpTests(APITestCase):
         url = reverse('account-public:activate', kwargs={
             'uuid':user_uuid, 'token':confirmation_code})
 
-        response = self.client.get(url, HTTP_HOST=settings.SITE_DOMAIN)
+        response = self.client.get(url)
         self.assertEquals(response.status_code, status.HTTP_200_OK)
 
         user = User.objects.get(uuid=user_uuid)
@@ -186,7 +189,7 @@ class SignUpTests(APITestCase):
         Check that the sign in works after signing up
         """
 
-        if not account_settings.ACCOUNT_ALLOW_SIGN_UP:
+        if not account_settings.ACCOUNT_ALLOW_SIGN_IN:
             print("Sign up is disabled")
             return
 
@@ -206,7 +209,9 @@ class SignUpTests(APITestCase):
             'email':'test@test.com',
             'password':'demo1234',
         }
+        print("Sign in payload", JSONRenderer().render(data))
         response = self.client.post(url, data, format='json')
+        print("Sign in response", JSONRenderer().render(response.data))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_sign_up_one_name(self):
@@ -237,10 +242,44 @@ class SignUpTests(APITestCase):
         url = reverse('account-public:activate', kwargs={
             'uuid':user_uuid, 'token':confirmation_code})
 
-        response = self.client.get(url, HTTP_HOST=settings.SITE_DOMAIN)
+        response = self.client.get(url)
         self.assertEquals(response.status_code, status.HTTP_200_OK)
 
         user = User.objects.get(uuid=user_uuid)
         self.assertEquals(user.is_active, True)
 
 
+    def test_authenticate(self):
+        """
+        Check that the user can authenticate with their token once they are
+        logged in
+        """
+
+        url = reverse('account-api:sign-up')
+
+        data = {
+            'full_name':'Ethan Sky Blue',
+            'email':'test@test.com',
+            'password':'demo1234',
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        url = reverse('account-api:sign-in')
+
+        data = {
+            'email':'test@test.com',
+            'password':'demo1234',
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        url = reverse('account-api:authenticate')
+
+        data = {
+            'token':response.data['token'],
+        }
+        print("Authenticate payload", JSONRenderer().render(data))
+        response = self.client.post(url, data, format='json')
+        print("Authenticate response", JSONRenderer().render(response.data))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

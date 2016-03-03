@@ -10,8 +10,11 @@
 
         <link rel="apple-touch-icon" href="apple-touch-icon.png">
         <!-- Place favicon.ico in the root directory -->
-
-        <link rel="stylesheet" href="{% static "css/backend.min.css" %}">
+        {% if DEBUG %}
+            <link rel="stylesheet" href="{% static "css/backend.css" %}">
+        {% else %}
+            <link rel="stylesheet" href="{% static "css/backend.min.css" %}">
+        {% endif %}
         {% block header_scripts %}{% endblock header_scripts %}
     </head>
     <body>
@@ -27,7 +30,13 @@
             type="text/javascript" 
             src="{% static "contenttools/content-tools.min.js" %}">
         </script>
-        <script src="{% static "js/backend.js" %}"></script>
+        
+        {% if DEBUG %}
+            <script src="{% static "js/backend.js" %}"></script>
+        {% else %}
+            <script src="{% static "js/backend.min.js" %}"></script>
+        {% endif %}
+
         {% block footer_scripts %}{% endblock footer_scripts %}
     </body>
 </html>
