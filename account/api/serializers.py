@@ -22,7 +22,7 @@ class SignUpSerializer(serializers.Serializer):
         })
 
     def validate_email(self, value):
-        email = value
+        email = value.lower().strip()
 
         if User.objects.filter(email=email.strip()).count() > 0:
             raise serializers.ValidationError(_("This email is already used."))
@@ -61,6 +61,10 @@ class SignInTokenSerializer(serializers.Serializer):
         'invalid': _("This password is not valid.")
         })
     remember_me = serializers.CharField(required=False)
+
+    def validate_email(self, value):
+        email = value.lower().strip()
+        return email
 
     def validate_password(self, value):
 
