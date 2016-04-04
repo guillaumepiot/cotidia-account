@@ -14,6 +14,11 @@ from account import settings as account_settings
 class SignUpTests(APITestCase):
     fixtures = []
 
+    def setUp(self):
+        self.user = User.objects.create(email="john@blue.com", is_active=True)
+        self.user.set_password('demo5678')
+        self.user.save()
+
     def get_confirmation_url_from_email(self, email_message):
         exp = r'(\/activate\/([a-z0-9\-]+)\/([a-z0-9\-]+))'
         m = re.search(exp, email_message)
@@ -193,21 +198,11 @@ class SignUpTests(APITestCase):
             print("Sign up is disabled")
             return
 
-        url = reverse('account-api:sign-up')
-
-        data = {
-            'full_name':'Ethan Sky Blue',
-            'email':'test@test.com',
-            'password':'demo1234',
-        }
-        response = self.client.post(url, data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
         url = reverse('account-api:sign-in')
 
         data = {
-            'email':'test@test.com',
-            'password':'demo1234',
+            'email':'john@blue.com',
+            'password':'demo5678',
         }
         print("Sign in payload", JSONRenderer().render(data))
         response = self.client.post(url, data, format='json')
@@ -255,21 +250,11 @@ class SignUpTests(APITestCase):
         logged in
         """
 
-        url = reverse('account-api:sign-up')
-
-        data = {
-            'full_name':'Ethan Sky Blue',
-            'email':'test@test.com',
-            'password':'demo1234',
-        }
-        response = self.client.post(url, data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
         url = reverse('account-api:sign-in')
 
         data = {
-            'email':'test@test.com',
-            'password':'demo1234',
+            'email':'john@blue.com',
+            'password':'demo5678',
         }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
