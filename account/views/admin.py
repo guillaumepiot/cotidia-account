@@ -7,13 +7,15 @@ from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import render_to_response, get_object_or_404
-from django.views.decorators.debug import sensitive_post_parameters
 from django.template import RequestContext  
 from django.core.exceptions import PermissionDenied
-from django.contrib.auth.views import login
+from django.contrib.auth import login as auth_login
 from django.http import HttpResponseRedirect 
 from django.db.models import Q
 from django.conf import settings
+from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.debug import sensitive_post_parameters
+from django.utils.http import is_safe_url
 
 from account.models import User
 from account.user_forms import UserAddForm, UserUpdateForm, GroupForm, ProfileForm, UserChangePassword
@@ -23,8 +25,13 @@ from account import settings as account_settings
 #########
 # Login #
 #########
-
-def login_remember_me(request, *args, **kwargs):
+@sensitive_post_parameters()
+@csrf_protect
+def login_remember_me(
+    request, 
+    authentication_form=None, 
+    template_name='admin/account/login.html', 
+    *args, **kwargs):
     
     """Custom login view that enables "remember me" functionality."""
     
@@ -34,11 +41,31 @@ def login_remember_me(request, *args, **kwargs):
 
     extra_context = {}
     if request.GET.get('next'):
-        extra_context['success_url'] = request.GET['next']
+        redirect_to = request.GET['next']
     else:
-        extra_context['success_url'] = reverse('account-admin:dashboard')
+        redirect_to = reverse('account-admin:dashboard')
 
-    return login(request, extra_context=extra_context, *args, **kwargs)
+    if request.method == "POST":
+        form = authentication_form(request, data=request.POST)
+        if form.is_valid():
+
+            # Ensure the user-originating redirection url is safe.
+            if not is_safe_url(url=redirect_to, host=request.get_host()):
+                redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
+
+            # Okay, security check complete. Log the user in.
+            auth_login(request, form.get_user())
+
+            return HttpResponseRedirect(redirect_to)
+    else:
+        form = authentication_form(request)
+
+    context = {
+        'form': form
+    }
+
+    return render_to_response(template_name, context,
+        context_instance=RequestContext(request))
 
 #############
 # Dashboard #
