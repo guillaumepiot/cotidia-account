@@ -61,6 +61,10 @@ This settings will disable the URLs make the page and API hook unavailable.
 
 Those settings can be overridden in `settings.py` if required.
 
+Day limit for activation link (Django settings):
+
+    PASSWORD_RESET_TIMEOUT_DAYS = 3
+
 ## URLs
 
 There's two set of urls, one for the admin management of users, role and dashboard, and one for public access.
