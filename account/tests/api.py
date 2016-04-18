@@ -28,14 +28,19 @@ class SignUpTests(APITestCase):
 
         return confirmation_url, user_uuid, confirmation_code
 
+    def get_reset_url_from_email(self, email_message):
+        exp = r'(\/reset-password\/([a-z0-9\-]+)\/([a-z0-9\-]+))'
+        m = re.search(exp, email_message)
+        reset_url = m.group()
+        user_uuid = m.group(2)
+        reset_code = m.group(3)
+
+        return reset_url, user_uuid, reset_code
+
     def test_sign_up(self):
         """
         Check that the sign up process works as expected
         """
-
-        if not account_settings.ACCOUNT_ALLOW_SIGN_UP:
-            print("Sign up is disabled")
-            return
 
         url = reverse('account-api:sign-up')
 
@@ -44,9 +49,8 @@ class SignUpTests(APITestCase):
             'email':'test@test.com',
             'password':'demo1234'
         }
-        print("Sign up payload", JSONRenderer().render(data))
+
         response = self.client.post(url, data, format='json')
-        print("Sign up response", JSONRenderer().render(response.data))
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # Check confirmation email
@@ -68,10 +72,6 @@ class SignUpTests(APITestCase):
         """
         Check that the user can't sign up with an email already used
         """
-
-        if not account_settings.ACCOUNT_ALLOW_SIGN_UP:
-            print("Sign up is disabled")
-            return
 
         url = reverse('account-api:sign-up')
 
@@ -96,10 +96,6 @@ class SignUpTests(APITestCase):
         """
         Check that the full name is valid
         """
-
-        if not account_settings.ACCOUNT_ALLOW_SIGN_UP:
-            print("Sign up is disabled")
-            return
 
         url = reverse('account-api:sign-up')
 
@@ -141,10 +137,6 @@ class SignUpTests(APITestCase):
         Check that the email is valid
         """
 
-        if not account_settings.ACCOUNT_ALLOW_SIGN_UP:
-            print("Sign up is disabled")
-            return
-
         url = reverse('account-api:sign-up')
 
         data = {
@@ -160,10 +152,6 @@ class SignUpTests(APITestCase):
         """
         Check that the password is valid
         """
-
-        if not account_settings.ACCOUNT_ALLOW_SIGN_UP:
-            print("Sign up is disabled")
-            return
 
         url = reverse('account-api:sign-up')
 
@@ -194,29 +182,19 @@ class SignUpTests(APITestCase):
         Check that the sign in works after signing up
         """
 
-        if not account_settings.ACCOUNT_ALLOW_SIGN_IN:
-            print("Sign up is disabled")
-            return
-
         url = reverse('account-api:sign-in')
 
         data = {
             'email':'john@blue.com',
             'password':'demo5678',
         }
-        print("Sign in payload", JSONRenderer().render(data))
         response = self.client.post(url, data, format='json')
-        print("Sign in response", JSONRenderer().render(response.data))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_sign_up_one_name(self):
         """
         Check that the sign up works when user on submit one name
         """
-
-        if not account_settings.ACCOUNT_ALLOW_SIGN_UP:
-            print("Sign up is disabled")
-            return
 
         url = reverse('account-api:sign-up')
 
@@ -243,7 +221,6 @@ class SignUpTests(APITestCase):
         user = User.objects.get(uuid=user_uuid)
         self.assertEquals(user.is_active, True)
 
-
     def test_authenticate(self):
         """
         Check that the user can authenticate with their token once they are
@@ -264,7 +241,196 @@ class SignUpTests(APITestCase):
         data = {
             'token':response.data['token'],
         }
-        print("Authenticate payload", JSONRenderer().render(data))
+
         response = self.client.post(url, data, format='json')
-        print("Authenticate response", JSONRenderer().render(response.data))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_reset_password(self):
+        """
+        Check that an email is sent with reset link when user enters email
+        """
+
+        data = {
+            'email': self.user.email
+        }
+        url = reverse('account-api:reset-password')
+        response = self.client.post(url, data, format='json')
+        self.assertEquals(response.data['message'], "PASSWORD_RESET")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        #
+        # Check that an email is sent
+        #
+        self.assertEqual(len(mail.outbox), 1)
+
+        #
+        # Test with an email that doesn't exists
+        # It should still return OK to avoid people checking for email
+        #
+        data = {
+            'email': 'inexistent@inexistent.com'
+        }
+        url = reverse('account-api:reset-password')
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_reset_key_valid(self):
+        """
+        Test that the reset key sent by email is valid
+        """
+
+        data = {
+            'email': self.user.email
+        }
+        url = reverse('account-api:reset-password')
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        #
+        # Check reset email
+        #
+        self.assertEqual(len(mail.outbox), 1)
+        reset_email = str(mail.outbox[0].message())
+        reset_url, user_uuid, reset_code = self.get_reset_url_from_email(reset_email)
+
+        #
+        # Validate the reset code
+        #
+        url = reverse('account-api:reset-password-validate', 
+            kwargs={
+                'uuid': user_uuid,
+                'token': reset_code
+            })
+
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(response.data['message'], "TOKEN_VALID")
+
+        #
+        # Test for TOKEN_INVALID status
+        # Change the user password manually to force the token to be invalid
+        #
+        self.user.set_password('Another')
+        self.user.save()
+
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEquals(response.data['message'], "TOKEN_INVALID")
+
+    def test_set_new_password(self):
+        """
+        Test that the user can set the new password
+        """
+
+        data = {
+            'email': self.user.email
+        }
+        url = reverse('account-api:reset-password')
+        response = self.client.post(url, data, format='json')
+        self.assertEquals(response.data['message'], "PASSWORD_RESET")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        #
+        # Check reset email
+        #
+        self.assertEqual(len(mail.outbox), 1)
+        reset_email = str(mail.outbox[0].message())
+        reset_url, user_uuid, reset_code = self.get_reset_url_from_email(reset_email)
+
+        #
+        # Validate the reset code with the set password url
+        #
+        url = reverse('account-api:set-password', 
+            kwargs={
+                'uuid': user_uuid,
+                'token': reset_code
+            })
+
+        data = {
+            'password1': "new password 123",
+            'password2': "new password 123"
+        }
+
+        response = self.client.post(url, data)
+        self.assertEquals(response.data['message'], "PASSWORD_SET")
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+
+        #
+        # Test for TOKEN_INVALID status
+        # When we submit a second time, the token should invalid
+        #
+
+        response = self.client.post(url, data)
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEquals(response.data['message'], "TOKEN_INVALID")
+
+
+        #
+        # Test that the user can sign in with the new password
+        #
+        url = reverse('account-api:sign-in')
+
+        data = {
+            'email':self.user.email,
+            'password':'new password 123',
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_password_valid(self):
+        """
+        Test that the password are valid and match
+        """
+
+        data = {
+            'email': self.user.email
+        }
+        url = reverse('account-api:reset-password')
+        response = self.client.post(url, data, format='json')
+        self.assertEquals(response.data['message'], "PASSWORD_RESET")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        #
+        # Check reset email
+        #
+        self.assertEqual(len(mail.outbox), 1)
+        reset_email = str(mail.outbox[0].message())
+        reset_url, user_uuid, reset_code = self.get_reset_url_from_email(reset_email)
+
+        #
+        # That password mismatch
+        #
+        url = reverse('account-api:set-password', 
+            kwargs={
+                'uuid': user_uuid,
+                'token': reset_code
+            })
+
+        data = {
+            'password1': "demo1234",
+            'password2': "demo4567"
+        }
+
+        response = self.client.post(url, data)
+        self.assertEquals(response.data['non_field_errors'], 
+            ["PASSWORD_MISMATCH"])
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        #
+        # That password invalid
+        #
+        url = reverse('account-api:set-password', 
+            kwargs={
+                'uuid': user_uuid,
+                'token': reset_code
+            })
+
+        data = {
+            'password1': "demo",
+            'password2': "demo"
+        }
+
+        response = self.client.post(url, data)
+        self.assertEquals(response.data['password1'], 
+            ["PASSWORD_TOO_SHORT"])
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)

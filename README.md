@@ -14,10 +14,6 @@ installed.
 
     $ pip install -e git+git@bitbucket.org:guillaumepiot/cotidia-account.git#egg=account
 
-Make your migrations (project basis):
-
-    $ python manage.py makemigrations account
-
 
 ## Settings   
 
@@ -30,6 +26,10 @@ Add 'account' to your INSTALLED_APPS:
         'rest_framework.authtoken',
         ...
     )
+
+Make your migrations (project basis):
+
+    $ python manage.py makemigrations account
 
 Specify the following settings:
 

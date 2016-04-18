@@ -13,8 +13,10 @@ from django.contrib import messages
 
 from account.forms import UpdateDetailsForm, AccountUserCreationForm
 from account.models import User
-from account.utils import send_activation_email
 from account.settings import ACCOUNT_FORCE_ACTIVATION
+from account.notices import (
+    NewUserActivationNotice
+    )
 
 @login_required
 def dashboard(request):
@@ -76,7 +78,17 @@ def sign_up(request):
                 messages.success(request, _('Your have successfully signed up'))
 
             # Create and send the confirmation email
-            send_activation_email(user)
+            token = default_token_generator.make_token(user)
+            url = '/activate/{0}/{1}/'.format(user.uuid, token)
+
+            notice = NewUserActivationNotice(
+                recipients = ['%s <%s>' % (user.get_full_name(), user.email) ],
+                context = {
+                    'url':"%s%s" % (settings.APP_URL, url),
+                    'first_name':user.first_name
+                }
+            )
+            notice.send(force_now=True)
             
             if ACCOUNT_FORCE_ACTIVATION:
                 return HttpResponseRedirect(reverse('account-public:activation-pending'))

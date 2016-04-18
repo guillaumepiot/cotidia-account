@@ -44,27 +44,3 @@ class StaffPermissionRequiredMixin(UserCheckMixin):
 def import_model(name, clsName):
     module = importlib.import_module(name)
     return getattr(module, clsName)
-
-
-#
-# Send the user activation email
-#
-def send_activation_email(user):
-    from django.contrib.auth.tokens import default_token_generator
-    from account.notices import NewUserActivationNotice
-
-    token = default_token_generator.make_token(user)
-    url = reverse('account-public:activate', kwargs={
-        'uuid':user.uuid,
-        'token':token
-        })
-
-
-    notice = NewUserActivationNotice(
-        recipients = ['%s <%s>' % (user.get_full_name(), user.email) ],
-        context = {
-            'url':"%s%s" % (settings.SITE_URL, url),
-            'first_name':user.first_name
-        }
-    )
-    notice.send(force_now=True)
