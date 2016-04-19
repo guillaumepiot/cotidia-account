@@ -73,7 +73,8 @@ class SignUp(APIView):
                 email=email, 
                 first_name=first_name,
                 last_name=last_name,
-                last_login=now()
+                last_login=now(),
+                is_active=False
                 )
             user.set_password(password)
             user.save()

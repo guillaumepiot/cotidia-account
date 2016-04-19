@@ -1,4 +1,7 @@
-import os, re, json
+import os
+import re
+import json
+import uuid
 
 from django.core.urlresolvers import reverse
 from django.core import mail
@@ -10,8 +13,9 @@ from rest_framework.renderers import JSONRenderer
 
 from account.models import User
 from account import settings as account_settings
+from account.doc import Doc
 
-class SignUpTests(APITestCase):
+class RegistrationTests(APITestCase):
     fixtures = []
 
     def setUp(self):
@@ -19,8 +23,10 @@ class SignUpTests(APITestCase):
         self.user.set_password('demo5678')
         self.user.save()
 
+        self.doc = Doc()
+
     def get_confirmation_url_from_email(self, email_message):
-        exp = r'(\/activate\/([a-z0-9\-]+)\/([a-z0-9\-]+))'
+        exp = r'(\/activate\/([a-z0-9\-]+)\/([a-z0-9\-]+))\/'
         m = re.search(exp, email_message)
         confirmation_url = m.group()
         user_uuid = m.group(2)
@@ -29,7 +35,7 @@ class SignUpTests(APITestCase):
         return confirmation_url, user_uuid, confirmation_code
 
     def get_reset_url_from_email(self, email_message):
-        exp = r'(\/reset-password\/([a-z0-9\-]+)\/([a-z0-9\-]+))'
+        exp = r'(\/reset-password\/([a-z0-9\-]+)\/([a-z0-9\-]+))\/'
         m = re.search(exp, email_message)
         reset_url = m.group()
         user_uuid = m.group(2)
@@ -42,6 +48,8 @@ class SignUpTests(APITestCase):
         Check that the sign up process works as expected
         """
 
+        section_title = "Sign up"
+
         url = reverse('account-api:sign-up')
 
         data = {
@@ -52,6 +60,16 @@ class SignUpTests(APITestCase):
 
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Generate documentation
+        content = {
+            'title': section_title,
+            'http_method': 'POST',
+            'url': url,
+            'payload': data,
+            'response': response.data,
+        }
+        self.doc.display_section(content)
 
         # Check confirmation email
         confirmation_email = str(mail.outbox[0].message())
@@ -182,6 +200,8 @@ class SignUpTests(APITestCase):
         Check that the sign in works after signing up
         """
 
+        section_title = "Sign in"
+
         url = reverse('account-api:sign-in')
 
         data = {
@@ -190,6 +210,16 @@ class SignUpTests(APITestCase):
         }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Generate documentation
+        content = {
+            'title': section_title,
+            'http_method': 'POST',
+            'url': url,
+            'payload': data,
+            'response': response.data
+        }
+        self.doc.display_section(content)
 
     def test_sign_up_one_name(self):
         """
@@ -221,34 +251,141 @@ class SignUpTests(APITestCase):
         user = User.objects.get(uuid=user_uuid)
         self.assertEquals(user.is_active, True)
 
-    def test_authenticate(self):
+    def test_activate(self):
         """
-        Check that the user can authenticate with their token once they are
-        logged in
+        Test the various activation responses
         """
 
-        url = reverse('account-api:sign-in')
+        section_title = "Activate"
+        description = ("The url should be formatted as follows:"
+            "`/api/account/activate/<uuid>/<token>/`\n\n"
+            "The activation API can return three activation statuses:\n\n"
+            "- `USER_INVALID`\n"
+            "- `TOKEN_INVALID`\n"
+            "- `ACTIVATED`")
+
+        url = reverse('account-api:sign-up')
+
+        # Test validation (required field)
 
         data = {
-            'email':'john@blue.com',
-            'password':'demo5678',
+            'full_name':'Ethan Sky Blue',
+            'email':'test@test.com',
+            'password':'demo1234'
         }
         response = self.client.post(url, data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Check confirmation email
+        confirmation_email = str(mail.outbox[0].message())
+        confirmation_url, user_uuid, confirmation_code = \
+            self.get_confirmation_url_from_email(confirmation_email)
+
+        self.assertEqual(confirmation_url, "/activate/{}/{}/".format(
+            user_uuid,
+            confirmation_code
+            ))
+
+        # Test invalid UUID
+        url = reverse('account-api:activate', kwargs={
+            'uuid':uuid.uuid4(), 'token':confirmation_code})
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['message'], 'USER_INVALID')
+
+        # Test invalid Token
+        url = reverse('account-api:activate', kwargs={
+            'uuid':user_uuid, 'token':'1234'})
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['message'], 'TOKEN_INVALID')
+
+        # Get the API confirmation url
+        url = reverse('account-api:activate', kwargs={
+            'uuid':user_uuid, 'token':confirmation_code})
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['message'], 'ACTIVATED')
+
+        user = User.objects.get(uuid=user_uuid)
+        self.assertEquals(user.is_active, True)
+
+        # Generate documentation
+        
+        content = {
+            'title': section_title,
+            'http_method': 'GET',
+            'url': url,
+            'payload': {
+                'uuid':str(user_uuid),
+                'token': confirmation_code
+            },
+            'response': response.data,
+            'description': description
+        }
+        self.doc.display_section(content)
+
+    def test_authenticate(self):
+        """
+        Check that the authenticate works using the user uuid
+        """
+
+        section_title = "Authenticate"
+
+        url = reverse('account-api:sign-up')
+
+        data = {
+            'full_name':'Ethan Sky Blue',
+            'email':'test@test.com',
+            'password':'demo1234'
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        token = response.data['token']
 
         url = reverse('account-api:authenticate')
 
+        # Invalid token
         data = {
-            'token':response.data['token'],
+            'token':'1234',
         }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['message'], 'TOKEN_INVALID')
+
+        # Valid token
+        data = {
+            'token':token,
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['message'], 'USER_INACTIVE')
+
+        # Activate user
+        user = User.objects.filter().latest('id')
+        user.is_active = True
+        user.save()
 
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Generate documentation
+        content = {
+            'title': section_title,
+            'http_method': 'POST',
+            'url': url,
+            'payload': data,
+            'response': response.data
+        }
+        self.doc.display_section(content)
 
     def test_reset_password(self):
         """
         Check that an email is sent with reset link when user enters email
         """
+
+        section_title = "Forgot password"
 
         data = {
             'email': self.user.email
@@ -262,6 +399,16 @@ class SignUpTests(APITestCase):
         # Check that an email is sent
         #
         self.assertEqual(len(mail.outbox), 1)
+
+        # Generate documentation
+        content = {
+            'title': section_title,
+            'http_method': 'POST',
+            'url': url,
+            'payload': data,
+            'response': response.data
+        }
+        self.doc.display_section(content)
 
         #
         # Test with an email that doesn't exists
@@ -278,6 +425,12 @@ class SignUpTests(APITestCase):
         """
         Test that the reset key sent by email is valid
         """
+
+        section_title = "Validate reset token"
+
+        description = ("The validate API can return two statuses:\n\n"
+            "- `TOKEN_VALID`\n"
+            "- `TOKEN_INVALID`")
 
         data = {
             'email': self.user.email
@@ -306,6 +459,16 @@ class SignUpTests(APITestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(response.data['message'], "TOKEN_VALID")
 
+        # Generate documentation
+        content = {
+            'title': section_title,
+            'http_method': 'POST',
+            'url': url,
+            'payload': data,
+            'response': response.data
+        }
+        self.doc.display_section(content)
+
         #
         # Test for TOKEN_INVALID status
         # Change the user password manually to force the token to be invalid
@@ -321,6 +484,12 @@ class SignUpTests(APITestCase):
         """
         Test that the user can set the new password
         """
+
+        section_title = "Set new password"
+
+        description = ("The set password API can return two statuses:\n\n"
+            "- `PASSWORD_SET`\n"
+            "- `TOKEN_INVALID`")
 
         data = {
             'email': self.user.email
@@ -354,6 +523,16 @@ class SignUpTests(APITestCase):
         response = self.client.post(url, data)
         self.assertEquals(response.data['message'], "PASSWORD_SET")
         self.assertEquals(response.status_code, status.HTTP_200_OK)
+
+        # Generate documentation
+        content = {
+            'title': section_title,
+            'http_method': 'POST',
+            'url': url,
+            'payload': data,
+            'response': response.data
+        }
+        self.doc.display_section(content)
 
         #
         # Test for TOKEN_INVALID status
