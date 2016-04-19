@@ -93,6 +93,7 @@ class SignIn(APIView):
     authentication_classes = ()
     permission_classes = ()
     serializer_class = SignInTokenSerializer
+    model = Token
 
     def get_serializer_class(self):
         return self.serializer_class
@@ -103,23 +104,43 @@ class SignIn(APIView):
 
         if serializer.is_valid():
 
-            if not serializer.data.get('remember_me'):
-                self.request.session.set_expiry(0)
-
             user = authenticate(username=serializer.data['email'], password=serializer.data['password'])
             auth_login(request, user)
-
-            # Create token for native applications
 
             token, created = Token.objects.get_or_create(user=user)
 
             data = {'token': token.key}
             user = UserSerializer(token.user)
             data.update(user.data)
-            
+
             return Response(data)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class Activate(APIView):
+    """
+    Activate a profile
+    """
+
+    authentication_classes = ()
+    permission_classes = ()
+
+    @transaction.atomic
+    def get(self, request, uuid, token):
+
+        try:
+            user = User.objects.get(uuid=uuid)
+        except User.DoesNotExist:
+            return Response({'message':'USER_INVALID'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not default_token_generator.check_token(user, token):
+            return Response({'message':'TOKEN_INVALID'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Activate now
+        user.is_active = True
+        user.save()
+
+        return Response({'message':'ACTIVATED'}, status=status.HTTP_200_OK)
 
 class Authenticate(APIView):
     """
@@ -141,10 +162,125 @@ class Authenticate(APIView):
             try:
                 token = Token.objects.get(key=serializer.data['token'])
             except Token.DoesNotExist:
-                return Response({'message':_('The token is not valid')}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message':'TOKEN_INVALID'}, status=status.HTTP_400_BAD_REQUEST)
+
+            if not token.user.is_active:
+                return Response({'message':'USER_INACTIVE'}, status=status.HTTP_400_BAD_REQUEST)
 
             user = UserSerializer(token.user)
 
             return Response(user.data)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ResetPassword(APIView):
+    """
+    Reset the password for an exiting user
+    """
+
+    authentication_classes = ()
+    permission_classes = ()
+
+    @transaction.atomic
+    def post(self, request):
+
+        serializer = ResetPasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            profile = Profile.objects.get(user__email=serializer.data['email'])
+        except Profile.DoesNotExist:
+            profile = None
+
+        if profile:
+
+            # 30 days activation time, if not activate, account should be 
+            # deactivated
+            activation_deadline = now() + datetime.timedelta(days=30)
+            profile.activation_expiry_date = activation_deadline
+            profile.activation_key = uuid.uuid4()
+
+            profile.save()
+
+            # Create and send the confirmation email
+            user = profile.user
+            url = '%s%s/#/users/set-password/%s' % (
+                settings.PROTOCOL, settings.SITE_DOMAIN, profile.activation_key)
+
+            notice = ResetPasswordNotice(
+                recipients = ['%s <%s>' % (user.get_full_name(), user.email) ],
+                context = {
+                    'url': url, 
+                    'first_name':user.first_name
+                    }
+            )
+            notice.send()
+
+        return Response({'message': "PASSWORD_RESET"}, 
+            status=status.HTTP_200_OK)
+
+class ResetPasswordValidate(APIView):
+    """
+    Validate the reset password key
+    """
+
+    authentication_classes = ()
+    permission_classes = ()
+
+    @transaction.atomic
+    def get(self, request, token):
+
+        try:
+            profile = Profile.objects.get(activation_key=token)
+        except Profile.DoesNotExist:
+            return Response(
+                {'message': "TOKEN_INVALID"}, 
+                status=status.HTTP_400_BAD_REQUEST)
+
+        if profile.activation_expiry_date < now():
+            return Response(
+                {'message': "TOKEN_EXPIRED"}, 
+                status=status.HTTP_400_BAD_REQUEST)
+
+
+        return Response({'message': "TOKEN_VALID"}, status=status.HTTP_200_OK)
+
+class SetPassword(APIView):
+    """
+    Set the new password
+    """
+
+    authentication_classes = ()
+    permission_classes = ()
+
+    @transaction.atomic
+    def post(self, request, token):
+
+        try:
+            profile = Profile.objects.get(activation_key=token)
+        except Profile.DoesNotExist:
+            return Response(
+                {'message': "TOKEN_INVALID"}, 
+                status=status.HTTP_400_BAD_REQUEST)
+
+        if profile.activation_expiry_date < now():
+            return Response(
+                {'message': "TOKEN_EXPIRED"}, 
+                status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = SetPasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        #
+        # Set the new password
+        #
+        profile.user.set_password(serializer.data['password1'])
+        profile.user.save()
+
+        #
+        # Clear the activation key
+        #
+        profile.activation_key = None
+        profile.save()
+
+        return Response({'message': "PASSWORD_SET"}, status=status.HTTP_200_OK)

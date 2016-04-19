@@ -1,4 +1,6 @@
 import importlib
+import os
+import json
 
 from django.conf import settings
 from django.core.urlresolvers import reverse_lazy
@@ -68,3 +70,56 @@ def send_activation_email(user):
         }
     )
     notice.send(force_now=True)
+
+
+class Doc():
+
+    def __init__(self, file_name, title):
+        
+        self.file_path = os.path.join(
+            settings.PROJECT_DIR, '../../docs/api/{0}'.format(file_name))
+        
+        self.file_handle = open(self.file_path, 'w')
+        self.file_handle.write(
+            "# {0}\n"
+            "\n".format(title))
+        # self.close()
+
+    def write_section(self, content):
+
+        payload = json.dumps(content['payload'], indent=4)
+        response = json.dumps(content['response'], indent=4)
+
+        self.file_handle = open(self.file_path, 'a')
+        self.file_handle.write(
+            "## {0}\n"
+            "\n"
+            "    [{6}] {1}{2}\n"
+            "\n"
+            "{5}\n"
+            "\n"
+            "\n"
+            "### Payload\n"
+            "\n"
+            "```json\n"
+            "{3}\n"
+            "```\n"
+            "\n"
+            "### Response\n"
+            "\n"
+            "```json\n"
+            "{4}\n"
+            "```\n".format(
+                content['title'], 
+                settings.SITE_URL, 
+                content['url'], 
+                payload, 
+                response,
+                content.get('description', ''),
+                content['http_method']
+                )
+            )
+        # self.close()
+
+    def close(self):
+        self.file_handle.close()
