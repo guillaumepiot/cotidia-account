@@ -79,12 +79,16 @@ def sign_up(request):
 
             # Create and send the confirmation email
             token = default_token_generator.make_token(user)
-            url = '/activate/{0}/{1}/'.format(user.uuid, token)
+            url = reverse('account-public:activate', kwargs={
+                'uuid':user.uuid,
+                'token':token
+                })
+
 
             notice = NewUserActivationNotice(
                 recipients = ['%s <%s>' % (user.get_full_name(), user.email) ],
                 context = {
-                    'url':"%s%s" % (settings.APP_URL, url),
+                    'url':"%s%s" % (settings.SITE_URL, url),
                     'first_name':user.first_name
                 }
             )
