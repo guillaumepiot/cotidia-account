@@ -172,10 +172,14 @@ class Authenticate(APIView):
         return self.serializer_class
 
     @transaction.atomic
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
+    def post(self, request, user_serializer_class=None):
+        
+        if user_serializer_class is None:
+            user_serializer_class = UserSerializer
 
+        serializer = self.serializer_class(data=request.data)
+        
+        if serializer.is_valid():
             try:
                 token = Token.objects.get(key=serializer.data['token'])
             except Token.DoesNotExist:
@@ -188,7 +192,7 @@ class Authenticate(APIView):
                     {'message':'USER_INACTIVE'}, 
                     status=status.HTTP_400_BAD_REQUEST)
 
-            user = UserSerializer(token.user)
+            user = user_serializer_class(token.user)
 
             return Response(user.data)
 
