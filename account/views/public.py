@@ -41,6 +41,9 @@ def edit(request):
 
 def login_remember_me(request, *args, **kwargs):
     """Custom login view that enables "remember me" functionality."""
+    # Redirect to account page if already logged in
+    if request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('account-public:dashboard')) 
     if request.method == 'POST':
         if not request.POST.get('remember_me', None):
             request.session.set_expiry(0)
@@ -56,6 +59,10 @@ def sign_up(request):
     form = AccountUserCreationForm()
 
     success_url = request.GET.get('next')
+
+    # Redirect to account page if already logged in
+    if request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('account-public:dashboard')) 
 
     if request.method == "POST":
         form = AccountUserCreationForm(request.POST)
