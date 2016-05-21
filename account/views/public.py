@@ -10,6 +10,7 @@ from django.contrib.auth.views import login
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib import messages
+from django.conf import settings
 
 from account.forms import UpdateDetailsForm, AccountUserCreationForm
 from account.models import User
