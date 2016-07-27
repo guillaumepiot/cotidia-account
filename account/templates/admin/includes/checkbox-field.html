@@ -7,9 +7,10 @@
         </div>
     {% endif %}
     <div class="form__control form__control--checkbox">
-        {{field}} 
         {% if field.label %}
-            <label class="form__label">{{field.label|safe}}</label>
+            <label class="form__label">{{field}} {{field.label|safe}}</label>
+        {% else %}
+            {{field}}
         {% endif %}
     </div>
     {% if field.help_text %}
