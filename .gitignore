@@ -3,5 +3,4 @@
 build/
 dist/
 *.egg-info/
-/indexes
-/migrations
+account/migrations

@@ -14,10 +14,6 @@ installed.
 
     $ pip install -e git+git@bitbucket.org:guillaumepiot/cotidia-account.git#egg=account
 
-Make your migrations (project basis):
-
-    $ python manage.py makemigrations account
-
 
 ## Settings   
 
@@ -26,8 +22,14 @@ Add 'account' to your INSTALLED_APPS:
     INSTALLED_APPS = (
         ...
         'account',
+        'rest_framework',
+        'rest_framework.authtoken',
         ...
     )
+
+Make your migrations (project basis):
+
+    $ python manage.py makemigrations account
 
 Specify the following settings:
 
@@ -43,7 +45,7 @@ By default, the login urls for the admin and the public side are set as follows:
     LOGIN_URL = '/account/login/'
     LOGOUT_URL = '/account/logout/'
 
-    ADMIN_LOGIN_URL = '/admin/login/'
+    ADMIN_LOGIN_URL = '/admin/account/login/'
     PUBLIC_LOGIN_URL = '/account/login/'
 
 Force the user to activate their account via email before being allowed to login.
@@ -51,7 +53,17 @@ Force the user to activate their account via email before being allowed to login
 
     ACCOUNT_FORCE_ACTIVATION = False
 
+You can decide wether you want to allow sign up and sign in indepently.
+This settings will disable the URLs make the page and API hook unavailable.
+
+    ACCOUNT_ALLOW_SIGN_IN = True
+    ACCOUNT_ALLOW_SIGN_UP = True
+
 Those settings can be overridden in `settings.py` if required.
+
+Day limit for activation link (Django settings):
+
+    PASSWORD_RESET_TIMEOUT_DAYS = 3
 
 ## URLs
 

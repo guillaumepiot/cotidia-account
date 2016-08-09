@@ -10,11 +10,14 @@ from django.contrib.auth.views import login
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib import messages
+from django.conf import settings
 
 from account.forms import UpdateDetailsForm, AccountUserCreationForm
 from account.models import User
-from account.utils import send_activation_email
 from account.settings import ACCOUNT_FORCE_ACTIVATION
+from account.notices import (
+    NewUserActivationNotice
+    )
 
 @login_required
 def dashboard(request):
@@ -39,6 +42,9 @@ def edit(request):
 
 def login_remember_me(request, *args, **kwargs):
     """Custom login view that enables "remember me" functionality."""
+    # Redirect to account page if already logged in
+    if request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('account-public:dashboard')) 
     if request.method == 'POST':
         if not request.POST.get('remember_me', None):
             request.session.set_expiry(0)
@@ -54,6 +60,10 @@ def sign_up(request):
     form = AccountUserCreationForm()
 
     success_url = request.GET.get('next')
+
+    # Redirect to account page if already logged in
+    if request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('account-public:dashboard')) 
 
     if request.method == "POST":
         form = AccountUserCreationForm(request.POST)
@@ -76,7 +86,21 @@ def sign_up(request):
                 messages.success(request, _('Your have successfully signed up'))
 
             # Create and send the confirmation email
-            send_activation_email(user)
+            token = default_token_generator.make_token(user)
+            url = reverse('account-public:activate', kwargs={
+                'uuid':user.uuid,
+                'token':token
+                })
+
+
+            notice = NewUserActivationNotice(
+                recipients = ['%s <%s>' % (user.get_full_name(), user.email) ],
+                context = {
+                    'url':"%s%s" % (settings.SITE_URL, url),
+                    'first_name':user.first_name
+                }
+            )
+            notice.send(force_now=True)
             
             if ACCOUNT_FORCE_ACTIVATION:
                 return HttpResponseRedirect(reverse('account-public:activation-pending'))

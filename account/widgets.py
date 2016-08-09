@@ -269,10 +269,9 @@ class SelectDateTimeWidget(Widget):
         # Month #
         #########
 
-        month_choices = MONTHS.items()
+        month_choices = tuple(MONTHS.items())
         if not (self.required and value):
-            month_choices.append((0,'Month'))
-        month_choices.sort()
+            month_choices = ((0,'Month'),) + month_choices
         local_attrs['id'] = self.month_field % id_
         
         s = Select(choices=month_choices)

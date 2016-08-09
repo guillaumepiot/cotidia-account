@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate
 from rest_framework import serializers
 
 from account.models import User
-from .validators import is_alpha
+from account.validators import is_alpha
 
 class SignUpSerializer(serializers.Serializer):
     full_name = serializers.CharField(max_length=100, min_length=2, error_messages={
@@ -22,7 +22,7 @@ class SignUpSerializer(serializers.Serializer):
         })
 
     def validate_email(self, value):
-        email = value
+        email = value.lower().strip()
 
         if User.objects.filter(email=email.strip()).count() > 0:
             raise serializers.ValidationError(_("This email is already used."))
@@ -57,10 +57,14 @@ class SignInTokenSerializer(serializers.Serializer):
         'invalid': _("This email address is not valid.")
         })
     password = serializers.CharField(error_messages={
-        'blank': _("Please enter a password."), 
-        'invalid': _("This password is not valid.")
+        'blank': _("Please enter a password"), 
+        'invalid': _("This password is not valid")
         })
     remember_me = serializers.CharField(required=False)
+
+    def validate_email(self, value):
+        email = value.lower().strip()
+        return email
 
     def validate_password(self, value):
 
@@ -81,7 +85,7 @@ class SignInTokenSerializer(serializers.Serializer):
 
             if user:
                 if not user.is_active:
-                    raise serializers.ValidationError(_('Your user account is not active.'))
+                    raise serializers.ValidationError(_('Your account is not active.'))
                 self.user = user
                 return attrs
             else:
@@ -96,3 +100,42 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields=['email', 'first_name', 'last_name']
+
+#
+# Requires the user to submit his email to receive a reset password link
+#
+class ResetPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField(error_messages={
+        'required': _("Please enter your email."), 
+        'invalid': _("This email address is not valid")
+        })
+
+#
+# Allow the creation of a new password when the user resetted it
+#
+class SetPasswordSerializer(serializers.Serializer):
+    password1 = serializers.CharField(error_messages={
+        'required': "PASSWORD_REQUIRED", 
+        'invalid': "PASSWORD_INVALID"
+        })
+    password2 = serializers.CharField(error_messages={
+        'required': "PASSWORD_REQUIRED", 
+        'invalid': "PASSWORD_INVALID"
+        })
+
+    def validate_password1(self, value):
+
+        password = value
+
+        if len(password.strip()) < 6:
+            raise serializers.ValidationError("PASSWORD_TOO_SHORT")
+        elif len(password.strip()) > 50:
+            raise serializers.ValidationError("PASSWORD_TOO_LONG")
+        return password
+
+    def validate(self, data):
+
+        if data['password1'] != data['password2']:
+            raise serializers.ValidationError("PASSWORD_MISMATCH")
+
+        return data

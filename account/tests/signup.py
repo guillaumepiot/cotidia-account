@@ -142,6 +142,28 @@ class SignUpTest(TestCase):
         response = self.client.post(reset_url, data)
         self.assertEquals(response.status_code, 302)
 
+    def test_signup_email_uppercase(self):
+        """
+        Test POST on /account/sign-up/
+        """
+        data = {
+            'email':'TEST@test.com',
+            'password1':'demo123',
+            'password2':'demo123',
+        }
+        response = self.client.post(reverse("account-public:sign-up"), data)
+        self.assertEquals(response.status_code, 302)
 
+        # test login no confirm
+        """
+        Test POST on /account/login/
+        """
+        data = {
+            'username':'TEST@test.com',
+            'password':'demo123',
+        }
+        response = self.client.post(reverse("account-public:login"), data)
+        # Shoud not redirect as not allowed to login
+        self.assertEquals(response.status_code, 302)
 
         

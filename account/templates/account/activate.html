@@ -20,7 +20,7 @@
             </div>
             <div class="modal__footer">
                 {% if user.is_active %}
-                <a href="btn btn--primary btn--full-width">
+                <a href="{% url "account-public:login" %}" class="btn btn--primary btn--full-width">
                     {% trans "Login" %}
                 </a>
                 {% endif %}

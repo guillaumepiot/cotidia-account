@@ -138,8 +138,11 @@ class AccountPasswordChangeForm(PasswordChangeForm):
 
         self.fields['new_password1'].label = ''
         self.fields['new_password1'].widget.attrs['placeholder'] = _("New password")
+        self.fields['new_password1'].widget.attrs['autocomplete'] = "off"
+
         self.fields['new_password2'].label = ''
         self.fields['new_password2'].widget.attrs['placeholder'] = _("New password confirmation")
+        self.fields['new_password2'].widget.attrs['autocomplete'] = "off"
 
         for field in self.fields:
             self.fields[field].widget.attrs['class'] = 'form__text'
@@ -198,6 +201,9 @@ class AccountUserCreationForm(forms.Form):
     def clean_email(self):
         email = self.cleaned_data['email']
 
+        # Force all emails to be lowercase and strip trailing spaces
+        email = email.lower().strip()
+        
         if User.objects.filter(email=email).count() > 0:
             raise forms.ValidationError(_("This email is already used."))
 
