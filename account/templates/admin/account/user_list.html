@@ -18,12 +18,14 @@
 	<div class="grid__span-12">
 		<div class="content__inner">
 			<form action="" method="get" class="user-search-form">
-                <div class="form__control form__control--text">
-                    <input type="text" name="query" class="form__text" 
-                        value="{% if search_query %}{{search_query}}{% endif %}">
-                    <button type="submit" class="btn btn--transparent">
-                        <span class="fa fa-search"></span>
-                    </button>
+                <div class="form__group">
+                    <div class="form__control form__control--text">
+                        <input type="text" name="query" class="form__text"
+                            value="{% if search_query %}{{search_query}}{% endif %}">
+                        <button type="submit" class="btn btn--transparent">
+                            <span class="fa fa-search"></span>
+                        </button>
+                    </div>
                 </div>
             </form>
 			<table class="table table--clickable">
@@ -36,7 +38,7 @@
 					<th class="table-head-cell">{% trans "Date joined" %}</th>
 				</tr>
 				{% for user in object_list %}
-				<tr class="table-row" 
+				<tr class="table-row"
 					onClick="window.location = '{% url 'account-admin:user_detail' user.uuid %}'">
 					<td class="table-cell">
 						<a href="{% url 'account-admin:user_detail' user.uuid %}">{{user}}</a></td>
