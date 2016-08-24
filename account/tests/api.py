@@ -1,19 +1,15 @@
-import os
 import re
-import json
 import uuid
 
 from django.core.urlresolvers import reverse
 from django.core import mail
-from django.conf import settings
 
 from rest_framework import status
 from rest_framework.test import APITestCase
-from rest_framework.renderers import JSONRenderer
 
 from account.models import User
-from account import settings as account_settings
 from account.doc import Doc
+
 
 class RegistrationTests(APITestCase):
     fixtures = []
@@ -53,9 +49,9 @@ class RegistrationTests(APITestCase):
         url = reverse('account-api:sign-up')
 
         data = {
-            'full_name':'Ethan Sky Blue',
-            'email':'test@test.com',
-            'password':'demo1234'
+            'full_name': 'Ethan Sky Blue',
+            'email': 'test@test.com',
+            'password': 'demo1234'
         }
 
         response = self.client.post(url, data, format='json')
@@ -77,8 +73,12 @@ class RegistrationTests(APITestCase):
             self.get_confirmation_url_from_email(confirmation_email)
 
         # Get the API confirmation url
-        url = reverse('account-public:activate', kwargs={
-            'uuid':user_uuid, 'token':confirmation_code})
+        url = reverse(
+            'account-public:activate',
+            kwargs={
+                'uuid': user_uuid,
+                'token': confirmation_code
+                })
 
         response = self.client.get(url)
         self.assertEquals(response.status_code, status.HTTP_200_OK)
@@ -94,21 +94,24 @@ class RegistrationTests(APITestCase):
         url = reverse('account-api:sign-up')
 
         data = {
-            'full_name':'Ethan Sky Blue',
-            'email':'test@test.com',
-            'password':'demo1234'
+            'full_name': 'Ethan Sky Blue',
+            'email': 'test@test.com',
+            'password': 'demo1234'
         }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         data = {
-            'full_name':'Ethan Sky Blue',
-            'email':'test@test.com',
-            'password':'demo1234',
+            'full_name': 'Ethan Sky Blue',
+            'email': 'test@test.com',
+            'password': 'demo1234',
         }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data['email'], ["This email is already used."])
+        self.assertEqual(
+            response.data['email'],
+            ["This email is already used."]
+            )
 
     def test_sign_up_invalid_name(self):
         """
@@ -120,35 +123,46 @@ class RegistrationTests(APITestCase):
         # Test full name too long
 
         data = {
-            'full_name':'Too long too long too long too long too long Too long too long',
-            'email':'test@test.com',
-            'password':'demo1234'
+            'full_name': (
+                "Too long too long too long too long too long Too "
+                "long too long"),
+            'email': 'test@test.com',
+            'password': 'demo1234'
         }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data['full_name'], ["The full name must be 50 characters long maximum."])
+        self.assertEqual(
+            response.data['full_name'],
+            ["The full name must be 50 characters long maximum."]
+            )
 
         # Test full name too short
 
         data = {
-            'full_name':'ab',
-            'email':'test@test.com',
-            'password':'demo1234',
+            'full_name': 'ab',
+            'email': 'test@test.com',
+            'password': 'demo1234',
         }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data['full_name'], ["The full name must be at least 3 characters long."])
+        self.assertEqual(
+            response.data['full_name'],
+            ["The full name must be at least 3 characters long."]
+            )
 
         # Test full name invalid
 
         data = {
-            'full_name':'ab $ 13',
-            'email':'test@test.com',
-            'password':'demo1234',
+            'full_name': 'ab $ 13',
+            'email': 'test@test.com',
+            'password': 'demo1234',
         }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data['full_name'], ["The full name field only accepts letters and hyphen."])
+        self.assertEqual(
+            response.data['full_name'],
+            ["The full name field only accepts letters and hyphen."]
+            )
 
     def test_sign_up_invalid_email(self):
         """
@@ -158,13 +172,16 @@ class RegistrationTests(APITestCase):
         url = reverse('account-api:sign-up')
 
         data = {
-            'full_name':'Ethan Blue',
-            'email':'test.test.com',
-            'password':'demo1234'
+            'full_name': 'Ethan Blue',
+            'email': 'test.test.com',
+            'password': 'demo1234'
         }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data['email'], ["This email address is not valid."])
+        self.assertEqual(
+            response.data['email'],
+            ["This email address is not valid."]
+            )
 
     def test_sign_up_invalid_password(self):
         """
@@ -176,24 +193,32 @@ class RegistrationTests(APITestCase):
         # Test password too long
 
         data = {
-            'full_name':'Ethan Blue',
-            'email':'test@test.com',
-            'password':'ToolongtoolongtoolongtoolongtoolongToolongtoolongToolongtoolong',
+            'full_name': 'Ethan Blue',
+            'email': 'test@test.com',
+            'password': (
+                "ToolongtoolongtoolongtoolongtoolongToolongtoolong"
+                "Toolongtoolong"),
         }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data['password'], ["Password must be 50 characters long maximum."])
+        self.assertEqual(
+            response.data['password'],
+            ["Password must be 50 characters long maximum."]
+            )
 
         # Test password too short
 
         data = {
-            'full_name':'ab',
-            'email':'test@test.com',
-            'password':'demo1',
+            'full_name': 'ab',
+            'email': 'test@test.com',
+            'password': 'demo1',
         }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data['password'], ["Password must be at least 6 characters long."])
+        self.assertEqual(
+            response.data['password'],
+            ["Password must be at least 6 characters long."]
+            )
 
     def test_sign_in(self):
         """
@@ -205,8 +230,8 @@ class RegistrationTests(APITestCase):
         url = reverse('account-api:sign-in')
 
         data = {
-            'email':'john@blue.com',
-            'password':'demo5678',
+            'email': 'john@blue.com',
+            'password': 'demo5678',
         }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -229,9 +254,9 @@ class RegistrationTests(APITestCase):
         url = reverse('account-api:sign-up')
 
         data = {
-            'full_name':'Ethan',
-            'email':'test@test.com',
-            'password':'demo1234'
+            'full_name': 'Ethan',
+            'email': 'test@test.com',
+            'password': 'demo1234'
         }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -242,8 +267,51 @@ class RegistrationTests(APITestCase):
             self.get_confirmation_url_from_email(confirmation_email)
 
         # Get the API confirmation url
-        url = reverse('account-public:activate', kwargs={
-            'uuid':user_uuid, 'token':confirmation_code})
+        url = reverse(
+            'account-public:activate',
+            kwargs={
+                'uuid': user_uuid,
+                'token': confirmation_code
+                }
+            )
+
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+
+        user = User.objects.get(uuid=user_uuid)
+        self.assertEquals(user.is_active, True)
+
+    def test_sign_up_mixed_case_email(self):
+        """
+        Test sign up with mixed case email.
+
+        Check that the user can input a mixed case email, and that he can
+        login with the same email, although it will be flatten in the database
+        """
+
+        url = reverse('account-api:sign-up')
+
+        data = {
+            'full_name': 'Ethan',
+            'email': 'Test@test.com',
+            'password': 'demo1234'
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Check confirmation email
+        confirmation_email = str(mail.outbox[0].message())
+        confirmation_url, user_uuid, confirmation_code = \
+            self.get_confirmation_url_from_email(confirmation_email)
+
+        # Get the API confirmation url
+        url = reverse(
+            'account-public:activate',
+            kwargs={
+                'uuid': user_uuid,
+                'token': confirmation_code
+                }
+            )
 
         response = self.client.get(url)
         self.assertEquals(response.status_code, status.HTTP_200_OK)
@@ -257,7 +325,8 @@ class RegistrationTests(APITestCase):
         """
 
         section_title = "Activate"
-        description = ("The url should be formatted as follows:"
+        description = (
+            "The url should be formatted as follows:"
             "`/api/account/activate/<uuid>/<token>/`\n\n"
             "The activation API can return three activation statuses:\n\n"
             "- `USER_INVALID`\n"
@@ -269,9 +338,9 @@ class RegistrationTests(APITestCase):
         # Test validation (required field)
 
         data = {
-            'full_name':'Ethan Sky Blue',
-            'email':'test@test.com',
-            'password':'demo1234'
+            'full_name': 'Ethan Sky Blue',
+            'email': 'test@test.com',
+            'password': 'demo1234'
         }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -287,22 +356,34 @@ class RegistrationTests(APITestCase):
             ))
 
         # Test invalid UUID
-        url = reverse('account-api:activate', kwargs={
-            'uuid':uuid.uuid4(), 'token':confirmation_code})
+        url = reverse(
+            'account-api:activate',
+            kwargs={
+                'uuid': uuid.uuid4(),
+                'token': confirmation_code
+                })
         response = self.client.get(url)
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['message'], 'USER_INVALID')
 
         # Test invalid Token
-        url = reverse('account-api:activate', kwargs={
-            'uuid':user_uuid, 'token':'1234'})
+        url = reverse(
+            'account-api:activate',
+            kwargs={
+                'uuid': user_uuid,
+                'token': '1234'
+                })
         response = self.client.get(url)
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['message'], 'TOKEN_INVALID')
 
         # Get the API confirmation url
-        url = reverse('account-api:activate', kwargs={
-            'uuid':user_uuid, 'token':confirmation_code})
+        url = reverse(
+            'account-api:activate',
+            kwargs={
+                'uuid': user_uuid,
+                'token': confirmation_code
+                })
         response = self.client.get(url)
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['message'], 'ACTIVATED')
@@ -311,13 +392,13 @@ class RegistrationTests(APITestCase):
         self.assertEquals(user.is_active, True)
 
         # Generate documentation
-        
+
         content = {
             'title': section_title,
             'http_method': 'GET',
             'url': url,
             'payload': {
-                'uuid':str(user_uuid),
+                'uuid': str(user_uuid),
                 'token': confirmation_code
             },
             'response': response.data,
@@ -335,9 +416,9 @@ class RegistrationTests(APITestCase):
         url = reverse('account-api:sign-up')
 
         data = {
-            'full_name':'Ethan Sky Blue',
-            'email':'test@test.com',
-            'password':'demo1234'
+            'full_name': 'Ethan Sky Blue',
+            'email': 'test@test.com',
+            'password': 'demo1234'
         }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -348,7 +429,7 @@ class RegistrationTests(APITestCase):
 
         # Invalid token
         data = {
-            'token':'1234',
+            'token': '1234',
         }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -356,7 +437,7 @@ class RegistrationTests(APITestCase):
 
         # Valid token
         data = {
-            'token':token,
+            'token': token,
         }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -421,6 +502,27 @@ class RegistrationTests(APITestCase):
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_reset_password_uppercase_email(self):
+        """
+        Test reset with uppercase email.
+
+        Check that if we submit and email with a different case, we still
+        match the user.
+        """
+
+        data = {
+            'email': self.user.email.upper()
+        }
+        url = reverse('account-api:reset-password')
+        response = self.client.post(url, data, format='json')
+        self.assertEquals(response.data['message'], "PASSWORD_RESET")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        #
+        # Check that an email is sent
+        #
+        self.assertEqual(len(mail.outbox), 1)
+
     def test_reset_key_valid(self):
         """
         Test that the reset key sent by email is valid
@@ -428,7 +530,8 @@ class RegistrationTests(APITestCase):
 
         section_title = "Validate reset token"
 
-        description = ("The validate API can return two statuses:\n\n"
+        description = (
+            "The validate API can return two statuses:\n\n"
             "- `TOKEN_VALID`\n"
             "- `TOKEN_INVALID`")
 
@@ -444,12 +547,14 @@ class RegistrationTests(APITestCase):
         #
         self.assertEqual(len(mail.outbox), 1)
         reset_email = str(mail.outbox[0].message())
-        reset_url, user_uuid, reset_code = self.get_reset_url_from_email(reset_email)
+        reset_url, user_uuid, reset_code = self.get_reset_url_from_email(
+            reset_email)
 
         #
         # Validate the reset code
         #
-        url = reverse('account-api:reset-password-validate', 
+        url = reverse(
+            'account-api:reset-password-validate',
             kwargs={
                 'uuid': user_uuid,
                 'token': reset_code
@@ -465,7 +570,8 @@ class RegistrationTests(APITestCase):
             'http_method': 'POST',
             'url': url,
             'payload': data,
-            'response': response.data
+            'response': response.data,
+            'description': description
         }
         self.doc.display_section(content)
 
@@ -487,7 +593,8 @@ class RegistrationTests(APITestCase):
 
         section_title = "Set new password"
 
-        description = ("The set password API can return two statuses:\n\n"
+        description = (
+            "The set password API can return two statuses:\n\n"
             "- `PASSWORD_SET`\n"
             "- `TOKEN_INVALID`")
 
@@ -504,12 +611,14 @@ class RegistrationTests(APITestCase):
         #
         self.assertEqual(len(mail.outbox), 1)
         reset_email = str(mail.outbox[0].message())
-        reset_url, user_uuid, reset_code = self.get_reset_url_from_email(reset_email)
+        reset_url, user_uuid, reset_code = self.get_reset_url_from_email(
+            reset_email)
 
         #
         # Validate the reset code with the set password url
         #
-        url = reverse('account-api:set-password', 
+        url = reverse(
+            'account-api:set-password',
             kwargs={
                 'uuid': user_uuid,
                 'token': reset_code
@@ -530,7 +639,8 @@ class RegistrationTests(APITestCase):
             'http_method': 'POST',
             'url': url,
             'payload': data,
-            'response': response.data
+            'response': response.data,
+            'description': description
         }
         self.doc.display_section(content)
 
@@ -543,15 +653,14 @@ class RegistrationTests(APITestCase):
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEquals(response.data['message'], "TOKEN_INVALID")
 
-
         #
         # Test that the user can sign in with the new password
         #
         url = reverse('account-api:sign-in')
 
         data = {
-            'email':self.user.email,
-            'password':'new password 123',
+            'email': self.user.email,
+            'password': 'new password 123',
         }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -574,12 +683,14 @@ class RegistrationTests(APITestCase):
         #
         self.assertEqual(len(mail.outbox), 1)
         reset_email = str(mail.outbox[0].message())
-        reset_url, user_uuid, reset_code = self.get_reset_url_from_email(reset_email)
+        reset_url, user_uuid, reset_code = self.get_reset_url_from_email(
+            reset_email)
 
         #
         # That password mismatch
         #
-        url = reverse('account-api:set-password', 
+        url = reverse(
+            'account-api:set-password',
             kwargs={
                 'uuid': user_uuid,
                 'token': reset_code
@@ -591,14 +702,17 @@ class RegistrationTests(APITestCase):
         }
 
         response = self.client.post(url, data)
-        self.assertEquals(response.data['non_field_errors'], 
-            ["PASSWORD_MISMATCH"])
+        self.assertEquals(
+            response.data['non_field_errors'],
+            ["PASSWORD_MISMATCH"]
+            )
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         #
         # That password invalid
         #
-        url = reverse('account-api:set-password', 
+        url = reverse(
+            'account-api:set-password',
             kwargs={
                 'uuid': user_uuid,
                 'token': reset_code
@@ -610,6 +724,8 @@ class RegistrationTests(APITestCase):
         }
 
         response = self.client.post(url, data)
-        self.assertEquals(response.data['password1'], 
-            ["PASSWORD_TOO_SHORT"])
+        self.assertEquals(
+            response.data['password1'],
+            ["PASSWORD_TOO_SHORT"]
+            )
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
