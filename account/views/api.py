@@ -1,26 +1,20 @@
-import datetime, time, hashlib
+import hashlib
 
-from django.utils.text import slugify
 from django.conf import settings
 from django.utils.timezone import now
-from django.utils.translation import ugettext_lazy as _
-from django.contrib.auth.models import Group
-from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.tokens import default_token_generator
 
-from rest_framework import status, generics
-from rest_framework import permissions
-from rest_framework.exceptions import PermissionDenied
+from rest_framework import status, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 
 from account.serializers import (
-    SignUpSerializer, 
-    SignInTokenSerializer, 
-    AuthenticateTokenSerializer, 
+    SignUpSerializer,
+    SignInTokenSerializer,
+    AuthenticateTokenSerializer,
     UserSerializer,
     ResetPasswordSerializer,
     SetPasswordSerializer
@@ -33,9 +27,7 @@ from account.notices import (
 
 
 class SignUp(APIView):
-    """
-    Handle the creation of a new account
-    """
+    """Handle the creation of a new account."""
 
     authentication_classes = ()
     permission_classes = ()
@@ -50,7 +42,7 @@ class SignUp(APIView):
         serializer = SignUpSerializer(data=request.data)
 
         if serializer.is_valid():
-            
+
             full_name = serializer.data['full_name'].strip()
             if len(full_name.split(' ')) > 1:
                 first_name = full_name.split(' ')[0]
@@ -58,7 +50,6 @@ class SignUp(APIView):
             else:
                 first_name = full_name
                 last_name = ''
-
 
             email = serializer.data['email'].strip()
             password = serializer.data['password'].strip()
@@ -70,7 +61,7 @@ class SignUp(APIView):
             # Create the user
             user = User.objects.create(
                 username=username,
-                email=email, 
+                email=email,
                 first_name=first_name,
                 last_name=last_name,
                 last_login=now(),
@@ -79,22 +70,27 @@ class SignUp(APIView):
             user.set_password(password)
             user.save()
 
-
             # Create and send the confirmation email
             token = default_token_generator.make_token(user)
-            url = '/activate/{0}/{1}/'.format(user.uuid, token)
+
+            if hasattr(settings, 'APP_URL'):
+                APP_URL = settings.APP_URL
+            else:
+                APP_URL = settings.SITE_URL
+
+            url = '{0}/activate/{1}/{2}/'.format(APP_URL, user.uuid, token)
 
             notice = NewUserActivationNotice(
-                recipients = ['%s <%s>' % (user.get_full_name(), user.email) ],
-                context = {
-                    'url':"%s%s" % (settings.APP_URL, url),
-                    'first_name':user.first_name
+                recipients=['%s <%s>' % (user.get_full_name(), user.email)],
+                context={
+                    'url': url,
+                    'first_name': user.first_name
                 }
             )
             notice.send(force_now=True)
 
             token, created = Token.objects.get_or_create(user=user)
-            
+
             data = {'token': token.key}
             user = UserSerializer(token.user)
             data.update(user.data)
@@ -102,10 +98,9 @@ class SignUp(APIView):
             return Response(data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class SignIn(APIView):
-    """
-    Sign in a user with email and password
-    """
+    """Sign in a user with email and password."""
 
     authentication_classes = ()
     permission_classes = ()
@@ -121,7 +116,10 @@ class SignIn(APIView):
 
         if serializer.is_valid():
 
-            user = authenticate(username=serializer.data['email'], password=serializer.data['password'])
+            user = authenticate(
+                username=serializer.data['email'],
+                password=serializer.data['password']
+                )
             auth_login(request, user)
 
             token, created = Token.objects.get_or_create(user=user)
@@ -131,13 +129,12 @@ class SignIn(APIView):
             data.update(user.data)
 
             return Response(data)
-        
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class Activate(APIView):
-    """
-    Activate a profile
-    """
+    """Activate a profile."""
 
     authentication_classes = ()
     permission_classes = ()
@@ -148,21 +145,26 @@ class Activate(APIView):
         try:
             user = User.objects.get(uuid=uuid)
         except User.DoesNotExist:
-            return Response({'message':'USER_INVALID'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'message': 'USER_INVALID'},
+                status=status.HTTP_400_BAD_REQUEST
+                )
 
         if not default_token_generator.check_token(user, token):
-            return Response({'message':'TOKEN_INVALID'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'message': 'TOKEN_INVALID'},
+                status=status.HTTP_400_BAD_REQUEST
+                )
 
         # Activate now
         user.is_active = True
         user.save()
 
-        return Response({'message':'ACTIVATED'}, status=status.HTTP_200_OK)
+        return Response({'message': 'ACTIVATED'}, status=status.HTTP_200_OK)
+
 
 class Authenticate(APIView):
-    """
-    Authenticate with a given token
-    """
+    """Authenticate with a given token."""
 
     authentication_classes = ()
     permission_classes = ()
@@ -173,23 +175,23 @@ class Authenticate(APIView):
 
     @transaction.atomic
     def post(self, request, user_serializer_class=None):
-        
+
         if user_serializer_class is None:
             user_serializer_class = UserSerializer
 
         serializer = self.serializer_class(data=request.data)
-        
+
         if serializer.is_valid():
             try:
                 token = Token.objects.get(key=serializer.data['token'])
             except Token.DoesNotExist:
                 return Response(
-                    {'message':'TOKEN_INVALID'}, 
+                    {'message': 'TOKEN_INVALID'},
                     status=status.HTTP_400_BAD_REQUEST)
 
             if not token.user.is_active:
                 return Response(
-                    {'message':'USER_INACTIVE'}, 
+                    {'message': 'USER_INACTIVE'},
                     status=status.HTTP_400_BAD_REQUEST)
 
             user = user_serializer_class(token.user)
@@ -198,10 +200,9 @@ class Authenticate(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class ResetPassword(APIView):
-    """
-    Reset the password for an exiting user
-    """
+    """Reset the password for an exiting user."""
 
     authentication_classes = ()
     permission_classes = ()
@@ -220,24 +221,32 @@ class ResetPassword(APIView):
         if user:
 
             token = default_token_generator.make_token(user)
-            url = '/reset-password/{0}/{1}/'.format(user.uuid, token)
+
+            if hasattr(settings, 'APP_URL'):
+                APP_URL = settings.APP_URL
+            else:
+                APP_URL = settings.SITE_URL
+
+            url = '{0}/reset-password/{1}/{2}/'.format(
+                APP_URL, user.uuid, token)
 
             notice = ResetPasswordNotice(
-                recipients = ['%s <%s>' % (user.get_full_name(), user.email) ],
-                context = {
-                    'url':"%s%s" % (settings.APP_URL, url),
-                    'first_name':user.first_name
+                recipients=['%s <%s>' % (user.get_full_name(), user.email)],
+                context={
+                    'url': url,
+                    'first_name': user.first_name
                 }
             )
             notice.send(force_now=True)
 
-        return Response({'message': "PASSWORD_RESET"}, 
-            status=status.HTTP_200_OK)
+        return Response(
+            {'message': "PASSWORD_RESET"},
+            status=status.HTTP_200_OK
+            )
+
 
 class ResetPasswordValidate(APIView):
-    """
-    Validate the reset password key
-    """
+    """Validate the reset password key."""
 
     authentication_classes = ()
     permission_classes = ()
@@ -249,21 +258,19 @@ class ResetPasswordValidate(APIView):
             user = User.objects.get(uuid=uuid)
         except User.DoesNotExist:
             return Response(
-                {'message': "USER_INVALID"}, 
+                {'message': "USER_INVALID"},
                 status=status.HTTP_400_BAD_REQUEST)
 
         if not default_token_generator.check_token(user, token):
             return Response(
-                {'message':'TOKEN_INVALID'}, 
+                {'message': "TOKEN_INVALID"},
                 status=status.HTTP_400_BAD_REQUEST)
-
 
         return Response({'message': "TOKEN_VALID"}, status=status.HTTP_200_OK)
 
+
 class SetPassword(APIView):
-    """
-    Set the new password
-    """
+    """Set the new password."""
 
     authentication_classes = ()
     permission_classes = ()
@@ -275,12 +282,12 @@ class SetPassword(APIView):
             user = User.objects.get(uuid=uuid)
         except User.DoesNotExist:
             return Response(
-                {'message': "USER_INVALID"}, 
+                {'message': "USER_INVALID"},
                 status=status.HTTP_400_BAD_REQUEST)
 
         if not default_token_generator.check_token(user, token):
             return Response(
-                {'message': "TOKEN_INVALID"}, 
+                {'message': "TOKEN_INVALID"},
                 status=status.HTTP_400_BAD_REQUEST)
 
         serializer = SetPasswordSerializer(data=request.data)
@@ -293,3 +300,19 @@ class SetPassword(APIView):
         user.save()
 
         return Response({'message': "PASSWORD_SET"}, status=status.HTTP_200_OK)
+
+
+class UpdateDetails(APIView):
+    """Update the user details."""
+
+    def get_permissions(self):
+        return [permissions.IsAuthenticated()]
+
+    @transaction.atomic
+    def post(self, request):
+
+        serializer = UserSerializer(instance=request.user, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
