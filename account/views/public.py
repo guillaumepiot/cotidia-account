@@ -1,8 +1,8 @@
 import hashlib
 
-from django.http import HttpResponse, HttpRequest, HttpResponseRedirect  
+from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404, redirect
-from django.template import RequestContext              
+from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.decorators import permission_required, login_required
@@ -14,7 +14,7 @@ from django.conf import settings
 
 from account.forms import UpdateDetailsForm, AccountUserCreationForm
 from account.models import User
-from account.settings import ACCOUNT_FORCE_ACTIVATION
+from account import settings as account_settings
 from account.notices import (
     NewUserActivationNotice
     )
@@ -24,7 +24,7 @@ def dashboard(request):
     template = 'account/dashboard.html'
     return render_to_response(template, {},
         context_instance=RequestContext(request))
-    
+
 @login_required
 def edit(request):
     template = 'account/edit.html'
@@ -44,7 +44,7 @@ def login_remember_me(request, *args, **kwargs):
     """Custom login view that enables "remember me" functionality."""
     # Redirect to account page if already logged in
     if request.user.is_authenticated():
-        return HttpResponseRedirect(reverse('account-public:dashboard')) 
+        return HttpResponseRedirect(reverse('account-public:dashboard'))
     if request.method == 'POST':
         if not request.POST.get('remember_me', None):
             request.session.set_expiry(0)
@@ -63,7 +63,7 @@ def sign_up(request):
 
     # Redirect to account page if already logged in
     if request.user.is_authenticated():
-        return HttpResponseRedirect(reverse('account-public:dashboard')) 
+        return HttpResponseRedirect(reverse('account-public:dashboard'))
 
     if request.method == "POST":
         form = AccountUserCreationForm(request.POST)
@@ -76,7 +76,7 @@ def sign_up(request):
             user.username = m.hexdigest()[0:30]
             user.save()
 
-            if ACCOUNT_FORCE_ACTIVATION:
+            if account_settings.ACCOUNT_FORCE_ACTIVATION is True:
                 user.is_active = False
                 user.save()
             else:
@@ -101,15 +101,15 @@ def sign_up(request):
                 }
             )
             notice.send(force_now=True)
-            
-            if ACCOUNT_FORCE_ACTIVATION:
+
+            if account_settings.ACCOUNT_FORCE_ACTIVATION is True:
                 return HttpResponseRedirect(reverse('account-public:activation-pending'))
             elif success_url:
                 return HttpResponseRedirect(success_url)
             else:
                 return HttpResponseRedirect(reverse('account-public:dashboard'))
 
-    return render_to_response(template, {'form': form, 'success_url':success_url },
+    return render_to_response(template, {'form': form, 'success_url': success_url },
         context_instance=RequestContext(request))
 
 
