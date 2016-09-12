@@ -740,6 +740,38 @@ class AccountAPITests(APITestCase):
         }
         self.doc.display_section(content)
 
+    def test_update_details_empty_values(self):
+        """Test that details can be updated."""
+
+        self.client.credentials(
+            HTTP_AUTHORIZATION='Token ' + self.user_token.key)
+
+        data = {
+            'first_name': "",
+            'last_name': "",
+            'email': ""
+        }
+        url = reverse('account-api:update-details')
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEquals(
+            response.data['first_name'], ['This field may not be blank.'])
+        self.assertEquals(
+            response.data['last_name'], ['This field may not be blank.'])
+        self.assertEquals(
+            response.data['email'], ['This field may not be blank.'])
+
+        data = {}
+        url = reverse('account-api:update-details')
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEquals(
+            response.data['first_name'], ['This field is required.'])
+        self.assertEquals(
+            response.data['last_name'], ['This field is required.'])
+        self.assertEquals(
+            response.data['email'], ['This field is required.'])
+
     def test_sign_up_no_activation(self):
         """Test sign up without activation email.
 

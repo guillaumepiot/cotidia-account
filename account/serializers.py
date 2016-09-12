@@ -124,6 +124,10 @@ class AuthenticateTokenSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    email = serializers.EmailField()
+
     class Meta:
         model = User
         fields = ['email', 'first_name', 'last_name']

@@ -315,6 +315,9 @@ class SetPassword(APIView):
 class UpdateDetails(APIView):
     """Update the user details."""
 
+    def get_serializer_class(self):
+        return UserSerializer
+
     def get_permissions(self):
         return [permissions.IsAuthenticated()]
 
