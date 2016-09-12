@@ -10,9 +10,10 @@ from rest_framework.authtoken.models import Token
 
 from account.models import User
 from account.doc import Doc
+from account import settings as account_settings
 
 
-class RegistrationTests(APITestCase):
+class AccountAPITests(APITestCase):
 
     def setUp(self):
         self.user = User.objects.create(email="john@blue.com", is_active=True)
@@ -22,6 +23,9 @@ class RegistrationTests(APITestCase):
             user=self.user)
 
         self.doc = Doc()
+
+        # Default account settings override
+        account_settings.ACCOUNT_FORCE_ACTIVATION = True
 
     def get_confirmation_url_from_email(self, email_message):
         exp = r'(\/activate\/([a-z0-9\-]+)\/([a-z0-9\-]+))\/'
@@ -68,6 +72,7 @@ class RegistrationTests(APITestCase):
         self.doc.display_section(content)
 
         # Check confirmation email
+        self.assertEqual(len(mail.outbox), 1)
         confirmation_email = str(mail.outbox[0].message())
         confirmation_url, user_uuid, confirmation_code = \
             self.get_confirmation_url_from_email(confirmation_email)
@@ -734,3 +739,31 @@ class RegistrationTests(APITestCase):
             'description': "Update the details of the user making the request."
         }
         self.doc.display_section(content)
+
+    def test_sign_up_no_activation(self):
+        """Test sign up without activation email.
+
+        If `ACCOUNT_FORCE_ACTIVATION` is set to False then the sign up
+        call should create an active user and not send an activation
+        email.
+        """
+
+        account_settings.ACCOUNT_FORCE_ACTIVATION = False
+
+        url = reverse('account-api:sign-up')
+
+        data = {
+            'full_name': 'Ethan Sky Blue',
+            'email': 'test@test.com',
+            'password': 'demo1234'
+        }
+
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Check confirmation email is not sent
+        self.assertEqual(len(mail.outbox), 0)
+
+        # Check that the user is active
+        user = User.objects.filter().latest('id')
+        self.assertEquals(user.is_active, True)

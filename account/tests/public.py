@@ -8,7 +8,7 @@ from django.test.client import Client
 
 from account.models import User
 
-class SignUpTest(TestCase):
+class AccountPublicTests(TestCase):
 
     def setUp(self):
        pass
@@ -92,7 +92,7 @@ class SignUpTest(TestCase):
         response = self.client.post(reverse("account-public:logout"), data)
         self.assertEquals(response.status_code, 200)
 
-    
+
     def test_password_reset(self):
 
         data = {
@@ -130,7 +130,7 @@ class SignUpTest(TestCase):
 
         site_url = settings.SITE_URL.replace('/', '\/')
         exp = r'('+site_url+'\/([a-z\-\/]+)?account\/password\/reset\/confirm\/([a-zA-Z0-9\-]+)\/)'
-        
+
         m = re.search(exp, email_message)
         reset_url = m.group()
 
@@ -165,5 +165,3 @@ class SignUpTest(TestCase):
         response = self.client.post(reverse("account-public:login"), data)
         # Shoud not redirect as not allowed to login
         self.assertEquals(response.status_code, 302)
-
-        

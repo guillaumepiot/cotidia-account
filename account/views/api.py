@@ -24,6 +24,7 @@ from account.notices import (
     NewUserActivationNotice,
     ResetPasswordNotice
     )
+from account import settings as account_settings
 
 
 class SignUp(APIView):
@@ -58,6 +59,11 @@ class SignUp(APIView):
             m.update(email.encode('utf-8'))
             username = m.hexdigest()[0:30]
 
+            if account_settings.ACCOUNT_FORCE_ACTIVATION is True:
+                active = False
+            else:
+                active = True
+
             # Create the user
             user = User.objects.create(
                 username=username,
@@ -65,29 +71,33 @@ class SignUp(APIView):
                 first_name=first_name,
                 last_name=last_name,
                 last_login=now(),
-                is_active=False
+                is_active=active
                 )
             user.set_password(password)
             user.save()
 
-            # Create and send the confirmation email
-            token = default_token_generator.make_token(user)
+            if account_settings.ACCOUNT_FORCE_ACTIVATION is True:
 
-            if hasattr(settings, 'APP_URL'):
-                APP_URL = settings.APP_URL
-            else:
-                APP_URL = settings.SITE_URL
+                # Create and send the confirmation email
+                token = default_token_generator.make_token(user)
 
-            url = '{0}/activate/{1}/{2}/'.format(APP_URL, user.uuid, token)
+                if hasattr(settings, 'APP_URL'):
+                    APP_URL = settings.APP_URL
+                else:
+                    APP_URL = settings.SITE_URL
 
-            notice = NewUserActivationNotice(
-                recipients=['%s <%s>' % (user.get_full_name(), user.email)],
-                context={
-                    'url': url,
-                    'first_name': user.first_name
-                }
-            )
-            notice.send(force_now=True)
+                url = '{0}/activate/{1}/{2}/'.format(APP_URL, user.uuid, token)
+
+                notice = NewUserActivationNotice(
+                    recipients=['{0} <{1}>'.format(
+                        user.get_full_name(), user.email
+                        )],
+                    context={
+                        'url': url,
+                        'first_name': user.first_name
+                    }
+                )
+                notice.send(force_now=True)
 
             token, created = Token.objects.get_or_create(user=user)
 

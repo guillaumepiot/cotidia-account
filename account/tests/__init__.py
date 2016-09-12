@@ -1,2 +1,2 @@
-from .signup import *
-from .api import *
+from account.tests.public import *
+from account.tests.api import *
