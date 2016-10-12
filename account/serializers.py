@@ -1,9 +1,14 @@
+import hashlib
+
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import authenticate
+from django.utils.timezone import now
+
 from rest_framework import serializers
 
 from account.models import User
 from account.validators import is_alpha
+from account import settings as account_settings
 
 
 class SignUpSerializer(serializers.Serializer):
@@ -63,6 +68,42 @@ class SignUpSerializer(serializers.Serializer):
                 "Password must be 50 characters long maximum."
                 )
         return password
+
+    def create(self, validated_data):
+
+        full_name = validated_data['full_name'].strip()
+        if len(full_name.split(' ')) > 1:
+            first_name = full_name.split(' ')[0]
+            last_name = ' '.join(full_name.split(' ')[1:])
+        else:
+            first_name = full_name
+            last_name = ''
+
+        email = validated_data['email'].strip()
+        password = validated_data['password'].strip()
+
+        m = hashlib.md5()
+        m.update(email.encode('utf-8'))
+        username = m.hexdigest()[0:30]
+
+        if account_settings.ACCOUNT_FORCE_ACTIVATION is True:
+            active = False
+        else:
+            active = True
+
+        # Create the user
+        user = User.objects.create(
+            username=username,
+            email=email,
+            first_name=first_name,
+            last_name=last_name,
+            last_login=now(),
+            is_active=active
+            )
+        user.set_password(password)
+        user.save()
+
+        return user
 
 
 class SignInTokenSerializer(serializers.Serializer):

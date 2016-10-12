@@ -1,7 +1,4 @@
-import hashlib
-
 from django.conf import settings
-from django.utils.timezone import now
 from django.db import transaction
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.tokens import default_token_generator
@@ -38,43 +35,19 @@ class SignUp(APIView):
         return self.serializer_class
 
     @transaction.atomic
-    def post(self, request):
+    def post(self, request, serializer_class=None, user_serializer_class=None):
 
-        serializer = SignUpSerializer(data=request.data)
+        if serializer_class is None:
+            serializer_class = self.get_serializer_class()
+
+        if user_serializer_class is None:
+            user_serializer_class = UserSerializer
+
+        serializer = serializer_class(data=request.data)
 
         if serializer.is_valid():
 
-            full_name = serializer.data['full_name'].strip()
-            if len(full_name.split(' ')) > 1:
-                first_name = full_name.split(' ')[0]
-                last_name = ' '.join(full_name.split(' ')[1:])
-            else:
-                first_name = full_name
-                last_name = ''
-
-            email = serializer.data['email'].strip()
-            password = serializer.data['password'].strip()
-
-            m = hashlib.md5()
-            m.update(email.encode('utf-8'))
-            username = m.hexdigest()[0:30]
-
-            if account_settings.ACCOUNT_FORCE_ACTIVATION is True:
-                active = False
-            else:
-                active = True
-
-            # Create the user
-            user = User.objects.create(
-                username=username,
-                email=email,
-                first_name=first_name,
-                last_name=last_name,
-                last_login=now(),
-                is_active=active
-                )
-            user.set_password(password)
-            user.save()
+            user = serializer.save()
 
             if account_settings.ACCOUNT_FORCE_ACTIVATION is True:
 
@@ -102,7 +75,7 @@ class SignUp(APIView):
             token, created = Token.objects.get_or_create(user=user)
 
             data = {'token': token.key}
-            user = UserSerializer(token.user)
+            user = user_serializer_class(token.user)
             data.update(user.data)
 
             return Response(data, status=status.HTTP_201_CREATED)
@@ -322,9 +295,12 @@ class UpdateDetails(APIView):
         return [permissions.IsAuthenticated()]
 
     @transaction.atomic
-    def post(self, request):
+    def post(self, request, serializer_class):
 
-        serializer = UserSerializer(instance=request.user, data=request.data)
+        if serializer_class is None:
+            serializer_class = self.get_serializer_class()
+
+        serializer = serializer_class(instance=request.user, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 

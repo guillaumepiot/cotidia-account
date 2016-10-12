@@ -1,19 +1,22 @@
-"""Custom registration forms that expects an email address as a username."""
 import hashlib
-import os
 
 from django import forms
 from django.conf import settings
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import authenticate, get_user_model
-from django.utils.translation import ugettext_lazy as _
-from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm, SetPasswordForm, PasswordChangeForm, ReadOnlyPasswordHashField
+from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import (
+    AuthenticationForm,
+    PasswordResetForm,
+    SetPasswordForm,
+    PasswordChangeForm,
+    ReadOnlyPasswordHashField
+)
 
 from account.models import User
 
+
 def get_md5_hexdigest(email):
     """
-    Returns an md5 hash for a given email.
+    Return an md5 hash for a given email.
 
     The length is 30 so that it fits into Django's ``User.username`` field.
 
@@ -23,7 +26,7 @@ def get_md5_hexdigest(email):
 
 def generate_username(email):
     """
-    Generates a unique username for the given email.
+    Generate a unique username for the given email.
 
     The username will be an md5 hash of the given email. If the username exists
     we just append `a` to the email until we get a unique md5 hash.
@@ -52,17 +55,17 @@ class EmailAuthenticationForm(AuthenticationForm):
     required_css_class = 'required'
     remember_me = forms.BooleanField(
         required=False,
-        label=_('Remember me for two weeks'),
+        label='Remember me for two weeks',
     )
     username = forms.EmailField(
-        label='', 
-        max_length=256, 
-        widget=forms.TextInput(attrs={'placeholder':_("Email")})
+        label='',
+        max_length=256,
+        widget=forms.TextInput(attrs={'placeholder': "Email"})
         )
     password = forms.CharField(
-        label='', 
-        max_length=256, 
-        widget=forms.PasswordInput(attrs={'placeholder':_("Password")})
+        label='',
+        max_length=256,
+        widget=forms.PasswordInput(attrs={'placeholder': "Password"})
         )
 
     def __init__(self, *args, **kwargs):
@@ -80,9 +83,9 @@ class AccountPasswordResetForm(PasswordResetForm):
     required_css_class = 'required'
 
     email = forms.EmailField(
-        label='', 
-        max_length=256, 
-        widget=forms.TextInput(attrs={'placeholder':_("Email")})
+        label='',
+        max_length=256,
+        widget=forms.TextInput(attrs={'placeholder': "Email"})
         )
 
     def __init__(self, *args, **kwargs):
@@ -97,14 +100,17 @@ class AccountPasswordResetForm(PasswordResetForm):
         active_users = UserModel._default_manager.filter(
             email__iexact=email, is_active=True)
         if active_users.count() == 0:
-            raise forms.ValidationError(_('There are no active accounts associated to this email.'))
+            raise forms.ValidationError(
+                "There are no active accounts associated to this email."
+                )
 
         return email
 
     def save(self, *args, **kwargs):
-        request = kwargs['request']
         domain_override = settings.SITE_URL
-        super(AccountPasswordResetForm, self).save(domain_override, *args, **kwargs)
+        super(AccountPasswordResetForm, self).save(
+            domain_override, *args, **kwargs)
+
 
 class AccountSetPasswordForm(SetPasswordForm):
     required_css_class = 'required'
@@ -113,35 +119,40 @@ class AccountSetPasswordForm(SetPasswordForm):
         super(AccountSetPasswordForm, self).__init__(*args, **kwargs)
 
         self.fields['new_password1'].label = ''
-        self.fields['new_password1'].widget.attrs['placeholder'] = _("New password")
+        self.fields['new_password1'].widget.attrs['placeholder'] = \
+            "New password"
         self.fields['new_password2'].label = ''
-        self.fields['new_password2'].widget.attrs['placeholder'] = _("New password confirmation")
+        self.fields['new_password2'].widget.attrs['placeholder'] = \
+            "New password confirmation"
 
         for field in self.fields:
             self.fields[field].widget.attrs['class'] = 'form__text'
 
 
 class AccountPasswordChangeForm(PasswordChangeForm):
-    
-    """
-    A form that change the password for the logged in user. The old password is asked to Validate
-    its identity
+    """A form that change the password for the logged in user.
+
+    The old password is asked to validate its identity.
     """
 
     old_password = forms.CharField(
         label="",
-        widget=forms.PasswordInput(attrs={'placeholder':_("Old password"), 'class':'form__text'})
+        widget=forms.PasswordInput(
+            attrs={'placeholder': "Old password", 'class': 'form__text'}
+            )
         )
 
     def __init__(self, *args, **kwargs):
         super(AccountPasswordChangeForm, self).__init__(*args, **kwargs)
 
         self.fields['new_password1'].label = ''
-        self.fields['new_password1'].widget.attrs['placeholder'] = _("New password")
+        self.fields['new_password1'].widget.attrs['placeholder'] = \
+            "New password"
         self.fields['new_password1'].widget.attrs['autocomplete'] = "off"
 
         self.fields['new_password2'].label = ''
-        self.fields['new_password2'].widget.attrs['placeholder'] = _("New password confirmation")
+        self.fields['new_password2'].widget.attrs['placeholder'] = \
+            "New password confirmation"
         self.fields['new_password2'].widget.attrs['autocomplete'] = "off"
 
         for field in self.fields:
@@ -150,8 +161,12 @@ class AccountPasswordChangeForm(PasswordChangeForm):
 
 class UpdateDetailsForm(forms.ModelForm):
 
-    email = forms.EmailField(label='',
-        widget=forms.TextInput(attrs={'placeholder':_("Email address"), 'class':'form__text'}))
+    email = forms.EmailField(
+        label='',
+        widget=forms.TextInput(
+            attrs={'placeholder': "Email address", 'class': 'form__text'}
+            )
+        )
 
     class Meta:
         model = User
@@ -163,30 +178,43 @@ class UpdateDetailsForm(forms.ModelForm):
     def clean_email(self):
         email = self.cleaned_data['email']
 
-        if User.objects.filter(email=email).count() > 0 and \
-            self.instance.email != email:
-            raise forms.ValidationError(_("This email is already used."))
+        if User.objects.filter(email=email).count() > 0 \
+                and self.instance.email != email:
+            raise forms.ValidationError("This email is already used.")
 
         return email
 
 
 class AccountUserCreationForm(forms.Form):
-    """
-    A form that creates a user, with no privileges, from the given username and
-    password.
-    """
+    """A form that creates a user, with no privileges."""
+
     error_messages = {
-        'password_mismatch': _("The two password fields didn't match."),
+        'password_mismatch': "The two password fields didn't match.",
     }
-    email = forms.EmailField(label='',
-        widget=forms.TextInput(attrs={'placeholder':_("Email address"), 'class':'form__text'}))
+    email = forms.EmailField(
+        label='',
+        widget=forms.TextInput(
+            attrs={'placeholder': "Email address", 'class': 'form__text'}
+            )
+        )
 
-    password1 = forms.CharField(label='',
-        widget=forms.PasswordInput(attrs={'placeholder':_("Password"), 'class':'form__text'}))
+    password1 = forms.CharField(
+        label='',
+        widget=forms.PasswordInput(
+            attrs={'placeholder': "Password", 'class': 'form__text'}
+            )
+        )
 
-    password2 = forms.CharField(label='',
-        widget=forms.PasswordInput(attrs={'placeholder':_("Password Confirmation"), 'class':'form__text'}),
-        help_text=_("Enter the same password as before, for verification."))
+    password2 = forms.CharField(
+        label='',
+        widget=forms.PasswordInput(
+            attrs={
+                'placeholder': "Password Confirmation",
+                'class': 'form__text'
+                }
+            ),
+        help_text="Enter the same password as before, for verification."
+        )
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
@@ -203,30 +231,38 @@ class AccountUserCreationForm(forms.Form):
 
         # Force all emails to be lowercase and strip trailing spaces
         email = email.lower().strip()
-        
+
         if User.objects.filter(email=email).count() > 0:
-            raise forms.ValidationError(_("This email is already used."))
+            raise forms.ValidationError("This email is already used.")
 
         return email
-        
+
+
 class AccountUserChangeForm(forms.ModelForm):
-    password = ReadOnlyPasswordHashField(label=_("Password"),
-        help_text=_("Raw passwords are not stored, so there is no way to see "
-                    "this user's password, but you can change the password "
-                    "using <a href=\"password/\">this form</a>."))
+    password = ReadOnlyPasswordHashField(
+        label="Password",
+        help_text=(
+            "Raw passwords are not stored, so there is no way to see "
+            "this user's password, but you can change the password "
+            "using <a href=\"password/\">this form</a>."
+            )
+        )
+
     class Meta:
         model = User
-        #fields = '__all__'
         exclude = ()
 
     def clean_email(self):
-        """
-        Validate that the supplied email address is unique for the
-        site.
-        
-        """
-        if self.cleaned_data.get('email') and User.objects.filter(email__iexact=self.cleaned_data['email']).exclude(username=self.cleaned_data['username']).exclude(username=self.initial['username']):
-            raise forms.ValidationError(_("This email address is already in use. Please supply a different email address."))
+        """Validate that the supplied email address is unique for the site."""
+
+        query = User.objects.filter(email__iexact=self.cleaned_data['email'])
+        query = query.exclude(username=self.cleaned_data['username'])
+        query = query.exclude(username=self.initial['username'])
+        if self.cleaned_data.get('email') and query:
+            raise forms.ValidationError(
+                "This email address is already in use. "
+                "Please supply a different email address."
+                )
         return self.cleaned_data['email']
 
     def clean_password(self):

@@ -59,6 +59,7 @@ class AccountAPITests(APITestCase):
         }
 
         response = self.client.post(url, data, format='json')
+        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # Generate documentation
