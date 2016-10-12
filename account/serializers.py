@@ -113,8 +113,8 @@ class SignInTokenSerializer(serializers.Serializer):
         'invalid': _("This email address is not valid.")
         })
     password = serializers.CharField(error_messages={
-        'blank': _("Please enter a password"),
-        'invalid': _("This password is not valid")
+        'blank': _("Please enter a password."),
+        'invalid': _("This password is not valid.")
         })
     remember_me = serializers.CharField(required=False)
 
@@ -180,7 +180,7 @@ class UserSerializer(serializers.ModelSerializer):
 class ResetPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField(error_messages={
         'required': _("Please enter your email."),
-        'invalid': _("This email address is not valid")
+        'invalid': _("This email address is not valid.")
         })
 
     def validate_email(self, value):

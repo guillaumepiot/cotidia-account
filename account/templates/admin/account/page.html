@@ -1,13 +1,13 @@
 {% extends "admin/account/base.html" %}{% load i18n %}
 {% block main %}
-	{% include "admin/account/menu.html" %}
+    {% include "admin/account/menu.html" %}
 
-	<div class="toolbar toolbar--menu-open" id="toolbar">
-		{% block toolbar %}{% endblock toolbar %}
-	</div>
+    <div class="toolbar toolbar--menu-open" id="toolbar">
+        {% block toolbar %}{% endblock toolbar %}
+    </div>
 
-	<div class="content content--menu-open" id="content">
-		{% include "admin/includes/messages.html" %}
-		{% block content %}{% endblock content %}
-	</div>
+    <div class="content content--menu-open" id="content">
+        {% include "admin/includes/messages.html" %}
+        {% block content %}{% endblock content %}
+    </div>
 {% endblock main %}

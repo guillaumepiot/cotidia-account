@@ -22,7 +22,7 @@
                             {% endfor %}
                             </div>
                         {% endif %}
-                        
+
                         {% with form.email as field %}
                             {% include 'admin/includes/text-field.html' %}
                         {% endwith %}
@@ -34,7 +34,7 @@
                         {% endwith %}
 
                         <input type="hidden" name="next" value="{{ next }}" />
-                    
+
                 </div>
                 <div class="modal__footer">
                     <button class="btn btn--primary btn--full-width" type="submit">
@@ -43,7 +43,7 @@
                 </div>
             </div>
             <div class="modal__sub-footer modal__sub-footer--small text-center">
-                
+
                 <p>
                     <a href="{% url "account-public:login" %}">{% trans "Login" %}</a>
                 </p>
