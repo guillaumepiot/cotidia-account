@@ -153,11 +153,10 @@ class Authenticate(APIView):
     permission_classes = ()
     serializer_class = AuthenticateTokenSerializer
 
-    def get_serializer_class(self):
-        return self.serializer_class
-
     @transaction.atomic
     def post(self, request, user_serializer_class=None):
+
+        print(user_serializer_class)
 
         if user_serializer_class is None:
             user_serializer_class = UserSerializer
