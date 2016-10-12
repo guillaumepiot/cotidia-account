@@ -165,9 +165,27 @@ class AuthenticateTokenSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    first_name = serializers.CharField()
-    last_name = serializers.CharField()
-    email = serializers.EmailField()
+    first_name = serializers.CharField(
+        error_messages={
+            'required': "Please enter your first name.",
+            'blank': "The first name may not be blank.",
+            'invalid': "The first name is not valid."
+        }
+    )
+    last_name = serializers.CharField(
+        error_messages={
+            'required': "Please enter your last name.",
+            'blank': "The last name may not be blank.",
+            'invalid': "The last name is not valid."
+        }
+    )
+    email = serializers.EmailField(
+        error_messages={
+            'required': "Please enter your email.",
+            'blank': "The email may not be blank.",
+            'invalid': "The email is not valid."
+        }
+    )
 
     class Meta:
         model = User
