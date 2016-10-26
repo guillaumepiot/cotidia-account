@@ -14,9 +14,8 @@ CLASSIFIERS = [
 ]
 
 install_requires = [
-    'Django>=1.9.1',
-    'django-form-utils==1.0.3',
-    'djangorestframework',
+    'Django>=1.10.2',
+    'djangorestframework>=3.5.1',
 ]
 
 # taken from django-registration
@@ -30,7 +29,8 @@ if root_dir:
 for dirpath, dirnames, filenames in os.walk('account'):
     # Ignore dirnames that start with '.'
     for i, dirname in enumerate(dirnames):
-        if dirname.startswith('.'): del dirnames[i]
+        if dirname.startswith('.'):
+            del dirnames[i]
     if '__init__.py' in filenames:
         pkg = dirpath.replace(os.path.sep, '.')
         if os.path.altsep:
@@ -38,24 +38,25 @@ for dirpath, dirnames, filenames in os.walk('account'):
         packages.append(pkg)
     elif filenames:
 
-        ################################################################################
-        # !!! IMPORTANT !!!                                                            #
-        # To get the right prefix, enter the index key of the same                     #
-        # value as the length of your package folder name, including the slash.        #
-        # Eg: for 'account/'' , key will be 4                                          #
-        ################################################################################
+        #######################################################################
+        # !!! IMPORTANT !!!                                                   #
+        # To get the right prefix, enter the index key of the same            #
+        # value as the length of your package folder name,                    #
+        # including the slash.                                                #
+        # Eg: for 'account/'' , key will be 4                                 #
+        #######################################################################
 
-        prefix = dirpath[4:] # Strip "account/" or "account\"
+        prefix = dirpath[4:]  # Strip "account/" or "account\"
         for f in filenames:
             data_files.append(os.path.join(prefix, f))
 
 setup(
     name="cotidia-account",
-    description="Django account management",
+    description="Account management and API for Cotidia base project.",
     version=VERSION,
     author="Guillaume Piot",
     author_email="guillaume@cotidia.com",
-    url="https://bitbucket.org/guillaumepiot/cotidia-account",
+    url="https://code.cotidia.com/cotidia/account",
     package_dir={'account': 'account'},
     packages=packages,
     package_data={'account': data_files},
