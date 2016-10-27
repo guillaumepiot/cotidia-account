@@ -19,6 +19,7 @@ setup(
             'templates/account/notices/*.txt',
         ]
     },
+    namespace_packages=['cotidia'],
     include_package_data=True,
     install_requires=[
         'django>=1.10.2',
