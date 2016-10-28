@@ -24,6 +24,7 @@ setup(
     install_requires=[
         'django>=1.10.2',
         'djangorestframework>=3.5.1',
+        'django-two-factor-auth>=1.4.0'
     ],
     classifiers=[
         'Framework :: Django',
