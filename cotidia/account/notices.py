@@ -1,6 +1,6 @@
 from django.utils.translation import ugettext_lazy as _
 
-from cotimail.notice import Notice
+from cotidia.mail.notice import Notice
 
 
 class NewUserActivationNotice(Notice):
