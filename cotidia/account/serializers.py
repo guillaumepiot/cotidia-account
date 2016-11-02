@@ -3,12 +3,12 @@ import hashlib
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import authenticate
 from django.utils.timezone import now
+from cotidia.account.conf import settings
 
 from rest_framework import serializers
 
 from cotidia.account.models import User
 from cotidia.account.validators import is_alpha
-from cotidia.account import settings as account_settings
 
 
 class SignUpSerializer(serializers.Serializer):
@@ -88,7 +88,7 @@ class SignUpSerializer(serializers.Serializer):
         m.update(email.encode("utf-8"))
         username = m.hexdigest()[0:30]
 
-        if account_settings.ACCOUNT_FORCE_ACTIVATION is True:
+        if settings.ACCOUNT_FORCE_ACTIVATION is True:
             active = False
         else:
             active = True

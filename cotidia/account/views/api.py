@@ -1,4 +1,4 @@
-from django.conf import settings
+from cotidia.account.conf import settings
 from django.db import transaction
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.tokens import default_token_generator
@@ -36,7 +36,7 @@ class SignUp(APIView):
     @transaction.atomic
     def post(self, request, serializer_class=None, user_serializer_class=None):
 
-        if account_settings.ACCOUNT_ALLOW_SIGN_UP is False:
+        if settings.ACCOUNT_ALLOW_SIGN_UP is False:
             return Response(
                 {"message": "Sign up disabled."},
                 status=status.HTTP_400_BAD_REQUEST
@@ -54,7 +54,7 @@ class SignUp(APIView):
 
             user = serializer.save()
 
-            if account_settings.ACCOUNT_FORCE_ACTIVATION is True:
+            if settings.ACCOUNT_FORCE_ACTIVATION is True:
                 user.send_activation_link()
 
             token, created = Token.objects.get_or_create(user=user)
@@ -81,7 +81,7 @@ class SignIn(APIView):
     @transaction.atomic
     def post(self, request, serializer_class=None, user_serializer_class=None):
 
-        if account_settings.ACCOUNT_ALLOW_SIGN_IN is False:
+        if settings.ACCOUNT_ALLOW_SIGN_IN is False:
             return Response(
                 {"message": "Sign in disabled."},
                 status=status.HTTP_400_BAD_REQUEST

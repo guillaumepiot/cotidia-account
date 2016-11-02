@@ -5,7 +5,7 @@ Inspired by http://djangosnippets.org/snippets/2463/
 
 """
 from django.contrib.auth.backends import ModelBackend
-from django.conf import settings
+from cotidia.account.conf import settings
 from django.core.validators import validate_email
 from django.apps import apps
 

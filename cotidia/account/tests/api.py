@@ -1,16 +1,19 @@
-import re
 import uuid
 
 from django.core.urlresolvers import reverse
 from django.core import mail
+from cotidia.account.conf import settings
 
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from cotidia.core import fixtures
+from cotidia.account import fixtures
 from cotidia.account.models import User
 from cotidia.account.doc import Doc
-from cotidia.account import settings as account_settings
+from cotidia.account.tests.utils import (
+    get_confirmation_url_from_email,
+    get_reset_url_from_email
+)
 
 
 class AccountAPITests(APITestCase):
@@ -20,27 +23,9 @@ class AccountAPITests(APITestCase):
         self.doc = Doc()
 
         # Default account settings override
-        account_settings.ACCOUNT_FORCE_ACTIVATION = True
+        settings.ACCOUNT_FORCE_ACTIVATION = True
 
         self.display_doc = True
-
-    def get_confirmation_url_from_email(self, email_message):
-        exp = r'(\/activate\/([a-z0-9\-]+)\/([a-z0-9\-]+))\/'
-        m = re.search(exp, email_message)
-        confirmation_url = m.group()
-        user_uuid = m.group(2)
-        confirmation_code = m.group(3)
-
-        return confirmation_url, user_uuid, confirmation_code
-
-    def get_reset_url_from_email(self, email_message):
-        exp = r'(\/reset-password\/([a-z0-9\-]+)\/([a-z0-9\-]+))\/'
-        m = re.search(exp, email_message)
-        reset_url = m.group()
-        user_uuid = m.group(2)
-        reset_code = m.group(3)
-
-        return reset_url, user_uuid, reset_code
 
     def test_sign_up(self):
         """Check that the sign up process works as expected."""
@@ -76,7 +61,7 @@ class AccountAPITests(APITestCase):
         self.assertEqual(len(mail.outbox), 1)
         confirmation_email = str(mail.outbox[0].message())
         confirmation_url, user_uuid, confirmation_code = \
-            self.get_confirmation_url_from_email(confirmation_email)
+            get_confirmation_url_from_email(confirmation_email)
 
         # Get the API confirmation url
         url = reverse(
@@ -255,7 +240,7 @@ class AccountAPITests(APITestCase):
         # Check confirmation email
         confirmation_email = str(mail.outbox[0].message())
         confirmation_url, user_uuid, confirmation_code = \
-            self.get_confirmation_url_from_email(confirmation_email)
+            get_confirmation_url_from_email(confirmation_email)
 
         # Get the API confirmation url
         url = reverse(
@@ -293,7 +278,7 @@ class AccountAPITests(APITestCase):
         # Check confirmation email
         confirmation_email = str(mail.outbox[0].message())
         confirmation_url, user_uuid, confirmation_code = \
-            self.get_confirmation_url_from_email(confirmation_email)
+            get_confirmation_url_from_email(confirmation_email)
 
         # Get the API confirmation url
         url = reverse(
@@ -337,7 +322,7 @@ class AccountAPITests(APITestCase):
         # Check confirmation email
         confirmation_email = str(mail.outbox[0].message())
         confirmation_url, user_uuid, confirmation_code = \
-            self.get_confirmation_url_from_email(confirmation_email)
+            get_confirmation_url_from_email(confirmation_email)
 
         self.assertEqual(confirmation_url, "/activate/{}/{}/".format(
             user_uuid,
@@ -425,7 +410,7 @@ class AccountAPITests(APITestCase):
         confirmation_email = str(mail.outbox[1].message())
 
         confirmation_url, user_uuid, confirmation_code = \
-            self.get_confirmation_url_from_email(confirmation_email)
+            get_confirmation_url_from_email(confirmation_email)
 
         self.assertEqual(confirmation_url, "/activate/{}/{}/".format(
             user_uuid,
@@ -596,7 +581,7 @@ class AccountAPITests(APITestCase):
         self.assertEqual(len(mail.outbox), 1)
         reset_email = str(mail.outbox[0].message())
         reset_url, user_uuid, reset_code = \
-            self.get_reset_url_from_email(reset_email)
+            get_reset_url_from_email(reset_email)
 
         #
         # Validate the reset code
@@ -659,7 +644,7 @@ class AccountAPITests(APITestCase):
         self.assertEqual(len(mail.outbox), 1)
         reset_email = str(mail.outbox[0].message())
         reset_url, user_uuid, reset_code = \
-            self.get_reset_url_from_email(reset_email)
+            get_reset_url_from_email(reset_email)
 
         #
         # Validate the reset code with the set password url
@@ -730,7 +715,7 @@ class AccountAPITests(APITestCase):
         self.assertEqual(len(mail.outbox), 1)
         reset_email = str(mail.outbox[0].message())
         reset_url, user_uuid, reset_code = \
-            self.get_reset_url_from_email(reset_email)
+            get_reset_url_from_email(reset_email)
 
         #
         # That password mismatch
@@ -852,7 +837,7 @@ class AccountAPITests(APITestCase):
         email.
         """
 
-        account_settings.ACCOUNT_FORCE_ACTIVATION = False
+        settings.ACCOUNT_FORCE_ACTIVATION = False
 
         url = reverse('account-api:sign-up')
 

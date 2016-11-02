@@ -7,6 +7,7 @@ related templates in the same `/templates/registration/` folder.
 """
 from django.conf.urls import url
 from django.contrib.auth import views as auth_views
+from cotidia.account.conf import settings
 
 from cotidia.account.forms import (
     EmailAuthenticationForm,
@@ -31,7 +32,6 @@ from cotidia.account.views.admin import (
     GroupDelete,
     docs
 )
-from cotidia.account import settings as account_settings
 
 from cotidia.account.views.two_factor import (
     LoginView,
@@ -156,7 +156,7 @@ urlpatterns = [
         name='docs'),
 ]
 
-if account_settings.ACCOUNT_ENABLE_TWO_FACTOR is True:
+if settings.ACCOUNT_ENABLE_TWO_FACTOR is True:
     # Two factor auth pattern
     urlpatterns += [
         url(

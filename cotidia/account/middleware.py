@@ -1,8 +1,7 @@
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib import messages
-
-from cotidia.account import settings as account_settings
+from cotidia.account.conf import settings
 
 
 __all__ = ['AccountMiddleware']
@@ -11,13 +10,13 @@ __all__ = ['AccountMiddleware']
 class AccountMiddleware(object):
     def process_request(self, request):
 
-        if account_settings.ACCOUNT_ENABLE_TWO_FACTOR is True:
+        if settings.ACCOUNT_ENABLE_TWO_FACTOR is True:
 
             # If the account had two factor enabled and forces admin to
             # setup the two-factor auth we then check if:
             # - They are authenticated (first step)
             # - They are not verified (second step)
-            if account_settings.ACCOUNT_FORCE_ADMIN_TWO_FACTOR is True \
+            if settings.ACCOUNT_FORCE_ADMIN_TWO_FACTOR is True \
                     and request.user.is_authenticated() \
                     and not request.user.is_verified():
 

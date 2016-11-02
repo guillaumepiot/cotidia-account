@@ -7,12 +7,11 @@ from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import render, get_object_or_404, resolve_url
-from django.template import RequestContext
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth import login as auth_login
 from django.http import HttpResponseRedirect
 from django.db.models import Q
-from django.conf import settings
+from cotidia.account.conf import settings
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.utils.http import is_safe_url
@@ -26,7 +25,6 @@ from cotidia.account.user_forms import (
     UserChangePassword
     )
 from cotidia.account.utils import StaffPermissionRequiredMixin, import_model
-from cotidia.account import settings as account_settings
 
 
 @sensitive_post_parameters()
@@ -73,7 +71,7 @@ def login_remember_me(
     return render(request, template_name, context)
 
 
-@login_required(login_url=account_settings.ADMIN_LOGIN_URL)
+@login_required(login_url=settings.ACCOUNT_ADMIN_LOGIN_URL)
 def dashboard(request):
 
     if not request.user.is_staff:
@@ -83,7 +81,7 @@ def dashboard(request):
     return render(request, template)
 
 
-@login_required(login_url=account_settings.ADMIN_LOGIN_URL)
+@login_required(login_url=settings.ACCOUNT_ADMIN_LOGIN_URL)
 def edit(request, user_form=ProfileForm):
 
     if not request.user.is_staff:
@@ -205,7 +203,7 @@ class UserDelete(StaffPermissionRequiredMixin, DeleteView):
         return reverse('account-admin:user_list')
 
 
-@login_required(login_url=account_settings.ADMIN_LOGIN_URL)
+@login_required(login_url=settings.ACCOUNT_ADMIN_LOGIN_URL)
 @sensitive_post_parameters()
 def user_change_password(request, slug):
 

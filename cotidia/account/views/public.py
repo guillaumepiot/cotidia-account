@@ -9,11 +9,10 @@ from django.contrib.auth.views import login
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib import messages
-from django.conf import settings
+from cotidia.account.conf import settings
 
 from cotidia.account.forms import UpdateDetailsForm, AccountUserCreationForm
 from cotidia.account.models import User
-from cotidia.account import settings as account_settings
 from cotidia.account.notices import (
     NewUserActivationNotice
     )
@@ -49,7 +48,7 @@ def edit(request):
 def login_remember_me(request, *args, **kwargs):
     """Custom login view that enables "remember me" functionality."""
 
-    if account_settings.ACCOUNT_ALLOW_SIGN_IN is False:
+    if settings.ACCOUNT_ALLOW_SIGN_IN is False:
         raise Http404
 
     # Redirect to account page if already logged in
@@ -69,7 +68,7 @@ def login_remember_me(request, *args, **kwargs):
 def sign_up(request):
     """Sign up view for public user."""
 
-    if account_settings.ACCOUNT_ALLOW_SIGN_UP is False:
+    if settings.ACCOUNT_ALLOW_SIGN_UP is False:
         raise Http404
 
     template = 'account/sign_up.html'
@@ -92,7 +91,7 @@ def sign_up(request):
             user.username = m.hexdigest()[0:30]
             user.save()
 
-            if account_settings.ACCOUNT_FORCE_ACTIVATION is True:
+            if settings.ACCOUNT_FORCE_ACTIVATION is True:
                 user.is_active = False
                 user.save()
             else:
@@ -121,7 +120,7 @@ def sign_up(request):
             )
             notice.send(force_now=True)
 
-            if account_settings.ACCOUNT_FORCE_ACTIVATION is True:
+            if settings.ACCOUNT_FORCE_ACTIVATION is True:
                 return HttpResponseRedirect(
                     reverse('account-public:activation-pending'))
             elif success_url:

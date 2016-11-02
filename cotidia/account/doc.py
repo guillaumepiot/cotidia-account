@@ -1,7 +1,7 @@
 import os
 import json
 
-from django.conf import settings
+from cotidia.account.conf import settings
 
 class Doc():
 

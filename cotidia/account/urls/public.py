@@ -7,6 +7,7 @@ related templates in the same `/templates/registration/` folder.
 """
 from django.conf.urls import url
 from django.contrib.auth import views as auth_views
+from cotidia.account.conf import settings
 
 from cotidia.account.forms import (
     EmailAuthenticationForm,
@@ -20,13 +21,14 @@ from cotidia.account.views.public import (
     sign_up,
     activate,
     activation_pending)
-from cotidia.account import settings as account_settings
+
+uuid_re = r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 
 urlpatterns = [
     url(r'^$', dashboard, name="dashboard"),
     url(r'^edit/$', edit, name="edit"),
     url(
-        r'^activate/(?P<uuid>[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/(?P<token>.+)/$',
+        r'^activate/(?P<uuid>'+uuid_re+')/(?P<token>.+)/$',
         activate,
         {'template_name': 'account/activate.html'},
         name='activate',
@@ -59,11 +61,13 @@ urlpatterns = [
     url(
         r'^password/reset/$',
         auth_views.password_reset,
-        {'template_name': 'account/password_reset_form.html',
+        {
+            'template_name': 'account/password_reset_form.html',
             'post_reset_redirect': 'account-public:password_reset_done',
             'password_reset_form': AccountPasswordResetForm,
             'email_template_name': 'account/password_reset_email.html',
-            'subject_template_name': 'account/password_reset_subject.txt',},
+            'subject_template_name': 'account/password_reset_subject.txt'
+        },
         name='password_reset',
     ),
     url(
@@ -72,7 +76,7 @@ urlpatterns = [
         {
             'template_name': 'account/password_reset_confirm.html',
             'post_reset_redirect': 'account-public:password_reset_complete',
-            'set_password_form':AccountSetPasswordForm
+            'set_password_form': AccountSetPasswordForm
         },
         name='password_reset_confirm',
     ),
@@ -90,7 +94,7 @@ urlpatterns = [
     ),
 ]
 
-if account_settings.ACCOUNT_ALLOW_SIGN_IN:
+if settings.ACCOUNT_ALLOW_SIGN_IN:
     urlpatterns += [
         url(
             r'^login/$',
@@ -101,7 +105,7 @@ if account_settings.ACCOUNT_ALLOW_SIGN_IN:
         ),
     ]
 
-if account_settings.ACCOUNT_ALLOW_SIGN_UP:
+if settings.ACCOUNT_ALLOW_SIGN_UP:
     urlpatterns += [
         url(r'^sign-up/$', sign_up, name='sign-up'),
     ]

@@ -1,17 +1,12 @@
 import importlib
 
-from django.conf import settings
+from cotidia.account.conf import settings
 from django.core.urlresolvers import reverse_lazy
 from django.shortcuts import redirect
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.apps import apps
 
-from cotidia.account import settings as account_settings
-
-#
-# Allow permission checking for class based views
-#
 
 class UserCheckMixin(object):
 
@@ -23,7 +18,7 @@ class UserCheckMixin(object):
             if request.user.is_authenticated():
                 raise PermissionDenied
             else:
-                return redirect(account_settings.ADMIN_LOGIN_URL)
+                return redirect(settings.ACCOUNT_ADMIN_LOGIN_URL)
         return super(UserCheckMixin, self).dispatch(request, *args, **kwargs)
 
 
