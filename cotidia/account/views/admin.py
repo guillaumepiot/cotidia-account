@@ -39,6 +39,9 @@ def login_remember_me(
         **kwargs):
     """Custom login view that enables "remember me" functionality."""
 
+    if request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('account-admin:dashboard'))
+
     if request.method == 'POST':
         if not request.POST.get('remember_me', None):
             request.session.set_expiry(0)
