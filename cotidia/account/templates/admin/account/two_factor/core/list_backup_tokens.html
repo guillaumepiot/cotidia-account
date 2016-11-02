@@ -1,0 +1,61 @@
+{% extends "admin/account/page.html" %}
+{% load i18n %}
+
+{% block title %}
+	{% trans "Backup Tokens" %}
+{% endblock title %}
+
+{% block toolbar %}
+	<span class="toolbar__title">{% trans "Account Security" %}</span>
+{% endblock toolbar %}
+
+{% block content %}
+<form method="post" action=".">
+    {% csrf_token %}
+    <div class="[ content__inner ] [ box box--padded box--bordered ]">
+        <fieldset>
+            <legend>{% trans "Backup Tokens" %}</legend>
+            <p>{% blocktrans %}Backup tokens can be used when your primary and backup
+            phone numbers aren't available. The backup tokens below can be used
+            for login verification. If you've used up all your backup tokens, you
+            can generate a new set of backup tokens. Only the backup tokens shown
+            below will be valid.{% endblocktrans %}</p>
+
+            {% if device.token_set.count %}
+                <ul>
+                    {% for token in device.token_set.all %}
+                        <li>{{ token.token }}</li>
+                    {% endfor %}
+                </ul>
+                <p>{% blocktrans %}Print these tokens and keep them somewhere safe.{% endblocktrans %}</p>
+            {% endif %}
+
+            {% if not has_backup_tokens %}
+                <p class="text-strong">{% trans "You don't have any backup codes yet." %}</p>
+            {% endif %}
+
+            {% if has_backup_tokens and not device %}
+                <div class="grid">
+                    <div class="grid__span-3">
+                        {% with form.password as field %}
+                            {% include "admin/includes/text-field.html" %}
+                        {% endwith %}
+                    </div>
+                    <div class="grid__span-3">
+                        <div class="form__group">
+                            <button class="btn btn--primary" type="submit">{% trans "View Tokens" %}</button>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </fieldset>
+
+
+
+    </div>
+    <div class="content__inner">
+        <a href="{% url 'account-admin:profile'%}" class="pull-right btn btn--transparent">{% trans "Back to Account Security" %}</a>
+        <a href="{% url 'account-admin:generate_backup_tokens'%}" class="btn btn--create">{% trans "Generate New Tokens" %}</a>
+    </div>
+</form>
+{% endblock %}
