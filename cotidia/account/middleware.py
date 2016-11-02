@@ -13,8 +13,6 @@ class AccountMiddleware(object):
 
         if account_settings.ACCOUNT_ENABLE_TWO_FACTOR is True:
 
-            print(request.user.is_verified())
-
             # If the account had two factor enabled and forces admin to
             # setup the two-factor auth we then check if:
             # - They are authenticated (first step)
