@@ -1,5 +1,6 @@
 import uuid
 
+from django.test import override_settings
 from django.core.urlresolvers import reverse
 from django.core import mail
 from cotidia.account.conf import settings
@@ -16,14 +17,12 @@ from cotidia.account.tests.utils import (
 )
 
 
+@override_settings(ACCOUNT_ENABLE_TWO_FACTOR=False)
 class AccountAPITests(APITestCase):
 
     @fixtures.normal_user
     def setUp(self):
         self.doc = Doc()
-
-        # Default account settings override
-        settings.ACCOUNT_FORCE_ACTIVATION = True
 
         self.display_doc = True
 

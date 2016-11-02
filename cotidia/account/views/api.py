@@ -20,7 +20,7 @@ from cotidia.account.models import User
 from cotidia.account.notices import (
     ResetPasswordNotice
     )
-from cotidia.account import settings as account_settings
+from cotidia.account import signals
 
 
 class SignUp(APIView):
@@ -140,6 +140,12 @@ class Activate(APIView):
         # Activate now
         user.is_active = True
         user.save()
+
+        # Send the activation signals
+        signals.user_activate.send(
+            sender=None,
+            request=request,
+            user=user)
 
         return Response({'message': 'ACTIVATED'}, status=status.HTTP_200_OK)
 
@@ -302,9 +308,7 @@ class SetPassword(APIView):
         serializer = SetPasswordSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        #
         # Set the new password
-        #
         user.set_password(serializer.data['password1'])
         user.save()
 

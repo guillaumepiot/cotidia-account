@@ -1,16 +1,18 @@
 import re
 
-from cotidia.account.conf import settings
 from django.core import mail
 from django.core.urlresolvers import reverse
 from django.test import TestCase
+from django.test import override_settings
+
+from cotidia.account.conf import settings
 
 
+@override_settings(ACCOUNT_ENABLE_TWO_FACTOR=False)
 class AccountPublicTests(TestCase):
 
     def setUp(self):
-        # Default account settings override
-        settings.ACCOUNT_FORCE_ACTIVATION = False
+        pass
 
     def get_confirmation_url_from_email(self, email_message):
         site_url = settings.SITE_URL.replace('/', '\/')

@@ -9,7 +9,7 @@ The package has dependencies:
 - django-form-utils==1.0.3
 
 
-All those dependencies will get automatically installed when the package is 
+All those dependencies will get automatically installed when the package is
 installed.
 
     $ pip install -e git+git@bitbucket.org:guillaumepiot/cotidia-account.git#egg=account
@@ -34,19 +34,19 @@ Make your migrations (project basis):
 Specify the following settings:
 
     AUTH_USER_MODEL = 'account.User'
-    
+
     AUTHENTICATION_BACKENDS = (
         'account.auth.EmailBackend',
     )
 
 By default, the login urls for the admin and the public side are set as follows:
-    
+
     LOGIN_REDIRECT_URL = '/account'
     LOGIN_URL = '/account/login/'
     LOGOUT_URL = '/account/logout/'
 
-    ADMIN_LOGIN_URL = '/admin/account/login/'
-    PUBLIC_LOGIN_URL = '/account/login/'
+    ACCOUNT_ADMIN_LOGIN_URL = '/admin/account/login/'
+    ACCOUNT_PUBLIC_LOGIN_URL = '/account/login/'
 
 Force the user to activate their account via email before being allowed to login.
 `False` by default.
@@ -73,13 +73,13 @@ There's two set of urls, one for the admin management of users, role and dashboa
 - `public.py` defines all the views for customer sign up, sign in and profile management
 
 Each set can be loaded independently, under their own urls, for example:
-    
+
     from account.views.admin import dashboard
 
     urlpatterns = [
-        url(r'^admin/account/', include('account.urls.admin', 
+        url(r'^admin/account/', include('account.urls.admin',
             namespace="account-admin")),
-        url(r'^account/', include('account.urls.public', 
+        url(r'^account/', include('account.urls.public',
             namespace="account-public")),
         url(r'^admin/$', dashboard, name="dashboard"),
     ]
@@ -87,7 +87,7 @@ Each set can be loaded independently, under their own urls, for example:
 ## User models override
 
 On a project basis, you may want to add your own fields to the user models.
-You can override which model class is used on a project basis by declaring a 
+You can override which model class is used on a project basis by declaring a
 path to another `User` model class.
 
     AUTH_USER_MODEL = "account.User"
@@ -114,12 +114,12 @@ In your `models.py` file, create your own `User` class:
                 return '%s %s' % (self.first_name, self.last_name)
             return self.username
 
-The model is only a standard Python object, it will get merged into a full User 
+The model is only a standard Python object, it will get merged into a full User
 model in the account models section on load.
 
 ## Add items to the menu
 
-You will need to register your app menu to the account menu. The register 
+You will need to register your app menu to the account menu. The register
 function requires the menu name and template url.
 
     from account.menu import menu
