@@ -828,6 +828,7 @@ class AccountAPITests(APITestCase):
         self.assertEquals(
             response.data['email'], ['Please enter your email.'])
 
+    @override_settings(ACCOUNT_FORCE_ACTIVATION=False)
     def test_sign_up_no_activation(self):
         """Test sign up without activation email.
 
@@ -835,8 +836,6 @@ class AccountAPITests(APITestCase):
         call should create an active user and not send an activation
         email.
         """
-
-        settings.ACCOUNT_FORCE_ACTIVATION = False
 
         url = reverse('account-api:sign-up')
 

@@ -1,10 +1,3 @@
-"""
-Re-definition of Django's auth URLs.
-
-This is done for convenience. It allows us to save all registration and auth
-related templates in the same `/templates/registration/` folder.
-
-"""
 from django.conf.urls import url
 from django.contrib.auth import views as auth_views
 from cotidia.account.conf import settings

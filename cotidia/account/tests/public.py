@@ -59,7 +59,7 @@ class AccountPublicTests(TestCase):
         self.assertEqual(len(mail.outbox), 1)
 
         # Verify that the subject of the first message is correct.
-        self.assertEqual(mail.outbox[0].subject, 'Sign up confirmation')
+        self.assertEqual(mail.outbox[0].subject, 'Account activation')
 
         email_message = str(mail.outbox[0].message())
         confirmation_url = self.get_confirmation_url_from_email(email_message)
