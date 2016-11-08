@@ -14,3 +14,9 @@ def user_update(sender, instance, created, **kwargs):
 user_activate = Signal(providing_args=["request", "user"])
 # user_authenticate = Signal(providing_args=["request", "user"])
 # user_set_password = Signal(providing_args=["request", "user"])
+
+
+@receiver(user_activate)
+def user_activate_update(sender, request, user, **kwargs):
+    """Call upon `user_activate` signal sent."""
+    pass
