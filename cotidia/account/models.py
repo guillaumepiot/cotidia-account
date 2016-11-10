@@ -6,6 +6,7 @@ from cotidia.account.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils.translation import ugettext_lazy as _
 
 from rest_framework.authtoken.models import Token
 from two_factor.utils import default_device
@@ -18,6 +19,14 @@ from cotidia.account.notices import (
 
 class User(AbstractUser):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    email = models.EmailField(
+        _('email address'),
+        blank=True,
+        unique=True,
+        error_messages={
+            'unique': _("A user with that email already exists."),
+        }
+        )
 
     def __str__(self):
         if self.first_name or self.last_name:
