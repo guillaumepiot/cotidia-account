@@ -15,6 +15,7 @@ from cotidia.account.notices import (
     NewUserActivationNotice,
     ResetPasswordNotice
     )
+from cotidia.account.managers import UserManager
 
 
 class User(AbstractUser):
@@ -27,6 +28,11 @@ class User(AbstractUser):
             'unique': _("A user with that email already exists."),
         }
         )
+    objects = UserManager()
+
+    # Used in createsuperuser manage command
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['first_name', 'last_name']
 
     def __str__(self):
         if self.first_name or self.last_name:
