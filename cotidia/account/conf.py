@@ -4,7 +4,7 @@ from appconf import AppConf
 
 
 class AccountConf(AppConf):
-    ADMIN_LOGIN_URL = '/admin/login/'
+    ADMIN_LOGIN_URL = '/admin/account/login/'
     PUBLIC_LOGIN_URL = '/account/login/'
 
     # Force the user to activate their account via email before being allowed
