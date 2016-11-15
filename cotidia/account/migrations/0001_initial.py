@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('auth', '0008_alter_user_username_max_length'),
+        ('auth', '0007_alter_validators_add_error_messages'),
     ]
 
     operations = [
