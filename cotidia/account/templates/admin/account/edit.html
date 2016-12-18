@@ -14,7 +14,7 @@
 {% block content %}
 <div class="[ content__inner ]">
     <p class="breadcrumb">
-        <a href="{% url 'account-admin:dashboard' %}">{% trans "Dashboard" %}</a>  
+        <a href="{% url 'account-admin:dashboard' %}">{% trans "Dashboard" %}</a>
         &nbsp;<span class="fa fa-angle-right"></span>&nbsp;
         {% trans "Update Profile" %}
     </p>
@@ -47,7 +47,7 @@
                 {% with form.last_name as field %}
                     {% include "admin/includes/text-field.html" %}
                 {% endwith %}
-            </div>      
+            </div>
         </div>
         <div class="grid">
             <div class="grid__span-2">
@@ -59,7 +59,7 @@
                 {% with form.email as field %}
                     {% include "admin/includes/text-field.html" %}
                 {% endwith %}
-            </div>  
+            </div>
         </div>
     </fieldset>
 </div>
@@ -91,6 +91,26 @@
                 </a>
             </div>
         </div>
+        {% if ACCOUNT_ENABLE_TWO_FACTOR %}
+        <div class="grid">
+            <div class="grid__span-2">
+                <span class="form__label--inline">
+                    {% trans "Two Factor Auth" %}
+                </span>
+            </div>
+            <div class="grid__span-8">
+                <div class="form__control">
+                    {% if user.two_factor_auth_enabled %}
+                        <p><span class="label label--success">Enabled</span></p>
+                        <p><a href="{% url 'account-admin:profile' %}">Manage Two-Factor Authentication</a></p>
+                    {% else %}
+                        <p><a href="{% url 'account-admin:setup' %}" class="btn btn--create btn--small">Enable Two-Factor Authentication</a></p>
+                    {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </fieldset>
 </div>
 

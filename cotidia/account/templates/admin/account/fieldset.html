@@ -1,8 +1,8 @@
 {% for fieldset in form.fieldsets %}
-            <div class="[ content__inner ] [ box box--padded box--bordered ]">
-            <h3>{{fieldset.description}}</h3>
-            {% for field in fieldset %}
-                {% include "admin/includes/text-field.html" %}
-            {% endfor %}
-            </div>
-        {% endfor %}
+    <div class="[ content__inner ] [ box box--padded box--bordered ]">
+    <h3>{{fieldset.description}}</h3>
+    {% for field in fieldset %}
+        {% include "admin/includes/text-field.html" %}
+    {% endfor %}
+    </div>
+{% endfor %}

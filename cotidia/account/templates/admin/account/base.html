@@ -8,7 +8,10 @@
         <link rel="shortcut icon" href="http://cotidia.com/static/img/favicon.ico" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
-        <link rel="apple-touch-icon" href="apple-touch-icon.png">
+        <link rel="apple-touch-icon" href="{% static "apple-touch-icon.png" %}">
+        <link rel="apple-touch-icon" sizes="76x76" href="{% static "apple-touch-icon-76x76.png" %}">
+        <link rel="apple-touch-icon" sizes="120x120" href="{% static "apple-touch-icon-120x120.png" %}">
+        <link rel="apple-touch-icon" sizes="152x152" href="{% static "apple-touch-icon-152x152.png" %}">
         <!-- Place favicon.ico in the root directory -->
         {% if DEBUG %}
             <link rel="stylesheet" href="{% static "css/backend.css" %}">
@@ -26,7 +29,7 @@
 
         <script src="{% static "js/es5-shim.min.js" %}"></script>
         <script src="{% static "js/es5-sham.min.js" %}"></script>
-        
+
         {% if DEBUG %}
             <script src="{% static "js/backend.js" %}"></script>
         {% else %}

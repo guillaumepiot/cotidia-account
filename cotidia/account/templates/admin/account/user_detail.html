@@ -54,6 +54,38 @@
         </div>
     </fieldset>
 </div>
+{% if ACCOUNT_ENABLE_TWO_FACTOR %}
+<div class="[ content__inner ] [ box box--padded box--bordered ]">
+    <fieldset>
+        <legend>{% trans "Security" %}</legend>
+        <div class="grid">
+            <div class="grid__span-2">
+                <span class="form__label--inline">
+                    {% trans "Two-Factor Authentication" %}
+                </span>
+            </div>
+            <div class="grid__span-8">
+                <div class="form__control">
+                    <p>
+                    {% if user.two_factor_auth_enabled %}
+                        <span class="label label--primary">Enabled</span>
+                        {% if request.user.is_superuser %}
+                        <p>
+                            <a href="{% url 'account-admin:user-disable' object.uuid %}">
+                                    Disable two-factor authentication
+                            </a>
+                        </p>
+                        {% endif %}
+                    {% else %}
+                        <span class="label label--danger">Disabled</span>
+                    {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+</div>
+{% endif %}
 <div class="[ content__inner ] [ box box--padded box--bordered ]">
     <fieldset>
         <legend>{% trans "Role & Permissions" %}</legend>

@@ -35,6 +35,7 @@
                     <th class="table-head-cell">{% trans "Superuser" %}</th>
                     <th class="table-head-cell">{% trans "Staff" %}</th>
                     <th class="table-head-cell">{% trans "Active" %}</th>
+                    {% if ACCOUNT_ENABLE_TWO_FACTOR %}<th class="table-head-cell">{% trans "Two Factor Auth" %}</th>{% endif %}
                     <th class="table-head-cell">{% trans "Date joined" %}</th>
                 </tr>
                 {% for user in object_list %}
@@ -61,6 +62,19 @@
                             <span class="fa fa-remove fa-red"></span>
                         {% endif %}
                     </td>
+                    {% if ACCOUNT_ENABLE_TWO_FACTOR %}
+                    <td class="table-cell">
+                        {% if user.is_staff or user.is_superuser %}
+                            {% if user.two_factor_auth_enabled %}
+                                <span class="label label--success">Enabled</span>
+                            {% else %}
+                                <span class="label label--danger">Disabled</span>
+                            {% endif %}
+                        {% else %}
+
+                        {% endif %}
+                    </td>
+                    {% endif %}
                     <td class="table-cell">
                         {{user.date_joined|date:"d F Y - g:i a"}}
                     </td>
