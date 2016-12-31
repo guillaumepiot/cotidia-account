@@ -1,24 +1,30 @@
-{% extends "account/base.html" %}{% load i18n %}
+{% extends "account/page.html" %}{% load i18n %}
 {% block title %}
     {% trans "Dashboard" %}
 {% endblock title %}
-{% block main %}
-<h1>My Account</h1>
-<ul>
-    <li>
-        <a href="{% url 'account-public:edit' %}">
-            {% trans "Change my details" %}
-        </a>
-    </li>
-    <li>
-        <a href="{% url 'account-public:password_change' %}">
-            {% trans "Change my password" %}
-        </a>
-    </li>
-    <li>
-        <a href="{% url 'account-public:logout' %}">
-            {% trans "Logout" %}
-        </a>
-    </li>
-</ul>
-{% endblock main %}
+
+{% block toolbar %}
+    <span class="toolbar__title">{% trans "Dashboard" %}</span>
+{% endblock toolbar %}
+
+{% block content %}
+<div class="[ content__inner ] [ box box--padded box--bordered ]">
+    <ul>
+        <li>
+            <a href="{% url 'account-public:edit' %}">
+                {% trans "Change my details" %}
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'account-public:password_change' %}">
+                {% trans "Change my password" %}
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'account-public:logout' %}">
+                {% trans "Logout" %}
+            </a>
+        </li>
+    </ul>
+</div>
+{% endblock %}
