@@ -1,27 +1,27 @@
-{% extends "admin/account/base.html" %}
+{% extends "account/base.html" %}
 {% load i18n %}
 
 {% block title %}{% trans "Activate" %}{% endblock %}
 
 {% block main %}
-<div class="modal modal--open">
-    <div class="modal__wrapper">
-        <div class="modal__content modal__content--small">
-            <div class="modal__header">
-                <h3>{{SITE_NAME}}</h3>
-            </div>
-            <div class="modal__body">
-                <h4>{% trans "Activate" %}</h4>
+<div class="dialog dialog--small">
+    <div class="dialog__content">
+        {% block dialog_header %}
+            {% include "account/includes/dialog_header.html" %}
+        {% endblock %}
+        <div class="dialog__body dialog__body--padded">
+            <h4>{% trans "Activate" %}</h4>
+            {% if user.is_active %}
+                <p>{% trans "Congratulations, your account has now been activated." %}</p>
+            {% else %}
+                <p>{% trans "Sorry, your account could not be activated." %}</p>
+            {% endif %}
+        </div>
+        <div class="dialog__footer dialog-footer">
+            <div class="dialog-footer__actions">
                 {% if user.is_active %}
-                    <p>{% trans "Congratulations, your account has now been activated." %}</p>
-                {% else %}
-                    <p>{% trans "Sorry, your account could not be activated." %}</p>
-                {% endif %}
-            </div>
-            <div class="modal__footer">
-                {% if user.is_active %}
-                <a href="{% url "account-public:login" %}" class="btn btn--primary btn--full-width">
-                    {% trans "Login" %}
+                <a href="{% url "account-public:dashboard" %}" class="btn btn--primary btn--full-width">
+                    {% trans "Go to dashboard" %}
                 </a>
                 {% endif %}
             </div>

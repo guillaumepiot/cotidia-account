@@ -1,13 +1,16 @@
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib import messages
+from django.utils.deprecation import MiddlewareMixin
+
 from cotidia.account.conf import settings
 
 
 __all__ = ['AccountMiddleware']
 
 
-class AccountMiddleware(object):
+class AccountMiddleware(MiddlewareMixin):
+
     def process_request(self, request):
 
         if settings.ACCOUNT_ENABLE_TWO_FACTOR is True:

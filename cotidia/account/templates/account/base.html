@@ -8,10 +8,16 @@
         <link rel="shortcut icon" href="http://cotidia.com/static/img/favicon.ico" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
-        <link rel="apple-touch-icon" href="apple-touch-icon.png">
+        <link rel="apple-touch-icon" href="{% static "apple-touch-icon.png" %}">
+        <link rel="apple-touch-icon" sizes="76x76" href="{% static "apple-touch-icon-76x76.png" %}">
+        <link rel="apple-touch-icon" sizes="120x120" href="{% static "apple-touch-icon-120x120.png" %}">
+        <link rel="apple-touch-icon" sizes="152x152" href="{% static "apple-touch-icon-152x152.png" %}">
         <!-- Place favicon.ico in the root directory -->
-
-        <link rel="stylesheet" href="{% static "css/backend.min.css" %}">
+        {% if DEBUG %}
+            <link rel="stylesheet" href="{% static "css/frontend.css" %}">
+        {% else %}
+            <link rel="stylesheet" href="{% static "css/frontend.min.css" %}">
+        {% endif %}
         {% block header_scripts %}{% endblock header_scripts %}
     </head>
     <body>

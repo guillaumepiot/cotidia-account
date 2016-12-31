@@ -1,63 +1,58 @@
-{% extends "admin/account/base.html" %}
+{% extends "account/base.html" %}
 {% load i18n %}
 
 {% block title %}{% trans "Login" %}{% endblock %}
 
 {% block main %}
 <form method="post" action="?next={{success_url}}">
-    <div class="dialog-header dialog-header--open">
-        <div class="dialog-header__wrapper">
-            {% if messages %}
-            <div class="dialog-header__pre-header dialog-header__pre-header--small">
-                <div class="alert alert--success">
-                {% for message in messages %}
-                    {{ message }}<br>
-                {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-            <div class="dialog-header__content dialog-header__content--small">
-                <div class="dialog-header__header">
-                    <h3>{{SITE_NAME}} (Public)</h3>
-                </div>
-                <div class="dialog-header__body">
-                    <h4>{% trans "Login" %}</h4>
-                    <p>{% trans "Please enter your email address and password below to login." %}</p>
-                        {% csrf_token %}
-                        {% if form.non_field_errors %}
-                            <div class="alert alert--error">
-                            {% for error in form.non_field_errors %}
-                                {{error}}<br>
-                            {% endfor %}
-                            </div>
-                        {% endif %}
-
-                        {% with form.username as field %}
-                            {% include 'admin/includes/text-field.html' %}
-                        {% endwith %}
-                        {% with form.password as field %}
-                            {% include 'admin/includes/text-field.html' %}
-                        {% endwith %}
-                        <div class="form-group">
-                            {{ form.remember_me.errors }}
-                            {{ form.remember_me.label_tag }}
-                            {{ form.remember_me }}
+    <div class="dialog dialog--small">
+        <div class="dialog__content dialog__content--small">
+            {% block dialog_header %}
+                {% include "account/includes/dialog_header.html" %}
+            {% endblock %}
+            <div class="dialog__body dialog__body--padded">
+                <h4>{% trans "Welcome back" %}</h4>
+                <p>{% trans "Please enter your email address and password below to login." %}</p>
+                    {% csrf_token %}
+                    {% if form.non_field_errors %}
+                        <div class="alert alert--error">
+                        {% for error in form.non_field_errors %}
+                            {{error}}<br>
+                        {% endfor %}
                         </div>
+                    {% endif %}
 
-                        <input type="hidden" name="next" value="{{ next }}" />
+                    {% with form.username as field %}
+                        {% include 'admin/includes/text-field.html' %}
+                    {% endwith %}
+                    {% with form.password as field %}
+                        {% include 'admin/includes/text-field.html' %}
+                    {% endwith %}
+                    <div class="form-group">
+                        {{ form.remember_me.errors }}
+                        {{ form.remember_me.label_tag }}
+                        {{ form.remember_me }}
+                    </div>
 
-                </div>
-                <div class="dialog-header__footer">
+                    <input type="hidden" name="next" value="{% if next %}{{ next }}{% else %}{% url 'account-public:dashboard' %}{% endif %}" />
+
+            </div>
+            <div class="dialog__footer dialog-footer">
+                <div class="dialog-footer__actions">
                     <button class="btn btn--primary btn--full-width" type="submit">
-                        {% trans "Login" %}
+                        {% trans "Sign in" %}
                     </button>
                 </div>
             </div>
-            <div class="dialog-header__sub-footer dialog-header__sub-footer--small text-center">
-                <p>
-                    <a href="{% url "account-public:password_reset" %}">{% trans "Forgot your password?" %}</a>
-                </p>
-            </div>
+        </div>
+        <div class="dialog__content dialog__content--post">
+            <p class="text-center">
+                <a href="{% url "account-public:password_reset" %}">{% trans "Forgot your password?" %}</a>
+            </p>
+            <p class="text-center">
+                {% trans "Not registered?" %}
+                <a href="{% url "account-public:sign-up" %}">{% trans "Sign up" %}</a>
+            </p>
         </div>
     </div>
 </form>

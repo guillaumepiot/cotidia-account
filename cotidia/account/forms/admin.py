@@ -213,7 +213,7 @@ class AccountUserCreationForm(forms.Form):
                 'class': 'form__text'
                 }
             ),
-        help_text="Enter the same password as before, for verification."
+        help_text="Enter the same password twice, for verification."
         )
 
     def clean_password2(self):

@@ -13,9 +13,6 @@ from cotidia.account.conf import settings
 
 from cotidia.account.forms import UpdateDetailsForm, AccountUserCreationForm
 from cotidia.account.models import User
-from cotidia.account.notices import (
-    NewUserActivationNotice
-    )
 
 
 @login_required
@@ -105,24 +102,16 @@ def sign_up(request):
                     request, _('Your have successfully signed up'))
 
             # Create and send the confirmation email
-            token = default_token_generator.make_token(user)
-            url = reverse('account-public:activate', kwargs={
-                'uuid': user.uuid,
-                'token': token
-                })
-
-            notice = NewUserActivationNotice(
-                recipients=['%s <%s>' % (user.get_full_name(), user.email)],
-                context={
-                    'url': "{0}{1}".format(settings.SITE_URL, url),
-                    'first_name': user.first_name
-                }
-            )
-            notice.send(force_now=True)
+            user.send_activation_link(app=False)
 
             if settings.ACCOUNT_FORCE_ACTIVATION is True:
                 return HttpResponseRedirect(
-                    reverse('account-public:activation-pending'))
+                    reverse(
+                        'account-public:activation-pending',
+                        kwargs={
+                            'uuid': user.uuid
+                            })
+                        )
             elif success_url:
                 return HttpResponseRedirect(success_url)
             else:
@@ -143,12 +132,35 @@ def activate(request, uuid, token, template_name):
         user.is_active = True
         user.save()
 
+    # Authenticate the user straight away
+    auth_login(request, user)
+
     return render(request, template_name, {'user': user})
 
 
-def activation_pending(request, template_name):
+def activation_pending(request, uuid, template_name):
     """Activation pending view for a public user."""
+
+    user = get_object_or_404(User, uuid=uuid)
+
     if request.user.is_authenticated():
         return HttpResponseRedirect(reverse('account-public:dashboard'))
 
-    return render(request, template_name, {})
+    return render(request, template_name, {"user": user})
+
+
+def resend_activation_link(request, uuid):
+    """Resend the activation link for a user."""
+
+    user = get_object_or_404(User, uuid=uuid)
+    user.send_activation_link(app=False)
+
+    messages.success(
+        request, "The activate link has been resent to your email address.")
+
+    return HttpResponseRedirect(
+            reverse(
+                "account-public:activation-pending",
+                kwargs={"uuid": user.uuid}
+            )
+        )

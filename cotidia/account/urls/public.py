@@ -13,24 +13,30 @@ from cotidia.account.views.public import (
     edit,
     sign_up,
     activate,
-    activation_pending)
+    activation_pending,
+    resend_activation_link)
 
-uuid_re = r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+u_re = r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 
 urlpatterns = [
     url(r'^$', dashboard, name="dashboard"),
     url(r'^edit/$', edit, name="edit"),
     url(
-        r'^activate/(?P<uuid>'+uuid_re+')/(?P<token>.+)/$',
+        r'^activate/(?P<uuid>'+u_re+')/(?P<token>.+)$',
         activate,
         {'template_name': 'account/activate.html'},
         name='activate',
     ),
     url(
-        r'^activation-pending/$',
+        r'^activation-pending/(?P<uuid>'+u_re+')$',
         activation_pending,
         {'template_name': 'account/activation-pending.html'},
         name="activation-pending"),
+    url(
+        r'^resend-activation-link/(?P<uuid>'+u_re+')$',
+        resend_activation_link,
+        name='resend-activation-link',
+    ),
     url(
         r'^logout/$',
         auth_views.logout,
