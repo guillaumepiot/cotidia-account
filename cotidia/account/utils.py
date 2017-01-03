@@ -1,11 +1,8 @@
 import importlib
 
 from cotidia.account.conf import settings
-from django.core.urlresolvers import reverse_lazy
 from django.shortcuts import redirect
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
-from django.apps import apps
 
 
 class UserCheckMixin(object):
@@ -32,6 +29,7 @@ class StaffPermissionRequiredMixin(UserCheckMixin):
         if user.is_superuser:
             return True
         return user.is_staff and user.has_perm(self.permission_required)
+
 
 #
 # Import a model using a dotted string value
