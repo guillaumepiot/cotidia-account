@@ -9,7 +9,7 @@ def user_update(sender, instance, created, **kwargs):
     pass
 
 # Account registraton signals
-# user_sign_up = Signal(providing_args=["request", "user"])
+user_sign_up = Signal(providing_args=["request", "user"])
 # user_sign_in = Signal(providing_args=["request", "user"])
 user_activate = Signal(providing_args=["request", "user"])
 # user_authenticate = Signal(providing_args=["request", "user"])

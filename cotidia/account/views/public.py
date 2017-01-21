@@ -13,6 +13,7 @@ from cotidia.account.conf import settings
 
 from cotidia.account.forms import UpdateDetailsForm, AccountUserCreationForm
 from cotidia.account.models import User
+from cotidia.account import signals
 
 
 @login_required
@@ -104,6 +105,12 @@ def sign_up(request):
             # Create and send the confirmation email
             user.send_activation_link(app=False)
 
+            # Send the activation signals
+            signals.user_sign_up.send(
+                sender=None,
+                request=request,
+                user=user)
+
             if settings.ACCOUNT_FORCE_ACTIVATION is True:
                 return HttpResponseRedirect(
                     reverse(
@@ -134,6 +141,12 @@ def activate(request, uuid, token, template_name):
 
     # Authenticate the user straight away
     auth_login(request, user)
+
+    # Send the activation signals
+    signals.user_activate.send(
+        sender=None,
+        request=request,
+        user=user)
 
     return render(request, template_name, {'user': user})
 

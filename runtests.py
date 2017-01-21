@@ -57,6 +57,7 @@ DEFAULT_SETTINGS = dict(
     },
     SITE_ID=1,
     SITE_URL="http://localhost:8000",
+    APP_URL="http://localhost:8000",
     ROOT_URLCONF="cotidia.account.tests.urls",
     SECRET_KEY="notasecret",
     AUTH_USER_MODEL="account.User",
