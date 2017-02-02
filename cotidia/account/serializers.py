@@ -53,7 +53,10 @@ class SignUpSerializer(serializers.Serializer):
                 )
         elif not is_alpha(full_name.strip()):
             raise serializers.ValidationError(
-                _("The full name field only accepts letters and hyphen.")
+                _(
+                    "The full name field only accepts letters, hyphen "
+                    "and apostrophe."
+                )
                 )
         return full_name
 

@@ -145,7 +145,10 @@ class AccountAPITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
             response.data['full_name'],
-            ["The full name field only accepts letters and hyphen."]
+            [
+                "The full name field only accepts letters, hyphen and "
+                "apostrophe."
+            ]
             )
 
     def test_sign_up_invalid_email(self):

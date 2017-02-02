@@ -1,10 +1,9 @@
 import re
 
 
-#
-# Contains letters, numbers, spaces and dashes only
-#
 def is_alphanumeric(value):
+    """Match letters, numbers, spaces and dashes only."""
+
     regex = r'^[a-zA-Z0-9\ \-]+$'
     regex = re.compile(regex)
 
@@ -14,14 +13,12 @@ def is_alphanumeric(value):
         return False
 
 
-#
-# Contains letters, spaces and dashes only
-#
 def is_alpha(value):
-    regex = r'^[a-zA-Z\ \-]+$'
-    regex = re.compile(regex)
+    """Match letters, spaces, apostrophe and hyphens only."""
 
-    if regex.match(value):
+    regex = r'^[a-zA-ZàèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅåÆæœ \'-]+$'
+
+    if re.match(regex, value, re.UNICODE):
         return True
     else:
         return False
