@@ -237,7 +237,10 @@ class ResetPassword(APIView):
 
             if not user.is_active:
                 return Response(
-                    {"message": ["USER_INACTIVE"]},
+                    {
+                        "message": ["USER_INACTIVE"],
+                        "non_field_errors": ["Your account is not active."]
+                    },
                     status=status.HTTP_400_BAD_REQUEST
                     )
 
