@@ -8,9 +8,9 @@
     <div class="dialog dialog--small">
         <div class="dialog__wrapper">
             <div class="dialog__content">
-                <div class="dialog__header dialog__header--logo">
-                    <a href="/" class="logo"><img src="/static/img/mwac_logo_white_400.png" alt=""></a>
-                </div>
+                {% block dialog_header %}
+                    {% include "admin/account/includes/dialog_header.html" %}
+                {% endblock %}
                 <div class="dialog__body dialog__body--padded">
                     <h3>{% trans "Sign in" %}</h3>
                     {% if wizard.steps.current == 'auth' %}
