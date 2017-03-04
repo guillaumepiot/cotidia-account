@@ -121,7 +121,9 @@ There's two set of urls, one for the admin management of users, role and dashboa
 Each set can be loaded independently, under their own urls, for example:
 
 ```python
-from account.views.admin import dashboard
+from django.conf.urls import url, include
+
+from cotidia.account.views.admin import dashboard
 
 urlpatterns = [
     url(r'^account/', include('cotidia.account.urls.public',
@@ -130,7 +132,7 @@ urlpatterns = [
         namespace="account-api")),
     url(r'^admin/account/', include('cotidia.account.urls.admin',
         namespace="account-admin")),
-    url(r'^admin/$', 'cotidia.account.views.admin.dashboard', name="dashboard"),
+    url(r'^admin/$', dashboard, name="dashboard"),
 ]
 ```
 
