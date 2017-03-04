@@ -144,7 +144,7 @@ You will need to register your app menu to the account menu. The register
 function requires the menu name and template url.
 
 ```python
-from account.menu import menu
+from cotidia.account.menu import menu
 menu.register("my_menu", "path/to/menu.html", 1)
 ```
 
