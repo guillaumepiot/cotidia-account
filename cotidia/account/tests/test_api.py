@@ -550,7 +550,10 @@ class AccountAPITests(APITestCase):
         }
         url = reverse('account-api:reset-password')
         response = self.client.post(url, data, format='json')
-        self.assertEquals(response.data['message'], "USER_INACTIVE")
+        self.assertEquals(
+            response.data["non_field_errors"],
+            ["Your account is not active."]
+            )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_reset_password_uppercase_email(self):

@@ -172,23 +172,23 @@ class AuthenticateTokenSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(
         error_messages={
-            'required': "Please enter your first name.",
-            'blank': "The first name may not be blank.",
-            'invalid': "The first name is not valid."
+            'required': _("Please enter your first name."),
+            'blank': _("The first name may not be blank."),
+            'invalid': _("The first name is not valid.")
         }
     )
     last_name = serializers.CharField(
         error_messages={
-            'required': "Please enter your last name.",
-            'blank': "The last name may not be blank.",
-            'invalid': "The last name is not valid."
+            'required': _("Please enter your last name."),
+            'blank': _("The last name may not be blank."),
+            'invalid': _("The last name is not valid.")
         }
     )
     email = serializers.EmailField(
         error_messages={
-            'required': "Please enter your email.",
-            'blank': "The email may not be blank.",
-            'invalid': "The email is not valid."
+            'required': _("Please enter your email."),
+            'blank': _("The email may not be blank."),
+            'invalid': _("The email is not valid.")
         }
     )
 
@@ -222,12 +222,12 @@ class ResetPasswordSerializer(serializers.Serializer):
 #
 class SetPasswordSerializer(serializers.Serializer):
     password1 = serializers.CharField(error_messages={
-        'required': "PASSWORD_REQUIRED",
-        'invalid': "PASSWORD_INVALID"
+        'required': _("The password is required."),
+        'invalid': _("The password is invalid.")
         })
     password2 = serializers.CharField(error_messages={
-        'required': "PASSWORD_REQUIRED",
-        'invalid': "PASSWORD_INVALID"
+        'required': _("The password is required."),
+        'invalid': _("The password is invalid.")
         })
 
     def validate_password1(self, value):
@@ -235,14 +235,14 @@ class SetPasswordSerializer(serializers.Serializer):
         password = value
 
         if len(password.strip()) < 6:
-            raise serializers.ValidationError("The password is too short.")
+            raise serializers.ValidationError(_("The password is too short."))
         elif len(password.strip()) > 50:
-            raise serializers.ValidationError("The password is too long.")
+            raise serializers.ValidationError(_("The password is too long."))
         return password
 
     def validate(self, data):
 
         if data['password1'] != data['password2']:
-            raise serializers.ValidationError("The passwords didn't match.")
+            raise serializers.ValidationError(_("The passwords didn't match."))
 
         return data
