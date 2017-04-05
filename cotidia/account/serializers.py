@@ -235,14 +235,14 @@ class SetPasswordSerializer(serializers.Serializer):
         password = value
 
         if len(password.strip()) < 6:
-            raise serializers.ValidationError("PASSWORD_TOO_SHORT")
+            raise serializers.ValidationError("The password is too short.")
         elif len(password.strip()) > 50:
-            raise serializers.ValidationError("PASSWORD_TOO_LONG")
+            raise serializers.ValidationError("The password is too long.")
         return password
 
     def validate(self, data):
 
         if data['password1'] != data['password2']:
-            raise serializers.ValidationError("PASSWORD_MISMATCH")
+            raise serializers.ValidationError("The passwords didn't match.")
 
         return data

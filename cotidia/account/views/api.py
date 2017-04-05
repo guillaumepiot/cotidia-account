@@ -38,7 +38,7 @@ class SignUp(APIView):
 
         if settings.ACCOUNT_ALLOW_SIGN_UP is False:
             return Response(
-                {"message": ["SIGN_UP_DISABLED"]},
+                {"message": "SIGN_UP_DISABLED"},
                 status=status.HTTP_400_BAD_REQUEST
                 )
 
@@ -127,13 +127,13 @@ class Activate(APIView):
             user = User.objects.get(uuid=uuid)
         except User.DoesNotExist:
             return Response(
-                {"message": ["USER_INVALID"]},
+                {"message": "USER_INVALID"},
                 status=status.HTTP_400_BAD_REQUEST
                 )
 
         if not default_token_generator.check_token(user, token):
             return Response(
-                {"message": ["TOKEN_INVALID"]},
+                {"message": "TOKEN_INVALID"},
                 status=status.HTTP_400_BAD_REQUEST
                 )
 
@@ -147,7 +147,7 @@ class Activate(APIView):
             request=request,
             user=user)
 
-        return Response({"message": ["ACTIVATED"]}, status=status.HTTP_200_OK)
+        return Response({"message": "ACTIVATED"}, status=status.HTTP_200_OK)
 
 
 class ResendActivationLink(APIView):
@@ -164,20 +164,20 @@ class ResendActivationLink(APIView):
             user = User.objects.get(uuid=uuid)
         except User.DoesNotExist:
             return Response(
-                {"message": ["USER_INVALID"]},
+                {"message": "USER_INVALID"},
                 status=status.HTTP_400_BAD_REQUEST
                 )
 
         if user.is_active:
             return Response(
-                {"message": ["USER_ACTIVE"]},
+                {"message": "USER_ACTIVE"},
                 status=status.HTTP_400_BAD_REQUEST
                 )
 
         user.send_activation_link()
 
         return Response(
-            {"message": ["ACTIVATION_SENT"]},
+            {"message": "ACTIVATION_SENT"},
             status=status.HTTP_200_OK)
 
 
@@ -201,12 +201,12 @@ class Authenticate(APIView):
                 token = Token.objects.get(key=serializer.data['token'])
             except Token.DoesNotExist:
                 return Response(
-                    {"message": ["TOKEN_INVALID"]},
+                    {"message": "TOKEN_INVALID"},
                     status=status.HTTP_400_BAD_REQUEST)
 
             if not token.user.is_active:
                 return Response(
-                    {"message": ["USER_INACTIVE"]},
+                    {"message": "USER_INACTIVE"},
                     status=status.HTTP_400_BAD_REQUEST)
 
             user = user_serializer_class(token.user)
@@ -238,8 +238,8 @@ class ResetPassword(APIView):
             if not user.is_active:
                 return Response(
                     {
-                        "message": ["USER_INACTIVE"],
-                        "non_field_errors": ["Your account is not active."]
+                        "message": "USER_INACTIVE",
+                        "non_field_errors": "Your account is not active."
                     },
                     status=status.HTTP_400_BAD_REQUEST
                     )
@@ -264,7 +264,7 @@ class ResetPassword(APIView):
             notice.send(force_now=True)
 
         return Response(
-            {"message": ["PASSWORD_RESET"]},
+            {"message": "PASSWORD_RESET"},
             status=status.HTTP_200_OK
             )
 
@@ -282,15 +282,15 @@ class ResetPasswordValidate(APIView):
             user = User.objects.get(uuid=uuid)
         except User.DoesNotExist:
             return Response(
-                {"message": ["USER_INVALID"]},
+                {"message": "USER_INVALID"},
                 status=status.HTTP_400_BAD_REQUEST)
 
         if not default_token_generator.check_token(user, token):
             return Response(
-                {"message": ["TOKEN_INVALID"]},
+                {"message": "TOKEN_INVALID"},
                 status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({"message": ["TOKEN_VALID"]}, status=status.HTTP_200_OK)
+        return Response({"message": "TOKEN_VALID"}, status=status.HTTP_200_OK)
 
 
 class SetPassword(APIView):
@@ -306,12 +306,12 @@ class SetPassword(APIView):
             user = User.objects.get(uuid=uuid)
         except User.DoesNotExist:
             return Response(
-                {"message": ["USER_INVALID"]},
+                {"message": "USER_INVALID"},
                 status=status.HTTP_400_BAD_REQUEST)
 
         if not default_token_generator.check_token(user, token):
             return Response(
-                {"message": ["TOKEN_INVALID"]},
+                {"message": "TOKEN_INVALID"},
                 status=status.HTTP_400_BAD_REQUEST)
 
         serializer = SetPasswordSerializer(data=request.data)
@@ -321,7 +321,7 @@ class SetPassword(APIView):
         user.set_password(serializer.data['password1'])
         user.save()
 
-        return Response({"message": ["PASSWORD_SET"]}, status=status.HTTP_200_OK)
+        return Response({"message": "PASSWORD_SET"}, status=status.HTTP_200_OK)
 
 
 class UpdateDetails(APIView):

@@ -340,7 +340,7 @@ class AccountAPITests(APITestCase):
                 })
         response = self.client.get(url)
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data['message'], ["USER_INVALID"])
+        self.assertEqual(response.data['message'], "USER_INVALID")
 
         # Test invalid Token
         url = reverse(
@@ -351,7 +351,7 @@ class AccountAPITests(APITestCase):
                 })
         response = self.client.get(url)
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data['message'], ["TOKEN_INVALID"])
+        self.assertEqual(response.data['message'], "TOKEN_INVALID")
 
         # Get the API confirmation url
         url = reverse(
@@ -362,7 +362,7 @@ class AccountAPITests(APITestCase):
                 })
         response = self.client.get(url)
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['message'], ["ACTIVATED"])
+        self.assertEqual(response.data['message'], "ACTIVATED")
 
         user = User.objects.get(uuid=user_uuid)
         self.assertEquals(user.is_active, True)
@@ -440,7 +440,7 @@ class AccountAPITests(APITestCase):
                 })
         response = self.client.get(url)
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['message'], ["ACTIVATED"])
+        self.assertEqual(response.data['message'], "ACTIVATED")
 
         user = User.objects.get(uuid=user_uuid)
         self.assertEquals(user.is_active, True)
@@ -470,7 +470,7 @@ class AccountAPITests(APITestCase):
         }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data['message'], ["TOKEN_INVALID"])
+        self.assertEqual(response.data['message'], "TOKEN_INVALID")
 
         # Valid token
         data = {
@@ -478,7 +478,7 @@ class AccountAPITests(APITestCase):
         }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data['message'], ["USER_INACTIVE"])
+        self.assertEqual(response.data['message'], "USER_INACTIVE")
 
         # Activate user
         user = User.objects.filter().latest('id')
@@ -509,7 +509,7 @@ class AccountAPITests(APITestCase):
         }
         url = reverse('account-api:reset-password')
         response = self.client.post(url, data, format='json')
-        self.assertEquals(response.data['message'], ["PASSWORD_RESET"])
+        self.assertEquals(response.data['message'], "PASSWORD_RESET")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         #
@@ -550,7 +550,7 @@ class AccountAPITests(APITestCase):
         }
         url = reverse('account-api:reset-password')
         response = self.client.post(url, data, format='json')
-        self.assertEquals(response.data['message'], ["USER_INACTIVE"])
+        self.assertEquals(response.data['message'], "USER_INACTIVE")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_reset_password_uppercase_email(self):
@@ -566,7 +566,7 @@ class AccountAPITests(APITestCase):
         }
         url = reverse('account-api:reset-password')
         response = self.client.post(url, data, format='json')
-        self.assertEquals(response.data['message'], ["PASSWORD_RESET"])
+        self.assertEquals(response.data['message'], "PASSWORD_RESET")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         #
@@ -611,7 +611,7 @@ class AccountAPITests(APITestCase):
 
         response = self.client.get(url)
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(response.data['message'], ["TOKEN_VALID"])
+        self.assertEquals(response.data['message'], "TOKEN_VALID")
 
         if self.display_doc:
             # Generate documentation
@@ -634,7 +634,7 @@ class AccountAPITests(APITestCase):
 
         response = self.client.get(url)
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEquals(response.data['message'], ["TOKEN_INVALID"])
+        self.assertEquals(response.data['message'], "TOKEN_INVALID")
 
     def test_set_new_password(self):
         """Test that the user can set the new password."""
@@ -651,7 +651,7 @@ class AccountAPITests(APITestCase):
         }
         url = reverse('account-api:reset-password')
         response = self.client.post(url, data, format='json')
-        self.assertEquals(response.data['message'], ["PASSWORD_RESET"])
+        self.assertEquals(response.data['message'], "PASSWORD_RESET")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         #
@@ -678,7 +678,7 @@ class AccountAPITests(APITestCase):
         }
 
         response = self.client.post(url, data)
-        self.assertEquals(response.data['message'], ["PASSWORD_SET"])
+        self.assertEquals(response.data['message'], "PASSWORD_SET")
         self.assertEquals(response.status_code, status.HTTP_200_OK)
 
         if self.display_doc:
@@ -700,7 +700,7 @@ class AccountAPITests(APITestCase):
 
         response = self.client.post(url, data)
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEquals(response.data['message'], ["TOKEN_INVALID"])
+        self.assertEquals(response.data['message'], "TOKEN_INVALID")
 
         #
         # Test that the user can sign in with the new password
@@ -722,7 +722,7 @@ class AccountAPITests(APITestCase):
         }
         url = reverse('account-api:reset-password')
         response = self.client.post(url, data, format='json')
-        self.assertEquals(response.data['message'], ["PASSWORD_RESET"])
+        self.assertEquals(response.data['message'], "PASSWORD_RESET")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         #
@@ -751,7 +751,7 @@ class AccountAPITests(APITestCase):
         response = self.client.post(url, data)
         self.assertEquals(
             response.data['non_field_errors'],
-            ["PASSWORD_MISMATCH"]
+            ["The passwords didn't match."]
             )
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -773,7 +773,7 @@ class AccountAPITests(APITestCase):
         response = self.client.post(url, data)
         self.assertEquals(
             response.data['password1'],
-            ["PASSWORD_TOO_SHORT"]
+            ["The password is too short."]
             )
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
 
