@@ -34,6 +34,9 @@ class User(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']
 
+    class Meta:
+        ordering = ["first_name", "last_name"]
+
     def __str__(self):
         if self.first_name or self.last_name:
             return '%s %s' % (self.first_name, self.last_name)
