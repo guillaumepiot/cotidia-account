@@ -1,5 +1,16 @@
+import os
+
 from setuptools import find_packages, setup
 
+
+def package_files(directory):
+    paths = []
+    for (path, directories, filenames) in os.walk(directory):
+        for filename in filenames:
+            paths.append(os.path.join('..', path, filename))
+    return paths
+
+template_files = package_files('cotidia/account/templates')
 
 setup(
     name="cotidia-account",
@@ -11,9 +22,7 @@ setup(
     packages=find_packages(),
     package_dir={'account': 'account'},
     package_data={
-        'cotidia.account': [
-            'templates/*',
-        ]
+        'cotidia.account': template_files
     },
     namespace_packages=['cotidia'],
     include_package_data=True,
