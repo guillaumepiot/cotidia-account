@@ -212,6 +212,9 @@ def user_change_password(request, slug):
 
     user = get_object_or_404(User, uuid=slug)
 
+    if user == request.user:
+        return HttpResponseRedirect(reverse('account-admin:password_change'))
+
     if request.method == 'POST':
         form = UserChangePassword(user, request.POST)
         if form.is_valid():
