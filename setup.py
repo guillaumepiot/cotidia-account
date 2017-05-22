@@ -13,6 +13,7 @@ setup(
     package_data={
         'cotidia.account': [
             'templates/admin/account/*.html',
+            'templates/admin/account/includes/*.html',
             'templates/admin/includes/*.html',
             'templates/account/*.html',
             'templates/account/notices/*.html',
