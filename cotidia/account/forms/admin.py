@@ -185,7 +185,7 @@ class UpdateDetailsForm(forms.ModelForm):
         return email
 
 
-class AccountUserCreationForm(forms.Form):
+class AccountUserCreationForm(forms.ModelForm):
     """A form that creates a user, with no privileges."""
 
     error_messages = {
@@ -215,6 +215,10 @@ class AccountUserCreationForm(forms.Form):
             ),
         help_text="Enter the same password twice, for verification."
         )
+
+    class Meta:
+        model = User
+        fields = ('email', 'password1', 'password2')
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")

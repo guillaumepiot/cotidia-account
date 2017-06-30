@@ -75,7 +75,7 @@ class AccountPublicTests(TestCase):
         self.assertEquals(response.status_code, 302)
 
         # test logout
-        response = self.client.post(reverse("account-public:logout"), data)
+        response = self.client.get(reverse("account-public:logout"), data)
         self.assertEquals(response.status_code, 200)
 
     def test_password_reset(self):

@@ -63,14 +63,16 @@ def login_remember_me(request, *args, **kwargs):
     return login(request, extra_context=extra_context, *args, **kwargs)
 
 
-def sign_up(request):
+def sign_up(
+        request,
+        sign_up_form=AccountUserCreationForm,
+        template_name='account/sign_up.html'):
     """Sign up view for public user."""
 
     if settings.ACCOUNT_ALLOW_SIGN_UP is False:
         raise Http404
 
-    template = 'account/sign_up.html'
-    form = AccountUserCreationForm()
+    form = sign_up_form()
 
     success_url = request.GET.get('next')
 
@@ -79,9 +81,9 @@ def sign_up(request):
         return HttpResponseRedirect(reverse('account-public:dashboard'))
 
     if request.method == "POST":
-        form = AccountUserCreationForm(request.POST)
+        form = sign_up_form(request.POST)
         if form.is_valid():
-            user = User(email=form.cleaned_data["email"])
+            user = form.save()
             user.set_password(form.cleaned_data["password1"])
             # Hash the email address to generate a unique username
             m = hashlib.md5()
@@ -126,7 +128,7 @@ def sign_up(request):
                     reverse('account-public:dashboard'))
 
     context = {'form': form, 'success_url': success_url}
-    return render(request, template, context)
+    return render(request, template_name, context)
 
 
 def activate(request, uuid, token, template_name):
