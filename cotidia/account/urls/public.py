@@ -3,13 +3,12 @@ from django.contrib.auth import views as auth_views
 from cotidia.account.conf import settings
 
 from cotidia.account.forms import (
-    EmailAuthenticationForm,
     AccountPasswordResetForm,
     AccountSetPasswordForm,
     AccountPasswordChangeForm)
 from cotidia.account.views.public import (
     dashboard,
-    login_remember_me,
+    LoginView,
     edit,
     sign_up,
     activate,
@@ -97,9 +96,7 @@ if settings.ACCOUNT_ALLOW_SIGN_IN:
     urlpatterns += [
         url(
             r'^login/$',
-            login_remember_me,
-            {'template_name': 'account/login.html',
-             'authentication_form': EmailAuthenticationForm, },
+            LoginView.as_view(),
             name='login',
         ),
     ]

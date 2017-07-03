@@ -5,13 +5,17 @@ from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import login
+from django.contrib.auth.views import LoginView as AuthLoginView
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib import messages
 from cotidia.account.conf import settings
 
-from cotidia.account.forms import UpdateDetailsForm, AccountUserCreationForm
+from cotidia.account.forms import (
+    UpdateDetailsForm,
+    AccountUserCreationForm,
+    EmailAuthenticationForm
+    )
 from cotidia.account.models import User
 from cotidia.account import signals
 
@@ -25,42 +29,41 @@ def dashboard(request):
 
 
 @login_required
-def edit(request):
+def edit(
+        request,
+        edit_form=UpdateDetailsForm,
+        template_name='account/edit.html'
+        ):
     """Edit details view for logged in public user."""
 
-    template = 'account/edit.html'
-
     if request.method == "POST":
-        form = UpdateDetailsForm(instance=request.user, data=request.POST)
+        form = edit_form(instance=request.user, data=request.POST)
         if form.is_valid():
             form.save()
             messages.success(
                 request, _('Your personal details have been saved'))
             return HttpResponseRedirect(reverse('account-public:dashboard'))
     else:
-        form = UpdateDetailsForm(instance=request.user)
+        form = edit_form(instance=request.user)
 
-    return render(request, template, {'form': form})
+    return render(request, template_name, {'form': form})
 
 
-def login_remember_me(request, *args, **kwargs):
-    """Custom login view that enables "remember me" functionality."""
+class LoginView(AuthLoginView):
+    template_name = 'account/login.html'
+    form_class = EmailAuthenticationForm
 
-    if settings.ACCOUNT_ALLOW_SIGN_IN is False:
-        raise Http404
+    def get(self, *args, **kwargs):
+        if settings.ACCOUNT_ALLOW_SIGN_IN is False:
+            raise Http404
+        if self.request.user.is_authenticated():
+            return HttpResponseRedirect(self.redirect_url)
+        return super().get(*args, **kwargs)
 
-    # Redirect to account page if already logged in
-    if request.user.is_authenticated():
-        return HttpResponseRedirect(reverse('account-public:dashboard'))
-    if request.method == 'POST':
-        if not request.POST.get('remember_me', None):
-            request.session.set_expiry(0)
-
-    extra_context = {}
-    if request.GET.get('next'):
-        extra_context['success_url'] = request.GET['next']
-
-    return login(request, extra_context=extra_context, *args, **kwargs)
+    def post(self, *args, **kwargs):
+        if self.request.POST.get('remember_me', None) is not None:
+            self.request.session.set_expiry(0)
+        return super().post(*args, **kwargs)
 
 
 def sign_up(
