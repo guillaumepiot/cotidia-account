@@ -1,5 +1,5 @@
 {% extends "admin/account/base.html" %}{% load i18n %}
-{% block main %}
+{% block content %}
     {% include "admin/account/menu.html" %}
 
     <div class="toolbar toolbar--menu-open" id="toolbar">
@@ -10,4 +10,4 @@
         {% include "admin/includes/messages.html" %}
         {% block content %}{% endblock content %}
     </div>
-{% endblock main %}
+{% endblock content %}

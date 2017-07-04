@@ -3,7 +3,7 @@
 
 {% block title %}{% trans "Enable Two-Factor Authentication" %}{% endblock %}
 
-{% block main %}
+{% block content %}
 <form method="post" action=".">
     {% csrf_token %}
     <div class="dialog dialog--small">

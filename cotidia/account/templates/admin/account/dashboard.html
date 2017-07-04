@@ -2,7 +2,7 @@
 {% block title %}
     {% trans "Dashboard" %}
 {% endblock title %}
-{% block main %}
+{% block content %}
     {% include "admin/account/menu.html" %}
 
     <div class="toolbar toolbar--menu-open" id="toolbar">
@@ -14,4 +14,4 @@
             <p>Welcome to the {{SITE_NAME}} dashboard.</p>
         </div>
     </div>
-{% endblock main %}
+{% endblock content %}
