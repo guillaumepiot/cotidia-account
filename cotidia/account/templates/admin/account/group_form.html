@@ -11,7 +11,7 @@
     <span class="toolbar__title">{% trans "Roles" %}</span>
 {% endblock toolbar %}
 
-{% block content %}
+{% block page_content %}
 <div class="[ content__inner ]">
     <p class="breadcrumb">
         <a href="{% url 'account-admin:group_list' %}">{% trans "Users" %}</a>
@@ -72,4 +72,4 @@
 </form>
 
 </div>
-{% endblock content %}
+{% endblock page_content %}

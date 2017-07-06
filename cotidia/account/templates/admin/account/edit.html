@@ -11,7 +11,7 @@
     <span class="toolbar__title">{% trans "Profile" %}</span>
 {% endblock toolbar %}
 
-{% block content %}
+{% block page_content %}
 <div class="[ content__inner ]">
     <p class="breadcrumb">
         <a href="{% url 'account-admin:dashboard' %}">{% trans "Dashboard" %}</a>
@@ -122,4 +122,4 @@
 </div>
 
 </form>
-{% endblock content %}
+{% endblock page_content %}

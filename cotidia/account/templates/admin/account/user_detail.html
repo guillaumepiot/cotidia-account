@@ -16,7 +16,7 @@
     <span class="toolbar__title">{% trans "Users" %}</span>
 {% endblock toolbar %}
 
-{% block content %}
+{% block page_content %}
 <div class="[ content__inner ]">
     <p class="breadcrumb">
         <a href="{% url 'account-admin:user_list' %}">{% trans "Users" %}</a>
@@ -177,4 +177,4 @@
         {% endif %}
     {% endif %}
 </div>
-{% endblock content %}
+{% endblock page_content %}
