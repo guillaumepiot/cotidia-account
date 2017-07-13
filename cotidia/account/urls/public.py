@@ -9,6 +9,7 @@ from cotidia.account.forms import (
 from cotidia.account.views.public import (
     dashboard,
     LoginView,
+    LogoutView,
     edit,
     sign_up,
     activate,
@@ -38,8 +39,7 @@ urlpatterns = [
     ),
     url(
         r'^logout/$',
-        auth_views.logout,
-        {'template_name': 'account/logout.html'},
+        LogoutView.as_view(),
         name='logout',
     ),
     url(

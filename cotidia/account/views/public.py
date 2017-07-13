@@ -6,6 +6,7 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView as AuthLoginView
+from django.contrib.auth.views import LogoutView as AuthLogoutView
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib import messages
@@ -64,6 +65,10 @@ class LoginView(AuthLoginView):
         if self.request.POST.get('remember_me', None) is not None:
             self.request.session.set_expiry(0)
         return super().post(*args, **kwargs)
+
+
+class LogoutView(AuthLogoutView):
+    template_name = 'account/logout.html'
 
 
 def sign_up(
