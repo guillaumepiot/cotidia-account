@@ -50,6 +50,25 @@ MIDDLEWARE_CLASSES = (
 )
 ```
 
+Template context processor:
+
+```
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+
+                "cotidia.account.context_processor.account_settings",
+        
+            ],
+        },
+    },
+]
+```
+
 Migrate the account models
 
 ```console
