@@ -158,7 +158,7 @@ class SelectTimeWidget(Widget):
         hour_choices = [(i, self.format_time_value(i)) for i in range(0, 24)]
         if not (self.required and value):
             hour_choices.insert(0, ('', 'Hour'))
-        local_attrs = self.build_attrs(id=self.hour_field % id_)
+        local_attrs = self.build_attrs(self.attrs)
 
         s = Select(choices=hour_choices)
         select_html = s.render(
@@ -172,7 +172,7 @@ class SelectTimeWidget(Widget):
         minute_choices = [(i, self.format_time_value(i)) for i in range(0, 60)]
         if not (self.required and value):
             minute_choices.insert(0, ('', 'Mins'))
-        local_attrs = self.build_attrs(id=self.minute_field % id_)
+        local_attrs = self.build_attrs(self.attrs)
 
         s = Select(choices=minute_choices)
         select_html = s.render(
@@ -296,7 +296,7 @@ class SelectDateTimeWidget(Widget):
         hour_choices = [(i, self.format_time_value(i)) for i in range(0, 23)]
         if not (self.required and value):
             hour_choices.insert(0, ('', 'Hour'))
-        local_attrs = self.build_attrs(id=self.hour_field % id_)
+        local_attrs = self.build_attrs(self.attrs)
 
         s = Select(choices=hour_choices)
         select_html = s.render(self.hour_field % name, hour_val, local_attrs)
@@ -309,7 +309,7 @@ class SelectDateTimeWidget(Widget):
         minute_choices = [(i, self.format_time_value(i)) for i in range(0, 59)]
         if not (self.required and value):
             minute_choices.insert(0, ('', 'Minute'))
-        local_attrs = self.build_attrs(id=self.minute_field % id_)
+        local_attrs = self.build_attrs(self.attrs)
 
         s = Select(choices=minute_choices)
         select_html = s.render(
