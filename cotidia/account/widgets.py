@@ -66,7 +66,7 @@ class SelectDateWidget(Widget):
         if not (self.required and value):
             day_choices.insert(0, (0, 'Day'))
 
-        local_attrs = self.build_attrs(id=self.day_field % id_)
+        local_attrs = self.build_attrs(self.attrs)
 
         s = Select(choices=day_choices)
         select_html = s.render(self.day_field % name, day_val, local_attrs)
@@ -258,7 +258,7 @@ class SelectDateTimeWidget(Widget):
         if not (self.required and value):
             day_choices.insert(0, (0, 'Day'))
 
-        local_attrs = self.build_attrs(id=self.day_field % id_)
+        local_attrs = self.build_attrs(self.attrs)
 
         s = Select(choices=day_choices)
         select_html = s.render(self.day_field % name, day_val, local_attrs)
