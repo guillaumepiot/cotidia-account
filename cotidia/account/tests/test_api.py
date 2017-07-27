@@ -502,7 +502,7 @@ class AccountAPITests(APITestCase):
     def test_reset_password(self):
         """Check that an email is sent with reset link."""
 
-        section_title = "Forgot password"
+        section_title = "Reset password"
 
         data = {
             'email': self.normal_user.email
