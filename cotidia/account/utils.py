@@ -16,7 +16,7 @@ class UserCheckMixin(object):
                 raise PermissionDenied
             else:
                 return redirect(settings.ACCOUNT_ADMIN_LOGIN_URL)
-        return super(UserCheckMixin, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
 
 class StaffPermissionRequiredMixin(UserCheckMixin):
