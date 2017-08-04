@@ -13,7 +13,7 @@ Install directly from the repository:
 $ pip install -e git+git@code.cotidia.com:cotidia/account.git#egg=cotidia-account
 ```
 
-## Settings   
+## Settings
 
 Add `cotidia.account` to your INSTALLED_APPS:
 
@@ -25,6 +25,7 @@ INSTALLED_APPS=[
     "two_factor",
 
     "cotidia.core",
+    "cotidia.admin",
     "cotidia.account",
     "cotidia.mail",
     "rest_framework",
@@ -62,7 +63,7 @@ TEMPLATES = [
             'context_processors': [
 
                 "cotidia.account.context_processor.account_settings",
-        
+
             ],
         },
     },
