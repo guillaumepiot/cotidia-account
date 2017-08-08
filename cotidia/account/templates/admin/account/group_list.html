@@ -1,4 +1,4 @@
-{% extends "admin/account/page.html" %}{% load i18n %}
+{% extends "admin/page.html" %}{% load i18n %}
 {% block title %}
     {% trans "Roles" %}
 {% endblock title %}
@@ -6,7 +6,7 @@
 {% block toolbar %}
     {% if perms.auth.add_group %}
     <a href="{% url 'account-admin:group_add' %}"
-        class="[ toolbar__item ] [ btn btn--create btn--small pull-right ]">
+        class="[ toolbar__item ] [ btn btn--create btn--small ]">
         <span class="fa fa-plus"></span> {% trans "Add a Role" %}
     </a>
     {% endif %}

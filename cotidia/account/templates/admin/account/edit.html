@@ -1,24 +1,17 @@
-{% extends "admin/account/page.html" %}{% load i18n %}
-{% block title %}
-    {% if object %}
-        {% trans "Edit User" %}
-    {% else %}
-        {% trans "Add a User" %}
-    {% endif %}
-{% endblock title %}
+{% extends "admin/page.html" %}{% load i18n %}
+{% block title %}{% trans "Profile" %}{% endblock title %}
+
+{% block body_class %}content-centered{% endblock body_class %}
 
 {% block toolbar %}
-    <span class="toolbar__title">{% trans "Profile" %}</span>
+    <span class="toolbar__breadcrumbs">
+        <a href="{% url 'account-admin:dashboard' %}">{% trans "Dashboard" %}</a>
+        &nbsp;<span class="fa fa-angle-right"></span>&nbsp;
+        {% trans "Profile" %}
+    </span>
 {% endblock toolbar %}
 
 {% block page_content %}
-<div class="[ content__inner ]">
-    <p class="breadcrumb">
-        <a href="{% url 'account-admin:dashboard' %}">{% trans "Dashboard" %}</a>
-        &nbsp;<span class="fa fa-angle-right"></span>&nbsp;
-        {% trans "Update Profile" %}
-    </p>
-</div>
 <form action="" method="post" class="form">
 {% csrf_token %}
 {% if form.non_field_errors %}
@@ -28,8 +21,6 @@
     {% endfor %}
     </div>
 {% endif %}
-
-<div class="[ content__inner ] [ box box--padded box--bordered ]">
     <fieldset>
         <legend>{% trans "Contact details" %}</legend>
         <div class="grid">
@@ -61,12 +52,6 @@
                 {% endwith %}
             </div>
         </div>
-    </fieldset>
-</div>
-
-<div class="[ content__inner ] [ box box--padded box--bordered ]">
-    <fieldset>
-        <legend>{% trans "Security" %}</legend>
         <div class="grid">
             <div class="grid__span-2">
                 <span class="form__label--inline">
@@ -112,14 +97,8 @@
         </div>
         {% endif %}
     </fieldset>
-</div>
-
-
-<div class="content__inner">
     <button type="submit" class="btn btn--primary">
         {% trans "Save" %}
     </button>
-</div>
-
 </form>
 {% endblock page_content %}
