@@ -1,10 +1,8 @@
-{% extends "admin/base.html" %}{% load i18n admin_tags %}
+{% extends "admin/base.html" %}{% load i18n %}
 {% block title %}
     {% trans "Dashboard" %}
 {% endblock title %}
 {% block content %}
-    {% menu %}
-
     <div class="toolbar toolbar--menu-open" id="toolbar">
         <span class="toolbar__title">{% trans "Dashboard" %}</span>
     </div>
