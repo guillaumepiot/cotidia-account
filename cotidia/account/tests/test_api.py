@@ -1,12 +1,13 @@
 import uuid
+import json
 
 from django.test import override_settings
 from django.core.urlresolvers import reverse
 from django.core import mail
-from cotidia.account.conf import settings
 
 from rest_framework import status
 from rest_framework.test import APITestCase
+from rest_framework.renderers import JSONRenderer
 
 from cotidia.account import fixtures
 from cotidia.account.models import User
@@ -25,6 +26,11 @@ class AccountAPITests(APITestCase):
         self.doc = Doc()
 
         self.display_doc = True
+
+    def jsonify(self, data):
+        """Make clean JSON for doc output."""
+
+        return json.loads(JSONRenderer().render(data).decode("utf-8"))
 
     def test_sign_up(self):
         """Check that the sign up process works as expected."""
@@ -51,8 +57,8 @@ class AccountAPITests(APITestCase):
                 'title': section_title,
                 'http_method': 'POST',
                 'url': url,
-                'payload': data,
-                'response': response.data,
+                'payload': self.jsonify(data),
+                'response': self.jsonify(response.data),
             }
             self.doc.display_section(content)
 
@@ -221,7 +227,7 @@ class AccountAPITests(APITestCase):
                 'title': section_title,
                 'http_method': 'POST',
                 'url': url,
-                'payload': data,
+                'payload': self.jsonify(data),
                 'response': response.data
             }
             self.doc.display_section(content)
@@ -377,7 +383,7 @@ class AccountAPITests(APITestCase):
                     'uuid': str(user_uuid),
                     'token': confirmation_code
                 },
-                'response': response.data,
+                'response': self.jsonify(response.data),
                 'description': description
             }
             self.doc.display_section(content)
@@ -426,7 +432,7 @@ class AccountAPITests(APITestCase):
                 'http_method': 'POST',
                 'url': url,
                 'payload': {},
-                'response': response.data,
+                'response': self.jsonify(response.data),
                 'description': description
             }
             self.doc.display_section(content)
@@ -494,7 +500,7 @@ class AccountAPITests(APITestCase):
                 'title': section_title,
                 'http_method': 'POST',
                 'url': url,
-                'payload': data,
+                'payload': self.jsonify(data),
                 'response': response.data
             }
             self.doc.display_section(content)
@@ -523,7 +529,7 @@ class AccountAPITests(APITestCase):
                 'title': section_title,
                 'http_method': 'POST',
                 'url': url,
-                'payload': data,
+                'payload': self.jsonify(data),
                 'response': response.data
             }
             self.doc.display_section(content)
@@ -622,8 +628,8 @@ class AccountAPITests(APITestCase):
                 'title': section_title,
                 'http_method': 'POST',
                 'url': url,
-                'payload': data,
-                'response': response.data,
+                'payload': self.jsonify(data),
+                'response': self.jsonify(response.data),
                 'description': description
             }
             self.doc.display_section(content)
@@ -690,8 +696,8 @@ class AccountAPITests(APITestCase):
                 'title': section_title,
                 'http_method': 'POST',
                 'url': url,
-                'payload': data,
-                'response': response.data,
+                'payload': self.jsonify(data),
+                'response': self.jsonify(response.data),
                 'description': description
             }
             self.doc.display_section(content)
@@ -808,8 +814,8 @@ class AccountAPITests(APITestCase):
                 'title': "Update details",
                 'http_method': 'POST',
                 'url': url,
-                'payload': data,
-                'response': response.data,
+                'payload': self.jsonify(data),
+                'response': self.jsonify(response.data),
                 'description': (
                     "Update the details of the user making the request."
                 )
