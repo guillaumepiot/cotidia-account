@@ -1,15 +1,11 @@
-{% extends "admin/base.html" %}{% load i18n %}
+{% extends "admin/page.html" %}{% load i18n %}
 {% block title %}
     {% trans "Dashboard" %}
 {% endblock title %}
-{% block content %}
-    <div class="toolbar toolbar--menu-open" id="toolbar">
-        <span class="toolbar__title">{% trans "Dashboard" %}</span>
-    </div>
 
-    <div class="content content--menu-open" id="content">
-        <div class="content__inner box box--padded box--bordered">
-            <p>Welcome to the {{SITE_NAME}} dashboard.</p>
-        </div>
-    </div>
-{% endblock content %}
+{% block toolbar %}<span class="toolbar__title">{% trans "Dashboard" %}</span>{% endblock toolbar %}
+{% block page_content %}
+<div class="content__inner box box--padded box--bordered">
+    <p>Welcome to the {{SITE_NAME}} dashboard.</p>
+</div>
+{% endblock page_content %}
