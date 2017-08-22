@@ -6,24 +6,21 @@
         {% trans "Add a Role" %}
     {% endif %}
 {% endblock title %}
-
+{% block body_class %}content-centered{% endblock body_class %}
 {% block toolbar %}
-    <span class="toolbar__title">{% trans "Roles" %}</span>
-{% endblock toolbar %}
-
-{% block page_content %}
-<div class="[ content__inner ]">
-    <p class="breadcrumb">
-        <a href="{% url 'account-admin:group_list' %}">{% trans "Users" %}</a>
+    <span class="toolbar__breadcrumbs">
+        <a href="{% url 'account-admin:group_list' %}">{% trans "Roles" %}</a>
         &nbsp;<span class="fa fa-angle-right"></span>&nbsp;
         {% if object %}
             {% trans "Edit Role" %}
         {% else %}
             {% trans "Add a Role" %}
         {% endif %}
-    </p>
-</div>
-<form action="" method="post" class="form">
+    </span>
+{% endblock toolbar %}
+
+{% block page_content %}
+<form action="" method="post" class="form form--action-fixed-bottom">
 {% csrf_token %}
 {% if form.non_field_errors %}
     <div class="alert alert--error">
@@ -32,41 +29,43 @@
     {% endfor %}
     </div>
 {% endif %}
-
-<div class="[ content__inner ] [ box box--padded box--bordered ]">
-    <fieldset>
-        <legend>{% trans "Role" %}</legend>
-        <div class="grid">
-            <div class="grid__span-2">
-                <span class="form__label--inline">
-                    {% trans "Description" %}
-                </span>
-            </div>
-            <div class="grid__span-3">
-                {% with form.name as field %}
-                    {% include "admin/includes/text-field.html" %}
-                {% endwith %}
-            </div>
+<fieldset>
+    <legend>{% trans "Role" %}</legend>
+    <div class="grid">
+        <div class="grid__span-2">
+            <span class="form__label--inline">
+                {% trans "Description" %}
+            </span>
         </div>
-        <div class="grid">
-            <div class="grid__span-2">
-                <span class="form__label--inline">
-                    {% trans "Permissions" %}
-                </span>
-            </div>
-            <div class="grid__span-6">
-                {% with form.permissions as field %}
-                    {% include "admin/includes/text-field.html" %}
-                {% endwith %}
-            </div>
+        <div class="grid__span-3">
+            {% with form.name as field %}
+                {% include "admin/generic/form/text-field.html" %}
+            {% endwith %}
         </div>
-    </fieldset>
-</div>
+    </div>
+    <div class="grid">
+        <div class="grid__span-2">
+            <span class="form__label--inline">
+                {% trans "Permissions" %}
+            </span>
+        </div>
+        <div class="grid__span-6">
+            {% with form.permissions as field %}
+                {% include "admin/generic/form/text-field.html" %}
+            {% endwith %}
+        </div>
+    </div>
+</fieldset>
 
-<div class="content__inner">
-    <button type="submit" class="btn btn--primary">
-        {% trans "Save" %}
-    </button>
+<div class="form__actions">
+    <div class="form__actions-inner">
+        <button type="submit" class="btn btn--primary">
+            {% trans "Save" %}
+        </button>
+        <a href="{% url 'account-admin:group_list' %}" class="btn btn--cancel btn--transparent pull-right">
+            {% trans "Cancel" %}
+        </a>
+    </div>
 </div>
 
 </form>

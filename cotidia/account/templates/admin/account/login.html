@@ -14,19 +14,13 @@
                 <h4>{% trans "Sign in" %}</h4>
                 <p>{% trans "Please enter your email address and password below to login." %}</p>
                     {% csrf_token %}
-                    {% if form.non_field_errors %}
-                        <div class="alert alert--error">
-                        {% for error in form.non_field_errors %}
-                            {{error}}<br>
-                        {% endfor %}
-                        </div>
-                    {% endif %}
+                    {% include "admin/generic/form/non_field_errors.html" %}
 
                     {% with form.username as field %}
-                        {% include 'admin/includes/text-field.html' %}
+                        {% include 'admin/generic/form/text-field.html' %}
                     {% endwith %}
                     {% with form.password as field %}
-                        {% include 'admin/includes/text-field.html' %}
+                        {% include 'admin/generic/form/text-field.html' %}
                     {% endwith %}
                     <div class="form-group">
                         {{ form.remember_me.errors }}

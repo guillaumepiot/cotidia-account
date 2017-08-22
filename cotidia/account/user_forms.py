@@ -6,40 +6,18 @@ from django.contrib.auth.forms import (
     UserChangeForm,
     ReadOnlyPasswordHashField,
     AdminPasswordChangeForm
-    )
+)
 
 from cotidia.account.models import User
 
 
 class UserForm(forms.ModelForm):
 
-    username = forms.CharField(
-        label='',
-        max_length=256,
-        widget=forms.TextInput(
-            attrs={'placeholder': _("Username"), 'class': 'form__text'})
-        )
+    username = forms.CharField(max_length=256)
+    first_name = forms.CharField(max_length=256)
+    last_name = forms.CharField(max_length=256)
 
-    first_name = forms.CharField(
-        label='',
-        max_length=256,
-        widget=forms.TextInput(
-            attrs={'placeholder': _("First name"), 'class': 'form__text'})
-        )
-
-    last_name = forms.CharField(
-        label='',
-        max_length=256,
-        widget=forms.TextInput(
-            attrs={'placeholder': _("Last name"), 'class': 'form__text'})
-        )
-
-    email = forms.EmailField(
-        label='',
-        max_length=256,
-        widget=forms.TextInput(
-            attrs={'placeholder': _("Email"), 'class': 'form__text'})
-        )
+    email = forms.EmailField()
 
     groups = forms.ModelMultipleChoiceField(
         label='',
@@ -112,40 +90,18 @@ class GroupForm(forms.ModelForm):
 
 
 class ProfileForm(forms.ModelForm):
-    username = forms.CharField(
-        label='',
-        max_length=256,
-        widget=forms.TextInput(
-            attrs={'placeholder': _("Username"), 'class': 'form__text'})
-        )
 
-    first_name = forms.CharField(
-        label='',
-        max_length=256,
-        widget=forms.TextInput(
-            attrs={'placeholder': _("First name"), 'class': 'form__text'})
-        )
-
-    last_name = forms.CharField(
-        label='',
-        max_length=256,
-        widget=forms.TextInput(
-            attrs={'placeholder': _("Last name"), 'class': 'form__text'})
-        )
-
-    email = forms.EmailField(
-        label='',
-        max_length=256,
-        widget=forms.TextInput(
-            attrs={'placeholder': _("Email"), 'class': 'form__text'})
-        )
+    username = forms.CharField(max_length=256)
+    first_name = forms.CharField(max_length=256)
+    last_name = forms.CharField(max_length=256)
+    email = forms.EmailField(max_length=256)
 
     class Meta:
         model = User
         fields = ('username', 'email', 'first_name', 'last_name')
 
     def __init__(self, *args, **kwargs):
-        super(ProfileForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class UserChangePassword(AdminPasswordChangeForm):
@@ -153,16 +109,16 @@ class UserChangePassword(AdminPasswordChangeForm):
     def __init__(self, *args, **kwargs):
         super(UserChangePassword, self).__init__(*args, **kwargs)
 
-        self.fields['password1'].widget = forms.PasswordInput(
-            attrs={'placeholder': "", 'class': 'form__text'})
-        self.fields['password2'].widget = forms.PasswordInput(
-            attrs={
-                'placeholder': _("Confirm Password"),
-                'class': 'form__text'
-                }
-            )
-        self.fields['password1'].label = ""
-        self.fields['password2'].label = ""
-        self.fields['password2'].help_text = _(
-            "Enter the same password again, for verification."
-            )
+        # self.fields['password1'].widget = forms.PasswordInput(
+        #     attrs={'placeholder': "", 'class': 'form__text'})
+        # self.fields['password2'].widget = forms.PasswordInput(
+        #     attrs={
+        #         'placeholder': _("Confirm Password"),
+        #         'class': 'form__text'
+        #         }
+        #     )
+        # self.fields['password1'].label = ""
+        # self.fields['password2'].label = ""
+        # self.fields['password2'].help_text = _(
+        #     "Enter the same password again, for verification."
+        #     )

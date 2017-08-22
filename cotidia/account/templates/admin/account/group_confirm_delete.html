@@ -4,23 +4,19 @@
 {% endblock title %}
 
 {% block toolbar %}
-    <span class="toolbar__title">{% trans "Roles" %}</span>
-{% endblock toolbar %}
-
-{% block page_content %}
-<div class="[ content__inner ]">
-    <p class="breadcrumb">
+    <span class="toolbar__breadcrumbs">
         <a href="{% url 'account-admin:group_list' %}">{% trans "Roles" %}</a>
         &nbsp;<span class="fa fa-angle-right"></span>&nbsp;
         {% trans "Confirm Delete" %}
-    </p>
-</div>
+    </span>
+{% endblock toolbar %}
 
-<div class="[ content__inner ] [ box box--padded box--bordered ]">
+{% block page_content %}
+<fieldset>
     <h3>{% trans "Are you sure to delete the following role?" %}</h3>
     <p class="text-strong">{{object.name}}</p>
     <p>{% trans "The operation is not reversible." %}</p>
-</div>
+</fieldset>
 
 <div class="content__inner">
     <form method="post" action=".">

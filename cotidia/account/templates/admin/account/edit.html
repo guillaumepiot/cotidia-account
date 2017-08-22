@@ -12,70 +12,31 @@
 {% endblock toolbar %}
 
 {% block page_content %}
+{% include "admin/generic/form/errors.html" %}
 <form action="" method="post" class="form">
-{% csrf_token %}
-{% if form.non_field_errors %}
-    <div class="alert alert--error">
-    {% for error in form.non_field_errors %}
-        {{error}}<br>
-    {% endfor %}
-    </div>
-{% endif %}
+    {% csrf_token %}
     <fieldset>
         <legend>{% trans "Contact details" %}</legend>
-        <div class="grid">
-            <div class="grid__span-2">
-                <span class="form__label--inline">
-                    {% trans "Full name" %}
-                </span>
-            </div>
-            <div class="grid__span-3">
-                {% with form.first_name as field %}
-                    {% include "admin/includes/text-field.html" %}
-                {% endwith %}
-            </div>
-            <div class="grid__span-3">
-                {% with form.last_name as field %}
-                    {% include "admin/includes/text-field.html" %}
-                {% endwith %}
-            </div>
-        </div>
-        <div class="grid">
-            <div class="grid__span-2">
-                <span class="form__label--inline">
-                    {% trans "Email" %}
-                </span>
-            </div>
-            <div class="grid__span-3">
-                {% with form.email as field %}
-                    {% include "admin/includes/text-field.html" %}
-                {% endwith %}
-            </div>
-        </div>
-        <div class="grid">
-            <div class="grid__span-2">
-                <span class="form__label--inline">
-                    {% trans "Username" %}
-                </span>
-            </div>
-            <div class="grid__span-3">
-                {% with form.username as field %}
-                    {% include "admin/includes/text-field.html" %}
-                {% endwith %}
-            </div>
-        </div>
-        <div class="grid">
-            <div class="grid__span-2">
-                <span class="form__label form__label--inline">
-                    &nbsp;
-                </span>
-            </div>
-            <div class="grid__span-3">
-                <a href="{% url 'account-admin:password_change' %}" class="btn btn--transparent btn--small">
-                    {% trans "Change Password" %}
-                </a>
-            </div>
-        </div>
+
+        {% with form.first_name as field %}
+            {% include "admin/generic/form/text-field.html" %}
+        {% endwith %}
+        {% with form.last_name as field %}
+            {% include "admin/generic/form/text-field.html" %}
+        {% endwith %}
+
+        {% with form.email as field %}
+            {% include "admin/generic/form/text-field.html" %}
+        {% endwith %}
+
+        {% with form.username as field %}
+            {% include "admin/generic/form/text-field.html" %}
+        {% endwith %}
+
+        <a href="{% url 'account-admin:password_change' %}" class="btn btn--transparent btn--small">
+            {% trans "Change Password" %}
+        </a>
+
         {% if ACCOUNT_ENABLE_TWO_FACTOR %}
         <div class="grid">
             <div class="grid__span-2">
@@ -97,8 +58,12 @@
         </div>
         {% endif %}
     </fieldset>
-    <button type="submit" class="btn btn--primary">
-        {% trans "Save" %}
-    </button>
+    <div class="form__action">
+        <div class="form__actions-inner">
+            <button type="submit" class="btn btn--primary">
+                {% trans "Save" %}
+            </button>
+        </div>
+    </div>
 </form>
 {% endblock page_content %}

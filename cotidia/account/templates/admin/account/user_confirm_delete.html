@@ -4,23 +4,25 @@
 {% endblock title %}
 
 {% block toolbar %}
-    <span class="toolbar__title">{% trans "Users" %}</span>
+    <span class="toolbar__breadcrumbs">
+        <a href="{% url 'account-admin:user_list' %}">{% trans "Users" %}</a>
+        &nbsp;<span class="fa fa-angle-right"></span>&nbsp;
+        {% trans "Confirm Delete" %}
+    </span>
 {% endblock toolbar %}
 
 {% block page_content %}
 <div class="[ content__inner ]">
     <p class="breadcrumb">
-        <a href="{% url 'account-admin:user_list' %}">{% trans "Users" %}</a>
-        &nbsp;<span class="fa fa-angle-right"></span>&nbsp;
-        {% trans "Confirm Delete" %}
+
     </p>
 </div>
 
-<div class="[ content__inner ] [ box box--padded box--bordered ]">
+<fieldset>
     <h3>{% trans "Are you sure to delete the following user?" %}</h3>
     <p class="text-strong">{{object}}</p>
     <p>{% trans "The operation is not reversible." %}</p>
-</div>
+</fieldset>
 
 <div class="content__inner">
     <form method="post" action=".">

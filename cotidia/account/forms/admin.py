@@ -57,22 +57,6 @@ class EmailAuthenticationForm(AuthenticationForm):
         required=False,
         label='Remember me for two weeks',
     )
-    username = forms.EmailField(
-        label='',
-        max_length=256,
-        widget=forms.TextInput(attrs={'placeholder': "Email"})
-        )
-    password = forms.CharField(
-        label='',
-        max_length=256,
-        widget=forms.PasswordInput(attrs={'placeholder': "Password"})
-        )
-
-    def __init__(self, *args, **kwargs):
-        super(EmailAuthenticationForm, self).__init__(*args, **kwargs)
-        for field in self.fields:
-            if field in ['username', 'password']:
-                self.fields[field].widget.attrs['class'] = 'form__text'
 
     def clean_username(self):
         """Prevent case-sensitive erros in email/username."""
@@ -82,11 +66,7 @@ class EmailAuthenticationForm(AuthenticationForm):
 class AccountPasswordResetForm(PasswordResetForm):
     required_css_class = 'required'
 
-    email = forms.EmailField(
-        label='',
-        max_length=256,
-        widget=forms.TextInput(attrs={'placeholder': "Email"})
-        )
+    email = forms.EmailField(max_length=256)
 
     def __init__(self, *args, **kwargs):
         super(AccountPasswordResetForm, self).__init__(*args, **kwargs)
@@ -96,13 +76,13 @@ class AccountPasswordResetForm(PasswordResetForm):
     def clean_email(self):
         email = self.cleaned_data['email']
 
-        UserModel = get_user_model()
-        active_users = UserModel._default_manager.filter(
+        user_model = get_user_model()
+        active_users = user_model._default_manager.filter(
             email__iexact=email, is_active=True)
         if active_users.count() == 0:
             raise forms.ValidationError(
                 "There are no active accounts associated to this email."
-                )
+            )
 
         return email
 
@@ -135,38 +115,15 @@ class AccountPasswordChangeForm(PasswordChangeForm):
     The old password is asked to validate its identity.
     """
 
-    old_password = forms.CharField(
-        label="",
-        widget=forms.PasswordInput(
-            attrs={'placeholder': "Old password", 'class': 'form__text'}
-            )
-        )
-
     def __init__(self, *args, **kwargs):
-        super(AccountPasswordChangeForm, self).__init__(*args, **kwargs)
-
-        self.fields['new_password1'].label = ''
-        self.fields['new_password1'].widget.attrs['placeholder'] = \
-            "New password"
+        super().__init__(*args, **kwargs)
         self.fields['new_password1'].widget.attrs['autocomplete'] = "off"
-
-        self.fields['new_password2'].label = ''
-        self.fields['new_password2'].widget.attrs['placeholder'] = \
-            "New password confirmation"
         self.fields['new_password2'].widget.attrs['autocomplete'] = "off"
-
-        for field in self.fields:
-            self.fields[field].widget.attrs['class'] = 'form__text'
 
 
 class UpdateDetailsForm(forms.ModelForm):
 
-    email = forms.EmailField(
-        label='',
-        widget=forms.TextInput(
-            attrs={'placeholder': "Email address", 'class': 'form__text'}
-            )
-        )
+    email = forms.EmailField()
 
     class Meta:
         model = User

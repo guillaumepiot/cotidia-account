@@ -10,35 +10,31 @@
         <span class="fa fa-plus"></span> {% trans "Add a Role" %}
     </a>
     {% endif %}
-    <span class="toolbar__title">{% trans "Roles" %}</span>
+    <span class="toolbar__breadcrumbs">{% trans "Roles" %}</span>
 {% endblock toolbar %}
 
 {% block page_content %}
-<div class="grid grid--collapse">
-    <div class="grid__span-12">
-        <div class="content__inner">
-            <table class="table  table--clickable">
-                <tr class="table-row">
-                    <th class="table-head-cell">{% trans "Role description" %}</th>
-                </tr>
-                {% for group in object_list %}
-                <tr class="table-row"
-                    onClick="window.location = '{% url 'account-admin:group_detail' group.id %}'">
-                    <td class="table-cell">
-                        <a href="{% url 'account-admin:group_detail' group.id %}">
-                            {{group}}
-                        </a>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr class="table-row">
-                    <td class="table-cell">
-                        {% trans "No roles have been created yet." %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-    </div>
+<div class="content__list">
+    <table class="table  table--clickable">
+        <tr class="table-row">
+            <th class="table-head-cell">{% trans "Role description" %}</th>
+        </tr>
+        {% for group in object_list %}
+        <tr class="table-row"
+            onClick="window.location = '{% url 'account-admin:group_detail' group.id %}'">
+            <td class="table-cell">
+                <a href="{% url 'account-admin:group_detail' group.id %}">
+                    {{group}}
+                </a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr class="table-row">
+            <td class="table-cell">
+                {% trans "No roles have been created yet." %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
 </div>
 {% endblock page_content %}

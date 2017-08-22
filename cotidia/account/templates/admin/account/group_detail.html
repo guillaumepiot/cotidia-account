@@ -4,7 +4,7 @@
 {% endblock title %}
 
 {% block toolbar %}
-    <span class="toolbar__title">{% trans "Roles" %}</span>
+    <span class="toolbar__breadcrumbs">{% trans "Roles" %}</span>
 {% endblock toolbar %}
 
 {% block page_content %}
@@ -16,38 +16,36 @@
     </p>
 </div>
 
-<div class="[ content__inner ] [ box box--padded box--bordered ]">
-    <fieldset>
-        <legend>{% trans "Role & Permissions" %}</legend>
-        <div class="grid">
-            <div class="grid__span-2">
-                &nbsp;
-            </div>
-            <div class="grid__span-8">
-                <span class="text-strong">{{object.name}}</span>
-            </div>
+<fieldset>
+    <legend>{% trans "Role & Permissions" %}</legend>
+    <div class="grid">
+        <div class="grid__span-2">
+            &nbsp;
         </div>
+        <div class="grid__span-8">
+            <span class="text-strong">{{object.name}}</span>
+        </div>
+    </div>
 
-        <div class="grid">
-            <div class="grid__span-2">
-                <span class="form__label--inline">
-                    {% trans "Permissions" %}
-                </span>
-            </div>
-            <div class="grid__span-8">
-                <div class="form__control">
-                    <ul>
-                    {% for permission in object.permissions.all %}
-                        <li>{{permission}}</li>
-                    {% empty %}
-                        <li><span class="text-italic">{% trans "No permission assigned" %}</span></li>
-                    {% endfor %}
-                    </ul>
-                </div>
+    <div class="grid">
+        <div class="grid__span-2">
+            <span class="form__label--inline">
+                {% trans "Permissions" %}
+            </span>
+        </div>
+        <div class="grid__span-8">
+            <div class="form__control">
+                <ul>
+                {% for permission in object.permissions.all %}
+                    <li>{{permission}}</li>
+                {% empty %}
+                    <li><span class="text-italic">{% trans "No permission assigned" %}</span></li>
+                {% endfor %}
+                </ul>
             </div>
         </div>
-    </fieldset>
-</div>
+    </div>
+</fieldset>
 
 <div class="content__inner">
     {% if perms.auth.delete_group %}
