@@ -5,11 +5,8 @@ def admin_menu(context):
     request = context["request"]
     return [
         {
-            "text": context["SITE_NAME"],
-            "url": reverse("dashboard"),
-        },
-        {
             "icon": "wrench",
+            "text": "Settings",
             "align_right": True,
             "nav_items": [
                 {
@@ -29,6 +26,7 @@ def admin_menu(context):
         },
         {
             "text": str(request.user),
+            "icon": "user",
             "align_right": True,
             "nav_items": [
                 {
