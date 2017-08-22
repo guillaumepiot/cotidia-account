@@ -95,10 +95,10 @@ def edit(request, user_form=ProfileForm):
             messages.success(
                 request,
                 _('Your personal details have been saved')
-                )
+            )
             return HttpResponseRedirect(
                 reverse('account-admin:dashboard')
-                )
+            )
     else:
         form = user_form(instance=request.user)
 
@@ -132,9 +132,24 @@ class UserList(StaffPermissionRequiredMixin, ListView):
                     Q(first_name__icontains=q) |
                     Q(last_name__icontains=q) |
                     Q(email__icontains=q)
-                    )
+                )
 
         return query
+
+    def get_context_data(self, **kwargs):
+
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        # The url params are used to add the url if the pagination is
+        # enabled, so the filtering data is not lost when changing page
+        context['url_params'] = ""
+
+        # Add get params
+        if self.request.GET.get('query'):
+            context['search_query'] = self.request.GET.get('query')
+            context['url_params'] += "query=%s&" % context['search_query']
+
+        return context
 
 
 class UserDetail(StaffPermissionRequiredMixin, DetailView):
