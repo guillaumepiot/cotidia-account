@@ -19,18 +19,18 @@
         <legend>{% trans "Contact details" %}</legend>
 
         {% with form.first_name as field %}
-            {% include "admin/generic/form/text-field.html" %}
+            {% include "admin/generic/form/form_group.html" %}
         {% endwith %}
         {% with form.last_name as field %}
-            {% include "admin/generic/form/text-field.html" %}
+            {% include "admin/generic/form/form_group.html" %}
         {% endwith %}
 
         {% with form.email as field %}
-            {% include "admin/generic/form/text-field.html" %}
+            {% include "admin/generic/form/form_group.html" %}
         {% endwith %}
 
         {% with form.username as field %}
-            {% include "admin/generic/form/text-field.html" %}
+            {% include "admin/generic/form/form_group.html" %}
         {% endwith %}
 
         <a href="{% url 'account-admin:password_change' %}" class="btn btn--transparent btn--small">

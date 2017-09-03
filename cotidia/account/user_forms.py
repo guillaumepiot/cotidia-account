@@ -20,13 +20,11 @@ class UserForm(forms.ModelForm):
     email = forms.EmailField()
 
     groups = forms.ModelMultipleChoiceField(
-        label='',
         widget=forms.CheckboxSelectMultiple,
         queryset=Group.objects.all(),
         required=False)
 
     user_permissions = forms.ModelMultipleChoiceField(
-        label='',
         widget=forms.CheckboxSelectMultiple,
         queryset=Permission.objects.all(),
         required=False)
@@ -38,20 +36,12 @@ class UserForm(forms.ModelForm):
 
 class UserAddForm(UserForm, UserCreationForm):
 
-    password1 = forms.CharField(
-        label='',
-        widget=forms.PasswordInput(
-            attrs={'placeholder': _("Password"), 'class': 'form__text'}))
-
-    password2 = forms.CharField(
-        label='',
-        widget=forms.PasswordInput(
-            attrs={
-                'placeholder': _("Password Confirmation"),
-                'class': 'form__text'
-                }
-            ),
-        help_text=_("Enter the same password as before, for verification."))
+    username = forms.CharField(
+        max_length=256,
+        help_text=(
+            "Usernames must be unique. You can use the email address."
+        )
+    )
 
     class Meta:
         model = User
@@ -68,25 +58,6 @@ class UserUpdateForm(UserForm, UserChangeForm):
     class Meta:
         model = User
         exclude = ('date_joined', 'last_login')
-
-
-class GroupForm(forms.ModelForm):
-
-    name = forms.CharField(
-        label='',
-        max_length=256,
-        widget=forms.TextInput(attrs={'class': 'form__text'})
-        )
-
-    permissions = forms.ModelMultipleChoiceField(
-        label='',
-        widget=forms.CheckboxSelectMultiple,
-        queryset=Permission.objects.all(),
-        required=False)
-
-    class Meta:
-        model = Group
-        fields = ['name', 'permissions']
 
 
 class ProfileForm(forms.ModelForm):

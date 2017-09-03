@@ -29,14 +29,14 @@
                     <div class="grid__span-3">
                         {% with wizard.form.number as field %}
                             {% include "admin/includes/label.html" %}
-                            {% include "admin/generic/form/text-field.html" %}
+                            {% include "admin/generic/form/form_group.html" %}
                         {% endwith %}
                     </div>
                 </div>
                 <div class="grid">
                     <div class="grid__span-3">
                         {% with wizard.form.method as field %}
-                            {% include "admin/generic/form/text-field.html" %}
+                            {% include "admin/generic/form/form_group.html" %}
                         {% endwith %}
                     </div>
                 </div>
@@ -44,7 +44,7 @@
                 <div class="grid">
                     <div class="grid__span-3">
                         {% with wizard.form.token as field %}
-                            {% include "admin/generic/form/text-field.html" %}
+                            {% include "admin/generic/form/form_group.html" %}
                         {% endwith %}
                     </div>
                 </div>

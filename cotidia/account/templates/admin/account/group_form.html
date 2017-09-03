@@ -29,32 +29,15 @@
     {% endfor %}
     </div>
 {% endif %}
+
 <fieldset>
     <legend>{% trans "Role" %}</legend>
-    <div class="grid">
-        <div class="grid__span-2">
-            <span class="form__label--inline">
-                {% trans "Description" %}
-            </span>
-        </div>
-        <div class="grid__span-3">
-            {% with form.name as field %}
-                {% include "admin/generic/form/text-field.html" %}
-            {% endwith %}
-        </div>
-    </div>
-    <div class="grid">
-        <div class="grid__span-2">
-            <span class="form__label--inline">
-                {% trans "Permissions" %}
-            </span>
-        </div>
-        <div class="grid__span-6">
-            {% with form.permissions as field %}
-                {% include "admin/generic/form/text-field.html" %}
-            {% endwith %}
-        </div>
-    </div>
+    {% with form.name as field %}
+        {% include "admin/generic/form/form_group.html" %}
+    {% endwith %}
+    {% with form.permissions as field %}
+        {% include "admin/generic/form/form_group.html" %}
+    {% endwith %}
 </fieldset>
 
 <div class="form__actions">

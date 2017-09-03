@@ -1,7 +1,6 @@
 import hashlib
 
 from django import forms
-from cotidia.account.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import (
     AuthenticationForm,
@@ -10,7 +9,9 @@ from django.contrib.auth.forms import (
     PasswordChangeForm,
     ReadOnlyPasswordHashField
 )
+from django.contrib.auth.models import Group, Permission
 
+from cotidia.account.conf import settings
 from cotidia.account.models import User
 
 
@@ -152,15 +153,15 @@ class AccountUserCreationForm(forms.ModelForm):
         label='',
         widget=forms.TextInput(
             attrs={'placeholder': "Email address", 'class': 'form__text'}
-            )
         )
+    )
 
     password1 = forms.CharField(
         label='',
         widget=forms.PasswordInput(
             attrs={'placeholder': "Password", 'class': 'form__text'}
-            )
         )
+    )
 
     password2 = forms.CharField(
         label='',
@@ -168,10 +169,10 @@ class AccountUserCreationForm(forms.ModelForm):
             attrs={
                 'placeholder': "Password Confirmation",
                 'class': 'form__text'
-                }
-            ),
+            }
+        ),
         help_text="Enter the same password twice, for verification."
-        )
+    )
 
     class Meta:
         model = User
@@ -206,8 +207,8 @@ class AccountUserChangeForm(forms.ModelForm):
             "Raw passwords are not stored, so there is no way to see "
             "this user's password, but you can change the password "
             "using <a href=\"password/\">this form</a>."
-            )
         )
+    )
 
     class Meta:
         model = User
@@ -223,7 +224,7 @@ class AccountUserChangeForm(forms.ModelForm):
             raise forms.ValidationError(
                 "This email address is already in use. "
                 "Please supply a different email address."
-                )
+            )
         return self.cleaned_data['email']
 
     def clean_password(self):
@@ -231,3 +232,15 @@ class AccountUserChangeForm(forms.ModelForm):
         # This is done here, rather than on the field, because the
         # field does not have access to the initial value
         return self.initial["password"]
+
+
+class GroupForm(forms.ModelForm):
+
+    permissions = forms.ModelMultipleChoiceField(
+        widget=forms.CheckboxSelectMultiple,
+        queryset=Permission.objects.all(),
+        required=False)
+
+    class Meta:
+        model = Group
+        fields = ['name', 'permissions']

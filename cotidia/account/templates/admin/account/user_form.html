@@ -34,22 +34,22 @@
 <fieldset>
     <legend>{% trans "Contact details" %}</legend>
     {% with form.first_name as field %}
-        {% include "admin/generic/form/text-field.html" %}
+        {% include "admin/generic/form/form_group.html" %}
     {% endwith %}
 
     {% with form.last_name as field %}
-        {% include "admin/generic/form/text-field.html" %}
+        {% include "admin/generic/form/form_group.html" %}
     {% endwith %}
 
     {% with form.email as field %}
-        {% include "admin/generic/form/text-field.html" %}
+        {% include "admin/generic/form/form_group.html" %}
     {% endwith %}
 </fieldset>
 
 <fieldset>
     <legend>{% trans "Security" %}</legend>
     {% with form.username as field %}
-        {% include "admin/generic/form/text-field.html" %}
+        {% include "admin/generic/form/form_group.html" %}
     {% endwith %}
 
     {% if object %}
@@ -60,70 +60,31 @@
         {% endif %}
     {% else %}
         {% with form.password1 as field %}
-            {% include "admin/generic/form/text-field.html" %}
+            {% include "admin/generic/form/form_group.html" %}
         {% endwith %}
         {% with form.password2 as field %}
-            {% include "admin/generic/form/text-field.html" %}
+            {% include "admin/generic/form/form_group.html" %}
         {% endwith %}
     {% endif %}
 </fieldset>
 
 <fieldset>
     <legend>{% trans "Role & Permissions" %}</legend>
-    <div class="grid">
-        <div class="grid__span-2">
-            &nbsp;
-        </div>
-        <div class="grid__span-8">
-            {% with form.is_active as field %}
-                {% include "admin/generic/form/checkbox-field.html" %}
-            {% endwith %}
-        </div>
-    </div>
-    <div class="grid">
-        <div class="grid__span-2">
-            &nbsp;
-        </div>
-        <div class="grid__span-8">
-            {% with form.is_staff as field %}
-                {% include "admin/generic/form/checkbox-field.html" %}
-            {% endwith %}
-        </div>
-    </div>
-    <div class="grid">
-        <div class="grid__span-2">
-            &nbsp;
-        </div>
-        <div class="grid__span-8">
-            {% with form.is_superuser as field %}
-                {% include "admin/generic/form/checkbox-field.html" %}
-            {% endwith %}
-        </div>
-    </div>
-    <div class="grid">
-        <div class="grid__span-2">
-            <span class="form__label--inline">
-                {% trans "Role" %}
-            </span>
-        </div>
-        <div class="grid__span-8">
-            {% with form.groups as field %}
-                {% include "admin/generic/form/text-field.html" %}
-            {% endwith %}
-        </div>
-    </div>
-    <div class="grid">
-        <div class="grid__span-2">
-            <span class="form__label--inline">
-                {% trans "Permissions" %}
-            </span>
-        </div>
-        <div class="grid__span-8">
-            {% with form.user_permissions as field %}
-                {% include "admin/generic/form/text-field.html" %}
-            {% endwith %}
-        </div>
-    </div>
+    {% with form.is_active as field %}
+        {% include "admin/generic/form/checkbox-field.html" %}
+    {% endwith %}
+    {% with form.is_staff as field %}
+        {% include "admin/generic/form/checkbox-field.html" %}
+    {% endwith %}
+    {% with form.is_superuser as field %}
+        {% include "admin/generic/form/checkbox-field.html" %}
+    {% endwith %}
+    {% with form.groups as field %}
+        {% include "admin/generic/form/form_group.html" %}
+    {% endwith %}
+    {% with form.user_permissions as field %}
+        {% include "admin/generic/form/form_group.html" %}
+    {% endwith %}
 </fieldset>
 
 

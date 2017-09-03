@@ -68,19 +68,19 @@
                 {% if wizard.steps.current == 'welcome' %}
                 {% elif wizard.steps.current == 'generator' %}
                     {% with wizard.form.token as field %}
-                        {% include "admin/generic/form/text-field.html" %}
+                        {% include "admin/generic/form/form_group.html" %}
                     {% endwith %}
                 {% elif wizard.steps.current == 'method' %}
                     {% with wizard.form.method as field %}
-                        {% include "admin/generic/form/text-field.html" %}
+                        {% include "admin/generic/form/form_group.html" %}
                     {% endwith %}
                 {% elif wizard.steps.current == 'call' or wizard.steps.current == 'sms' %}
                     {% with wizard.form.number as field %}
-                        {% include "admin/generic/form/text-field.html" %}
+                        {% include "admin/generic/form/form_group.html" %}
                     {% endwith %}
                 {% elif wizard.steps.current == 'validation' %}
                     {% with wizard.form.token as field %}
-                        {% include "admin/generic/form/text-field.html" %}
+                        {% include "admin/generic/form/form_group.html" %}
                     {% endwith %}
                 {% endif %}
                 {# hidden submit button to enable [enter] key #}

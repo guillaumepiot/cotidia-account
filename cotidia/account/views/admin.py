@@ -11,19 +11,19 @@ from django.core.exceptions import PermissionDenied
 from django.contrib.auth import login as auth_login
 from django.http import HttpResponseRedirect
 from django.db.models import Q
-from cotidia.account.conf import settings
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.utils.http import is_safe_url
 
+from cotidia.account.conf import settings
 from cotidia.account.models import User
 from cotidia.account.user_forms import (
     UserAddForm,
     UserUpdateForm,
-    GroupForm,
     ProfileForm,
     UserChangePassword
-    )
+)
+from cotidia.account.forms.admin import GroupForm
 from cotidia.account.utils import StaffPermissionRequiredMixin, import_model
 
 

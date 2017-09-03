@@ -42,10 +42,10 @@
 
                     {% if wizard.steps.current == 'auth' %}
                         {% with wizard.form.username as field %}
-                            {% include 'admin/generic/form/text-field.html' %}
+                            {% include 'admin/generic/form/form_group.html' %}
                         {% endwith %}
                         {% with wizard.form.password as field %}
-                            {% include 'admin/generic/form/text-field.html' %}
+                            {% include 'admin/generic/form/form_group.html' %}
                         {% endwith %}
                         <div class="form-group">
                             {{ wizard.form.remember_me.errors }}
@@ -54,11 +54,11 @@
                         </div>
                     {% elif wizard.steps.current == 'token' %}
                         {% with wizard.form.otp_token as field %}
-                            {% include 'admin/generic/form/text-field.html' %}
+                            {% include 'admin/generic/form/form_group.html' %}
                         {% endwith %}
                     {% elif wizard.steps.current == 'backup' %}
                         {% with wizard.form.otp_token as field %}
-                            {% include 'admin/generic/form/text-field.html' %}
+                            {% include 'admin/generic/form/form_group.html' %}
                         {% endwith %}
                     {% endif %}
                     <input type="hidden" name="next" value="{{ next }}" />

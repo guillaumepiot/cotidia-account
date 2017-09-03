@@ -17,10 +17,10 @@
                     {% include "admin/generic/form/non_field_errors.html" %}
 
                     {% with form.username as field %}
-                        {% include 'admin/generic/form/text-field.html' %}
+                        {% include 'admin/generic/form/form_group.html' %}
                     {% endwith %}
                     {% with form.password as field %}
-                        {% include 'admin/generic/form/text-field.html' %}
+                        {% include 'admin/generic/form/form_group.html' %}
                     {% endwith %}
                     <div class="form-group">
                         {{ form.remember_me.errors }}

@@ -4,18 +4,14 @@
 {% endblock title %}
 
 {% block toolbar %}
-    <span class="toolbar__breadcrumbs">{% trans "Roles" %}</span>
-{% endblock toolbar %}
-
-{% block page_content %}
-<div class="[ content__inner ]">
-    <p class="breadcrumb">
+    <span class="toolbar__breadcrumbs">
         <a href="{% url 'account-admin:group_list' %}">{% trans "Roles" %}</a>
         &nbsp;<span class="fa fa-angle-right"></span>&nbsp;
         {% trans "Role details" %}
-    </p>
-</div>
+    </span>
+{% endblock toolbar %}
 
+{% block page_content %}
 <fieldset>
     <legend>{% trans "Role & Permissions" %}</legend>
     <div class="grid">

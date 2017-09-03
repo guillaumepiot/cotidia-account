@@ -2,7 +2,7 @@
 {% block title %}
     {% trans "User details" %}
 {% endblock title %}
-
+{% block body_class %}content-centered{% endblock body_class %}
 {% block toolbar %}
     {% if not request.user.is_superuser and object.is_superuser %}
         {# Non superuser can't update superusers #}
@@ -16,155 +16,124 @@
     <span class="toolbar__breadcrumbs">
         <a href="{% url 'account-admin:user_list' %}">{% trans "Users" %}</a>
         &nbsp;<span class="fa fa-angle-right"></span>&nbsp;
-        {% trans "User details" %}
+        {{object}}
     </span>
 {% endblock toolbar %}
 
 {% block page_content %}
-<fieldset>
-    <legend>{% trans "Contact details" %}</legend>
-    <div class="grid">
-        <div class="grid__span-2">
-            <span class="form__label--inline">
-                {% trans "Full name" %}
-            </span>
+<div class="content__detail">
+    <fieldset>
+        <legend>{% trans "Contact details" %}</legend>
+        <div class="form__group">
+            <label class="form__label">{% trans "Full name" %}</label>
+            <br>
+            {{object.first_name}} {{object.last_name}}
         </div>
-        <div class="grid__span-8">
-            <div class="form__control">
-                <p>{{object.first_name}} {{object.last_name}}</p>
-            </div>
+        <div class="form__group">
+            <label class="form__label">{% trans "Email" %}</label>
+            <br>
+            <a href="mailto:{{object.email}}">{{object.email}}</a>
         </div>
-    </div>
-    <div class="grid">
-        <div class="grid__span-2">
-            <span class="form__label--inline">
-                {% trans "Email" %}
-            </span>
-        </div>
-        <div class="grid__span-8">
-            <div class="form__control">
-                <p><a href="mailto:{{object.email}}">{{object.email}}</a></p>
-            </div>
-        </div>
-    </div>
-</fieldset>
+    </fieldset>
 
-{% if ACCOUNT_ENABLE_TWO_FACTOR %}
-<fieldset>
-    <legend>{% trans "Security" %}</legend>
-    <div class="grid">
-        <div class="grid__span-2">
-            <span class="form__label--inline">
-                {% trans "Two-Factor Authentication" %}
-            </span>
-        </div>
-        <div class="grid__span-8">
-            <div class="form__control">
-                <p>
-                {% if user.two_factor_auth_enabled %}
-                    <span class="label label--primary">Enabled</span>
-                    {% if request.user.is_superuser %}
+    {% if ACCOUNT_ENABLE_TWO_FACTOR %}
+    <fieldset>
+        <legend>{% trans "Security" %}</legend>
+        <div class="grid">
+            <div class="grid__span-2">
+                <span class="form__label--inline">
+                    {% trans "Two-Factor Authentication" %}
+                </span>
+            </div>
+            <div class="grid__span-8">
+                <div class="form__control">
                     <p>
-                        <a href="{% url 'account-admin:user-disable' object.uuid %}">
-                                Disable two-factor authentication
-                        </a>
-                    </p>
+                    {% if user.two_factor_auth_enabled %}
+                        <span class="label label--primary">Enabled</span>
+                        {% if request.user.is_superuser %}
+                        <p>
+                            <a href="{% url 'account-admin:user-disable' object.uuid %}">
+                                    Disable two-factor authentication
+                            </a>
+                        </p>
+                        {% endif %}
+                    {% else %}
+                        <span class="label label--danger">Disabled</span>
                     {% endif %}
-                {% else %}
-                    <span class="label label--danger">Disabled</span>
-                {% endif %}
-                </p>
+                    </p>
+                </div>
             </div>
         </div>
-    </div>
-</fieldset>
-{% endif %}
-<fieldset>
-    <legend>{% trans "Role & Permissions" %}</legend>
-    <div class="grid">
-        <div class="grid__span-2">
-            &nbsp;
-        </div>
-        <div class="grid__span-8">
-            <p>{% if object.is_active %}
-                <span class="fa fa-check fa-green"></span>
-            {% else %}
-                <span class="fa fa-remove fa-red"></span>
-            {% endif %}
-            {% trans "Active" %}</p>
+    </fieldset>
+    {% endif %}
+    <fieldset>
+        <legend>{% trans "Role & Permissions" %}</legend>
 
-            <p>{% if object.is_staff %}
-                <span class="fa fa-check fa-green"></span>
-            {% else %}
-                <span class="fa fa-remove fa-red"></span>
-            {% endif %}
-            {% trans "Staff" %}</p>
+        <p>
+        {% if object.is_active %}
+            <span class="fa fa-check fa-green"></span>
+        {% else %}
+            <span class="fa fa-remove fa-red"></span>
+        {% endif %}
+        {% trans "Active" %}</p>
 
-            <p>{% if object.is_superuser %}
-                <span class="fa fa-check fa-green"></span>
-            {% else %}
-                <span class="fa fa-remove fa-red"></span>
-            {% endif %}
-            {% trans "Superuser" %}</p>
-        </div>
-    </div>
+        <p>{% if object.is_staff %}
+            <span class="fa fa-check fa-green"></span>
+        {% else %}
+            <span class="fa fa-remove fa-red"></span>
+        {% endif %}
+        {% trans "Staff" %}</p>
 
-    <div class="grid">
-        <div class="grid__span-2">
-            <span class="form__label--inline">
-                {% trans "Role" %}
-            </span>
+        <p>{% if object.is_superuser %}
+            <span class="fa fa-check fa-green"></span>
+        {% else %}
+            <span class="fa fa-remove fa-red"></span>
+        {% endif %}
+        {% trans "Superuser" %}
+        </p>
+
+        <div class="form__group">
+            <label class="form__label">{% trans "Role" %}</label>
+            <ul>
+            {% for group in object.groups.all %}
+                <li>{{group}}</li>
+            {% empty %}
+                <li><span class="text-italic">{% trans "No role assigned" %}</span></li>
+            {% endfor %}
+            </ul>
         </div>
-        <div class="grid__span-8">
-            <div class="form__control">
-                <ul>
-                {% for group in object.groups.all %}
-                    <li>{{group}}</li>
-                {% empty %}
-                    <li><span class="text-italic">{% trans "No role assigned" %}</span></li>
-                {% endfor %}
-                </ul>
-            </div>
+
+        <div class="form__group">
+            <label class="form__label">{% trans "Permissions" %}</label>
+            <ul>
+            {% for permission in object.user_permissions.all %}
+                <li>{{permission}}</li>
+            {% empty %}
+                <li><span class="text-italic">{% trans "No permission assigned" %}</span></li>
+            {% endfor %}
+            </ul>
         </div>
-    </div>
-    <div class="grid">
-        <div class="grid__span-2">
-            <span class="form__label--inline">
-                {% trans "Permissions" %}
-            </span>
-        </div>
-        <div class="grid__span-8">
-            <div class="form__control">
-                <ul>
-                {% for permission in object.user_permissions.all %}
-                    <li>{{permission}}</li>
-                {% empty %}
-                    <li><span class="text-italic">{% trans "No permission assigned" %}</span></li>
-                {% endfor %}
-                </ul>
-            </div>
-        </div>
-    </div>
-</fieldset>
-<div class="content__inner">
-    {% if perms.account.delete_user %}
+    </fieldset>
+    <div class="content__inner">
+        {% if perms.account.delete_user %}
+            {% if not request.user.is_superuser and object.is_superuser %}
+                {# Non superuser can't delete superusers #}
+            {% else %}
+                <a href="{% url 'account-admin:user_delete' object.uuid %}" class="btn btn--delete btn--transparent pull-right">
+                    {% trans "Delete User" %}
+                </a>
+            {% endif %}
+        {% endif %}
+        {% if perms.account.change_user %}
+
         {% if not request.user.is_superuser and object.is_superuser %}
-            {# Non superuser can't delete superusers #}
-        {% else %}
-            <a href="{% url 'account-admin:user_delete' object.uuid %}" class="btn btn--delete btn--transparent pull-right">
-                {% trans "Delete User" %}
-            </a>
+                {# Non superuser can't update superusers #}
+            {% else %}
+                <a href="{% url 'account-admin:user_update' object.uuid %}" class="btn btn--change">
+                    {% trans "Edit User" %}
+                </a>
+            {% endif %}
         {% endif %}
-    {% endif %}
-    {% if perms.account.change_user %}
-
-    {% if not request.user.is_superuser and object.is_superuser %}
-            {# Non superuser can't update superusers #}
-        {% else %}
-            <a href="{% url 'account-admin:user_update' object.uuid %}" class="btn btn--change">
-                {% trans "Edit User" %}
-            </a>
-        {% endif %}
-    {% endif %}
+    </div>
 </div>
 {% endblock page_content %}
