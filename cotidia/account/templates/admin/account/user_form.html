@@ -71,13 +71,13 @@
 <fieldset>
     <legend>{% trans "Role & Permissions" %}</legend>
     {% with form.is_active as field %}
-        {% include "admin/generic/form/checkbox-field.html" %}
+        {% include "admin/generic/form/form_group.html" %}
     {% endwith %}
     {% with form.is_staff as field %}
-        {% include "admin/generic/form/checkbox-field.html" %}
+        {% include "admin/generic/form/form_group.html" %}
     {% endwith %}
     {% with form.is_superuser as field %}
-        {% include "admin/generic/form/checkbox-field.html" %}
+        {% include "admin/generic/form/form_group.html" %}
     {% endwith %}
     {% with form.groups as field %}
         {% include "admin/generic/form/form_group.html" %}
