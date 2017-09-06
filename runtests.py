@@ -44,6 +44,7 @@ DEFAULT_SETTINGS = dict(
             "OPTIONS": {
                 "debug": True,
                 "context_processors": [
+                    'django.template.context_processors.request',
                     "django.contrib.auth.context_processors.auth",
                 ]
             }
@@ -104,7 +105,7 @@ def runtests(*test_args):
         verbosity=1,
         interactive=True,
         failfast=False
-        ).run_tests(test_args)
+    ).run_tests(test_args)
     sys.exit(failures)
 
 
