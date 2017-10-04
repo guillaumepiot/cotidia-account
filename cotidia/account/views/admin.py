@@ -170,14 +170,7 @@ class UserCreate(StaffPermissionRequiredMixin, CreateView):
         return reverse('account-admin:user_list')
 
     def get_form_class(self):
-        if hasattr(settings, 'ACCOUNT_USER_ADD_FORM'):
-            form_class = import_model(
-                settings.ACCOUNT_USER_ADD_FORM, "UserAddForm"
-                )
-        else:
-            form_class = UserAddForm
-
-        return form_class
+        return self.kwargs.get('user_form') or UserAddForm
 
 
 class UserUpdate(StaffPermissionRequiredMixin, UpdateView):
