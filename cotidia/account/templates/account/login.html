@@ -23,10 +23,10 @@
                     {% endif %}
 
                     {% with form.username as field %}
-                        {% include 'admin/includes/text-field.html' %}
+                        {% include 'admin/generic/form/form_group.html' %}
                     {% endwith %}
                     {% with form.password as field %}
-                        {% include 'admin/includes/text-field.html' %}
+                        {% include 'admin/generic/form/form_group.html' %}
                     {% endwith %}
                     <div class="form-group">
                         {{ form.remember_me.errors }}
