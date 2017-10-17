@@ -2,11 +2,11 @@
 {% block content %}
     {% include "account/menu.html" %}
 
-    <div class="toolbar toolbar--menu-open" id="toolbar">
+     <div class="toolbar">
         {% block toolbar %}{% endblock toolbar %}
     </div>
 
-    <div class="content content--menu-open" id="content">
+    <div class="content">
         {% include "account/includes/messages.html" %}
         {% block page_content %}{% endblock page_content %}
     </div>
