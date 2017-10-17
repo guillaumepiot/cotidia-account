@@ -34,7 +34,7 @@ def edit(
         request,
         edit_form=UpdateDetailsForm,
         template_name='account/edit.html'
-        ):
+    ):
     """Edit details view for logged in public user."""
 
     if request.method == "POST":
@@ -58,7 +58,7 @@ class LoginView(AuthLoginView):
         if settings.ACCOUNT_ALLOW_SIGN_IN is False:
             raise Http404
         if self.request.user.is_authenticated():
-            return HttpResponseRedirect(self.redirect_url)
+            return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
         return super().get(*args, **kwargs)
 
     def post(self, *args, **kwargs):
@@ -86,7 +86,7 @@ def sign_up(
 
     # Redirect to account page if already logged in
     if request.user.is_authenticated():
-        return HttpResponseRedirect(reverse('account-public:dashboard'))
+        return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
 
     if request.method == "POST":
         form = sign_up_form(request.POST)
