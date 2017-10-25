@@ -35,4 +35,8 @@ urlpatterns = [
         r'^update-details$',
         api.UpdateDetails.as_view(),
         name="update-details"),
+    url(
+        r'^change-password$',
+        api.ChangePassword.as_view(),
+        name="change-password"),
 ]

@@ -224,11 +224,56 @@ class SetPasswordSerializer(serializers.Serializer):
     password1 = serializers.CharField(error_messages={
         'required': _("The password is required."),
         'invalid': _("The password is invalid.")
-        })
+    })
     password2 = serializers.CharField(error_messages={
         'required': _("The password is required."),
         'invalid': _("The password is invalid.")
-        })
+    })
+
+    def validate_password1(self, value):
+
+        password = value
+
+        if len(password.strip()) < 6:
+            raise serializers.ValidationError(_("The password is too short."))
+        elif len(password.strip()) > 50:
+            raise serializers.ValidationError(_("The password is too long."))
+        return password
+
+    def validate(self, data):
+
+        if data['password1'] != data['password2']:
+            raise serializers.ValidationError(_("The passwords didn't match."))
+
+        return data
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    current_password = serializers.CharField(error_messages={
+        'required': _("The current password is required."),
+        'invalid': _("The current password is invalid.")
+    })
+    password1 = serializers.CharField(error_messages={
+        'required': _("The password is required."),
+        'invalid': _("The password is invalid.")
+    })
+    password2 = serializers.CharField(error_messages={
+        'required': _("The password is required."),
+        'invalid': _("The password is invalid.")
+    })
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop("user")
+        super().__init__(*args, **kwargs)
+
+    def validate_current_password(self, value):
+
+        if not self.user.check_password(value):
+            raise serializers.ValidationError(
+                _("The current password is invalid.")
+            )
+
+        return value
 
     def validate_password1(self, value):
 

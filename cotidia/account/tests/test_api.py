@@ -854,6 +854,63 @@ class AccountAPITests(APITestCase):
         self.assertEquals(
             response.data['email'], ['Please enter your email.'])
 
+    def test_change_password(self):
+        """Test that the user can change its password."""
+
+        section_title = "Change password"
+
+        url = reverse('account-api:change-password')
+
+        data = {
+            'current_password': self.normal_user_pwd,
+            'password1': "another123",
+            'password2': "another123"
+        }
+
+        self.client.credentials(
+            HTTP_AUTHORIZATION='Token ' + self.normal_user_token.key
+        )
+
+        response = self.client.post(url, data)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+
+        # Check that the new password is set
+
+        user = User.objects.get(id=self.normal_user.id)
+
+        self.assertTrue(user.check_password("another123"))
+
+        if self.display_doc:
+            # Generate documentation
+            content = {
+                'title': section_title,
+                'http_method': 'POST',
+                'url': url,
+                'payload': self.jsonify(data),
+                'response': self.jsonify(response.data),
+                'description': 'Change the user password.'
+            }
+            self.doc.display_section(content)
+
+        # Test for invalid current password
+
+        data = {
+            'current_password': self.normal_user_pwd + "5",
+            'password1': "another123",
+            'password2': "another123"
+        }
+
+        self.client.credentials(
+            HTTP_AUTHORIZATION='Token ' + self.normal_user_token.key
+        )
+
+        response = self.client.post(url, data)
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEquals(
+            response.data["current_password"],
+            ["The current password is invalid."]
+        )
+
     @override_settings(ACCOUNT_FORCE_ACTIVATION=False)
     def test_sign_up_no_activation(self):
         """Test sign up without activation email.

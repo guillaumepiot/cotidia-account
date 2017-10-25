@@ -14,12 +14,13 @@ from cotidia.account.serializers import (
     AuthenticateTokenSerializer,
     UserSerializer,
     ResetPasswordSerializer,
-    SetPasswordSerializer
-    )
+    SetPasswordSerializer,
+    ChangePasswordSerializer
+)
 from cotidia.account.models import User
 from cotidia.account.notices import (
     ResetPasswordNotice
-    )
+)
 from cotidia.account import signals
 
 
@@ -340,3 +341,22 @@ class UpdateDetails(APIView):
         serializer.save()
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ChangePassword(APIView):
+    """Change the current password."""
+
+    @transaction.atomic
+    def post(self, request):
+
+        serializer = ChangePasswordSerializer(
+            data=request.data,
+            user=request.user
+        )
+        serializer.is_valid(raise_exception=True)
+
+        # Set the new password
+        request.user.set_password(serializer.data['password1'])
+        request.user.save()
+
+        return Response({"message": "PASSWORD_CHANGED"}, status=status.HTTP_200_OK)
