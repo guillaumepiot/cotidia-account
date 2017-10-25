@@ -74,7 +74,7 @@ class AccountAPITests(APITestCase):
             kwargs={
                 'uuid': user_uuid,
                 'token': confirmation_code
-                })
+            })
 
         response = self.client.get(url)
         self.assertEquals(response.status_code, status.HTTP_200_OK)
@@ -105,7 +105,7 @@ class AccountAPITests(APITestCase):
         self.assertEqual(
             response.data['email'],
             ["This email is already used."]
-            )
+        )
 
     def test_sign_up_invalid_name(self):
         """Check that the full name is valid."""
@@ -124,7 +124,7 @@ class AccountAPITests(APITestCase):
         self.assertEqual(
             response.data['full_name'],
             ["The full name must be 50 characters long maximum."]
-            )
+        )
 
         # Test full name too short
 
@@ -138,7 +138,7 @@ class AccountAPITests(APITestCase):
         self.assertEqual(
             response.data['full_name'],
             ["The full name must be at least 3 characters long."]
-            )
+        )
 
         # Test full name invalid
 
@@ -155,7 +155,7 @@ class AccountAPITests(APITestCase):
                 "The full name field only accepts letters, hyphen and "
                 "apostrophe."
             ]
-            )
+        )
 
     def test_sign_up_invalid_email(self):
         """Check that the email is valid."""
@@ -172,7 +172,7 @@ class AccountAPITests(APITestCase):
         self.assertEqual(
             response.data['email'],
             ["This email address is not valid."]
-                )
+        )
 
     def test_sign_up_invalid_password(self):
         """Check that the password is valid."""
@@ -184,14 +184,14 @@ class AccountAPITests(APITestCase):
         data = {
             'full_name': 'Ethan Blue',
             'email': 'test@test.com',
-            'password': 'Toolong'*10,
+            'password': 'Toolong' * 10,
         }
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
             response.data['password'],
             ["Password must be 50 characters long maximum."]
-            )
+        )
 
         # Test password too short
 
@@ -205,7 +205,7 @@ class AccountAPITests(APITestCase):
         self.assertEqual(
             response.data['password'],
             ["Password must be at least 6 characters long."]
-            )
+        )
 
     def test_sign_in(self):
         """Check that the sign in works after signing up."""
@@ -256,8 +256,8 @@ class AccountAPITests(APITestCase):
             kwargs={
                 'uuid': user_uuid,
                 'token': confirmation_code
-                }
-            )
+            }
+        )
 
         response = self.client.get(url)
         self.assertEquals(response.status_code, status.HTTP_200_OK)
@@ -294,8 +294,8 @@ class AccountAPITests(APITestCase):
             kwargs={
                 'uuid': user_uuid,
                 'token': confirmation_code
-                }
-            )
+            }
+        )
 
         response = self.client.get(url)
         self.assertEquals(response.status_code, status.HTTP_200_OK)
@@ -335,7 +335,7 @@ class AccountAPITests(APITestCase):
         self.assertEqual(confirmation_url, "/activate/{}/{}/".format(
             user_uuid,
             confirmation_code
-            ))
+        ))
 
         # Test invalid UUID
         url = reverse(
@@ -343,7 +343,7 @@ class AccountAPITests(APITestCase):
             kwargs={
                 'uuid': uuid.uuid4(),
                 'token': confirmation_code
-                })
+            })
         response = self.client.get(url)
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['message'], "USER_INVALID")
@@ -354,7 +354,7 @@ class AccountAPITests(APITestCase):
             kwargs={
                 'uuid': user_uuid,
                 'token': '1234'
-                })
+            })
         response = self.client.get(url)
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['message'], "TOKEN_INVALID")
@@ -365,7 +365,7 @@ class AccountAPITests(APITestCase):
             kwargs={
                 'uuid': user_uuid,
                 'token': confirmation_code
-                })
+            })
         response = self.client.get(url)
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['message'], "ACTIVATED")
@@ -410,7 +410,7 @@ class AccountAPITests(APITestCase):
         url = reverse(
             'account-api:resend-activation-link',
             kwargs={'uuid': str(user.uuid)}
-            )
+        )
         response = self.client.post(url, {}, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -423,7 +423,7 @@ class AccountAPITests(APITestCase):
         self.assertEqual(confirmation_url, "/activate/{}/{}/".format(
             user_uuid,
             confirmation_code
-            ))
+        ))
 
         if self.display_doc:
             # Generate documentation
@@ -443,7 +443,7 @@ class AccountAPITests(APITestCase):
             kwargs={
                 'uuid': user_uuid,
                 'token': confirmation_code
-                })
+            })
         response = self.client.get(url)
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['message'], "ACTIVATED")
@@ -559,7 +559,7 @@ class AccountAPITests(APITestCase):
         self.assertEquals(
             response.data["non_field_errors"],
             ["Your account is not active."]
-            )
+        )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_reset_password_uppercase_email(self):
@@ -761,7 +761,7 @@ class AccountAPITests(APITestCase):
         self.assertEquals(
             response.data['non_field_errors'],
             ["The passwords didn't match."]
-            )
+        )
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         #
@@ -783,7 +783,7 @@ class AccountAPITests(APITestCase):
         self.assertEquals(
             response.data['password1'],
             ["The password is too short."]
-            )
+        )
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_update_details(self):

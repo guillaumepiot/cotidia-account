@@ -12,9 +12,8 @@ from rest_framework.authtoken.models import Token
 from two_factor.utils import default_device
 
 from cotidia.account.notices import (
-    NewUserActivationNotice,
-    ResetPasswordNotice
-    )
+    NewUserActivationNotice
+)
 from cotidia.account.managers import UserManager
 
 
@@ -27,7 +26,7 @@ class User(AbstractUser):
         error_messages={
             'unique': _("A user with that email already exists."),
         }
-        )
+    )
     objects = UserManager()
 
     # Used in createsuperuser manage command
@@ -78,13 +77,13 @@ class User(AbstractUser):
                 reverse('account-public:activate', kwargs={
                     'uuid': self.uuid,
                     'token': token
-                    })
-                )
+                })
+            )
 
         notice = NewUserActivationNotice(
             recipients=['{0} <{1}>'.format(
                 self.get_full_name(), self.email
-                )],
+            )],
             context={
                 'url': url,
                 'first_name': self.first_name

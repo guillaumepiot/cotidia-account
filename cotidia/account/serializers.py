@@ -46,18 +46,18 @@ class SignUpSerializer(serializers.Serializer):
         if len(full_name.strip()) > 50:
             raise serializers.ValidationError(
                 _("The full name must be 50 characters long maximum.")
-                )
+            )
         elif len(full_name.strip()) < 3:
             raise serializers.ValidationError(
                 _("The full name must be at least 3 characters long.")
-                )
+            )
         elif not is_alpha(full_name.strip()):
             raise serializers.ValidationError(
                 _(
                     "The full name field only accepts letters, hyphen "
                     "and apostrophe."
                 )
-                )
+            )
         return full_name
 
     def validate_password(self, value):
@@ -67,11 +67,11 @@ class SignUpSerializer(serializers.Serializer):
         if len(password.strip()) < 6:
             raise serializers.ValidationError(
                 _("Password must be at least 6 characters long.")
-                )
+            )
         elif len(password.strip()) > 50:
             raise serializers.ValidationError(
                 _("Password must be 50 characters long maximum.")
-                )
+            )
         return password
 
     def create(self, validated_data):
@@ -104,7 +104,7 @@ class SignUpSerializer(serializers.Serializer):
             last_name=last_name,
             last_login=now(),
             is_active=active
-            )
+        )
         user.set_password(password)
         user.save()
 
@@ -116,11 +116,11 @@ class SignInTokenSerializer(serializers.Serializer):
         'blank': _("Please enter your email."),
         'unique': _("This email is already used."),
         'invalid': _("This email address is not valid.")
-        })
+    })
     password = serializers.CharField(error_messages={
         'blank': _("Please enter a password."),
         'invalid': _("This password is not valid.")
-        })
+    })
     remember_me = serializers.CharField(required=False)
 
     def validate_email(self, value):
@@ -134,11 +134,11 @@ class SignInTokenSerializer(serializers.Serializer):
         if len(password.strip()) < 6:
             raise serializers.ValidationError(
                 _("Password must be at least 6 characters long.")
-                )
+            )
         elif len(password.strip()) > 50:
             raise serializers.ValidationError(
                 _("Password must be 50 characters long maximum.")
-                )
+            )
         return password
 
     def validate(self, attrs):
@@ -152,17 +152,17 @@ class SignInTokenSerializer(serializers.Serializer):
                 if not user.is_active:
                     raise serializers.ValidationError(
                         _("Your account is not active.")
-                        )
+                    )
                 self.user = user
                 return attrs
             else:
                 raise serializers.ValidationError(
                     _("The email and password combination is invalid.")
-                    )
+                )
         else:
             raise serializers.ValidationError(
                 _("Please include an email and a password.")
-                )
+            )
 
 
 class AuthenticateTokenSerializer(serializers.Serializer):
@@ -199,7 +199,7 @@ class UserSerializer(serializers.ModelSerializer):
             'email',
             'first_name',
             'last_name'
-            ]
+        ]
 
 
 #
@@ -209,7 +209,7 @@ class ResetPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField(error_messages={
         'required': _("Please enter your email."),
         'invalid': _("This email address is not valid.")
-        })
+    })
 
     def validate_email(self, value):
         """Force the email to be lowercase with trailing white spaces."""
