@@ -64,12 +64,12 @@ class User(AbstractUser):
         """Create the absolute url to the admin user detail view."""
         return reverse('account-admin:user_detail', kwargs={'slug': self.uuid})
 
-    def send_activation_link(self, app=True):
+    def send_activation_link(self, app=False):
         """Create a new activation notice and send it straight away."""
 
         token = default_token_generator.make_token(self)
 
-        if app is True:
+        if app is True and hasattr(settings, "APP_URL"):
             url = '{0}/activate/{1}/{2}/'.format(
                 settings.APP_URL, self.uuid, token)
         else:

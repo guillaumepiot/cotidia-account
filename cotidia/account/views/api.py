@@ -56,7 +56,7 @@ class SignUp(APIView):
             user = serializer.save()
 
             if settings.ACCOUNT_FORCE_ACTIVATION is True:
-                user.send_activation_link()
+                user.send_activation_link(app=True)
 
             token, created = Token.objects.get_or_create(user=user)
 
@@ -175,7 +175,7 @@ class ResendActivationLink(APIView):
                 status=status.HTTP_400_BAD_REQUEST
                 )
 
-        user.send_activation_link()
+        user.send_activation_link(app=True)
 
         return Response(
             {"message": "ACTIVATION_SENT"},
