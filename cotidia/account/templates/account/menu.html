@@ -1,28 +1,70 @@
-{% load i18n account_tags %}<div class="menu menu--open" id="menu">
-    <div class="menu__list">
-        <a href="{% url 'account-public:dashboard' %}" class="[ menu__item ] [ menu-item menu-item--header ]">
-            {{SITE_NAME}}
-        </a>
-
-        <a href="{% url 'account-public:dashboard' %}" class="[ menu__item ] [ menu-item ]">
-            <span class="menu-item__icon fa fa-th"></span>
-            <span class="menu-item__text">Dashboard</span>
-        </a>
-        <div class="menu__section-header">
-            {% trans "Profile" %}
+{% load i18n %}
+<menu class="menu">
+    <header class="menu__item menu__item--open menu-item">
+        <a href="#" class="menu-item__link"><span class="fa fa-bars"></span></a>
+        <span class="menu__title">{{SITE_NAME}}</span>
+    </header>
+    <ul class="menu__container">
+        <li class="menu__item menu__item--close menu-item">
+            <a href="#" class="menu-item__link"><span class="fa fa-close"></span></a>
+        </li>
+        <li class="menu__item menu-item menu-item--home">
+            <a href="{% url 'dashboard' %}" class="menu-item__link">
+                <span class="menu-item__link-icon">
+                    <span class="fa fa-home"></span>
+                </span>
+                <span class="menu-item__link-text">{{SITE_NAME}}</span>
+            </a>
+        </li>
+        <li class="menu__item menu-item">
+            <a href="{% url 'account-public:dashboard' %}" class="menu-item__link">
+                <span class="menu-item__link-icon">
+                    <span class="fa fa-th"></span>
+                </span>
+                <span class="menu-item__link-text">Dashboard</span>
+            </a>
+        </li>
+        <div class="menu__section">
+            {% trans "Account" %}
         </div>
-        <a href="{% url 'account-public:edit' %}" class="[ menu__item ] [ menu-item ]">
-            <span class="menu-item__icon fa fa-user"></span>
-            <span class="menu-item__text">{% trans "Update my profile" %}</span>
-        </a>
-        <a href="{% url 'account-public:password_change' %}" class="[ menu__item ] [ menu-item ]">
-            <span class="menu-item__icon fa fa-lock"></span>
-            <span class="menu-item__text">{% trans "Change my password" %}</span>
-        </a>
-
-        <a href="{% url 'account-public:logout' %}" class="[ menu__item ] [ menu-item menu-item--sign-out ]">
-            <span class="menu-item__icon fa fa-sign-out"></span>
-            <span class="menu-item__text">Sign out</span>
-        </a>
-    </div>
-</div>
+        <li class="menu__item menu-item">
+            <a href="{% url 'account-public:edit' %}" class="menu-item__link">
+                <span class="menu-item__link-icon">
+                    <span class="fa fa-user"></span>
+                </span>
+                <span class="menu-item__link-text">Update my profile</span>
+            </a>
+        </li>
+        <li class="menu__item menu-item">
+            <a href="{% url 'account-public:password_change' %}" class="menu-item__link">
+                <span class="menu-item__link-icon">
+                    <span class="fa fa-lock"></span>
+                </span>
+                <span class="menu-item__link-text">Change my password</span>
+            </a>
+        </li>
+        <li class="menu__item menu-item">
+            <a href="{% url 'account-public:logout' %}" class="menu-item__link">
+                <span class="menu-item__link-icon">
+                    <span class="fa fa-sign-out"></span>
+                </span>
+                <span class="menu-item__link-text">Sign out</span>
+            </a>
+        </li>
+        <li class="menu__item menu__item--sidebar-expand">
+            <a href="#" class="menu-item__link">
+                <span class="menu-item__link-icon">
+                    <span class="fa fa-chevron-right"></span>
+                </span>
+            </a>
+        </li>
+        <li class="menu__item menu__item--sidebar-collapse">
+            <a href="#" class="menu-item__link">
+                <span class="menu-item__link-icon">
+                    <span class="fa fa-chevron-left"></span>
+                </span>
+                <span class="menu-item__link-text">Compact</span>
+            </a>
+        </li>
+    </ul>
+</menu>
