@@ -23,6 +23,7 @@ DEFAULT_SETTINGS = dict(
         "two_factor",
 
         "cotidia.core",
+        "cotidia.admin",
         "cotidia.account",
         "cotidia.mail",
         "rest_framework",

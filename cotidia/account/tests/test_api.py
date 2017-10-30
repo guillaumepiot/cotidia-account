@@ -348,6 +348,21 @@ class AccountAPITests(APITestCase):
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['message'], "USER_INVALID")
 
+        if self.display_doc:
+            # Generate documentation
+            content = {
+                'title': "Activate with invalid user",
+                'http_method': 'GET',
+                'url': url,
+                'payload': {
+                    'uuid': str(uuid.uuid4()),
+                    'token': '1234'
+                },
+                'response': self.jsonify(response.data),
+                'description': description
+            }
+            self.doc.display_section(content)
+
         # Test invalid Token
         url = reverse(
             'account-api:activate',
@@ -358,6 +373,21 @@ class AccountAPITests(APITestCase):
         response = self.client.get(url)
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['message'], "TOKEN_INVALID")
+
+        if self.display_doc:
+            # Generate documentation
+            content = {
+                'title': "Activate with invalid token",
+                'http_method': 'GET',
+                'url': url,
+                'payload': {
+                    'uuid': str(user_uuid),
+                    'token': '1234'
+                },
+                'response': self.jsonify(response.data),
+                'description': description
+            }
+            self.doc.display_section(content)
 
         # Get the API confirmation url
         url = reverse(
@@ -478,6 +508,19 @@ class AccountAPITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['message'], "TOKEN_INVALID")
 
+        if self.display_doc:
+            # Generate documentation
+            content = {
+                'title': "Authenticate with invalid token",
+                'http_method': 'POST',
+                'url': url,
+                'payload': {
+                    'token': '1234',
+                },
+                'response': self.jsonify(response.data)
+            }
+            self.doc.display_section(content)
+
         # Valid token
         data = {
             'token': token,
@@ -485,6 +528,19 @@ class AccountAPITests(APITestCase):
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['message'], "USER_INACTIVE")
+
+        if self.display_doc:
+            # Generate documentation
+            content = {
+                'title': "Authenticate with inactive user",
+                'http_method': 'POST',
+                'url': url,
+                'payload': {
+                    'token': token,
+                },
+                'response': self.jsonify(response.data)
+            }
+            self.doc.display_section(content)
 
         # Activate user
         user = User.objects.filter().latest('id')
@@ -645,6 +701,18 @@ class AccountAPITests(APITestCase):
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEquals(response.data['message'], "TOKEN_INVALID")
 
+        if self.display_doc:
+            # Generate documentation
+            content = {
+                'title': "Reset key is invalid",
+                'http_method': 'GET',
+                'url': url,
+                'payload': self.jsonify(data),
+                'response': self.jsonify(response.data),
+                'description': description
+            }
+            self.doc.display_section(content)
+
     def test_set_new_password(self):
         """Test that the user can set the new password."""
 
@@ -710,6 +778,18 @@ class AccountAPITests(APITestCase):
         response = self.client.post(url, data)
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEquals(response.data['message'], "TOKEN_INVALID")
+
+        if self.display_doc:
+            # Generate documentation
+            content = {
+                'title': "Reset password with invalid token",
+                'http_method': 'POST',
+                'url': url,
+                'payload': self.jsonify(data),
+                'response': self.jsonify(response.data),
+                'description': description
+            }
+            self.doc.display_section(content)
 
         #
         # Test that the user can sign in with the new password
