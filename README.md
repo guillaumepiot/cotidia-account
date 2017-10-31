@@ -99,10 +99,10 @@ ACCOUNT_PUBLIC_LOGIN_URL = '/account/login/'
 ```
 
 Force the user to activate their account via email before being allowed to login.
-`False` by default.
+`True` by default.
 
 ```python
-ACCOUNT_FORCE_ACTIVATION = False
+ACCOUNT_FORCE_ACTIVATION = True
 ```
 
 You can decide wether you want to allow sign up and sign in independently.

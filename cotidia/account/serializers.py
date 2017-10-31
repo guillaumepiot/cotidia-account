@@ -91,10 +91,7 @@ class SignUpSerializer(serializers.Serializer):
         m.update(email.encode("utf-8"))
         username = m.hexdigest()[0:30]
 
-        if settings.ACCOUNT_FORCE_ACTIVATION is True:
-            active = False
-        else:
-            active = True
+        active = not settings.ACCOUNT_FORCE_ACTIVATION
 
         # Create the user
         user = User.objects.create(
