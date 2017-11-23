@@ -21,7 +21,7 @@ from cotidia.account.models import User
 from cotidia.account import signals
 
 
-@login_required
+@login_required(login_url=settings.ACCOUNT_PUBLIC_LOGIN_URL)
 def dashboard(request):
     """Dashboard view for public users."""
 
@@ -29,7 +29,7 @@ def dashboard(request):
     return render(request, template, {})
 
 
-@login_required
+@login_required(login_url=settings.ACCOUNT_PUBLIC_LOGIN_URL)
 def edit(
         request,
         edit_form=UpdateDetailsForm,

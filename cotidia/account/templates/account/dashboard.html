@@ -1,4 +1,4 @@
-{% extends "admin/page.html" %}{% load i18n %}
+{% extends "account/page.html" %}{% load i18n %}
 {% block title %}
     {% trans "Dashboard" %}
 {% endblock title %}
@@ -8,23 +8,5 @@
 {% endblock toolbar %}
 
 {% block page_content %}
-<div class="[ content__inner ] [ box box--padded box--bordered ]">
-    <ul>
-        <li>
-            <a href="{% url 'account-public:edit' %}">
-                {% trans "Change my details" %}
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'account-public:password_change' %}">
-                {% trans "Change my password" %}
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'account-public:logout' %}">
-                {% trans "Logout" %}
-            </a>
-        </li>
-    </ul>
-</div>
+
 {% endblock %}

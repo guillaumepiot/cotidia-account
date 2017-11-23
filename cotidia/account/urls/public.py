@@ -89,7 +89,7 @@ urlpatterns = [
         auth_views.password_reset_done,
         {'template_name': 'account/password_reset_done.html'},
         name='password_reset_done',
-    ),
+    )
 ]
 
 if settings.ACCOUNT_ALLOW_SIGN_IN:
