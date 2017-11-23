@@ -61,8 +61,9 @@ class SignUp(APIView):
             token, created = Token.objects.get_or_create(user=user)
 
             data = {'token': token.key}
-            user = user_serializer_class(token.user)
-            data.update(user.data)
+            data.update(user_serializer_class(token.user).data)
+
+            signals.user_sign_up.send(sender=None, request=request, user=user)
 
             return Response(data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
