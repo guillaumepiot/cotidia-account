@@ -31,8 +31,9 @@ setup(
     install_requires=[
         'django>=1.11.3',
         'djangorestframework>=3.5.1',
-        'django-two-factor-auth>=1.4.0',
-        'django-appconf>=1.0.2'
+        'django-two-factor-auth>=1.6',
+        'django-appconf>=1.0.2',
+        'django-formtools>=2.0'
     ],
     classifiers=[
         'Framework :: Django',
