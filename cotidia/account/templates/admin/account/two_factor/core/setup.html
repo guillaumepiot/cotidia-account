@@ -11,7 +11,7 @@
             {% block dialog_header %}
                 {% include "admin/account/includes/dialog_header.html" %}
             {% endblock %}
-            <div class="dialog__body dialog__body--padded">
+            <div class="dialog__body dialog-section--padded">
                 {% include "admin/includes/messages.html" %}
                 <h3>{% trans "Enable Two-Factor Authentication" %}</h3>
                 {% if wizard.steps.current == 'welcome' %}
@@ -86,7 +86,7 @@
                 {# hidden submit button to enable [enter] key #}
                 <div style="margin-left: -9999px"><input type="submit" value=""/></div>
             </div>
-            <div class="dialog__footer dialog-footer">
+            <div class="dialog__footer dialog-footer dialog-section--padded">
                 <div class="dialog-footer__actions">
                     <a href="{% url 'account-admin:edit' %}" class="pull-right btn btn--transparent">{% trans "Cancel" %}</a>
                     {% if wizard.steps.prev %}

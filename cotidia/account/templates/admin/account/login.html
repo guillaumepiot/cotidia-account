@@ -10,7 +10,7 @@
             {% block dialog_header %}
                 {% include "admin/account/includes/dialog_header.html" %}
             {% endblock %}
-            <div class="dialog__body dialog__body--padded">
+            <div class="dialog__body dialog-section--padded">
                 <h4>{% trans "Sign in" %}</h4>
                 <p>{% trans "Please enter your email address and password below to login." %}</p>
                     {% csrf_token %}
@@ -31,7 +31,7 @@
                     <input type="hidden" name="next" value="{% if next %}{{ next }}{% else %}{% url 'account-admin:dashboard' %}{% endif %}" />
 
             </div>
-            <div class="dialog__footer dialog-footer">
+            <div class="dialog__footer dialog-footer dialog-section--padded">
                 <div class="dialog-footer__actions">
                     <button class="btn btn--primary btn--full-width" type="submit">
                         {% trans "Login" %}

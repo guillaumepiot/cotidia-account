@@ -9,7 +9,7 @@
         {% block dialog_header %}
             {% include "account/includes/dialog_header.html" %}
         {% endblock %}
-        <div class="dialog__body dialog__body--padded">
+        <div class="dialog__body dialog-section--padded">
             <h4>{% trans "Activate" %}</h4>
             {% if user.is_active %}
                 <p>{% trans "Congratulations, your account has now been activated." %}</p>
@@ -17,7 +17,7 @@
                 <p>{% trans "Sorry, your account could not be activated." %}</p>
             {% endif %}
         </div>
-        <div class="dialog__footer dialog-footer">
+        <div class="dialog__footer dialog-footer dialog-section--padded">
             <div class="dialog-footer__actions">
                 {% if user.is_active %}
                 <a href="{% url "account-public:dashboard" %}" class="btn btn--primary btn--full-width">

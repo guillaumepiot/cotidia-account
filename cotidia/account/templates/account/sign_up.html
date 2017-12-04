@@ -10,7 +10,7 @@
             {% block dialog_header %}
                 {% include "account/includes/dialog_header.html" %}
             {% endblock %}
-            <div class="dialog__body dialog__body--padded">
+            <div class="dialog__body dialog-section--padded">
                 <h4>{% trans "Sign up" %}</h4>
                 <p>{% trans "Please enter your email address and choose a password." %}</p>
                     {% csrf_token %}
@@ -35,7 +35,7 @@
                     <input type="hidden" name="next" value="{{ next }}" />
 
             </div>
-            <div class="dialog__footer dialog-footer">
+            <div class="dialog__footer dialog-footer dialog-section--padded">
                 <div class="dialog-footer__actions">
                     <button class="btn btn--primary btn--full-width" type="submit">
                         {% trans "Sign up" %}

@@ -11,7 +11,7 @@
                 {% block dialog_header %}
                     {% include "admin/account/includes/dialog_header.html" %}
                 {% endblock %}
-                <div class="dialog__body dialog__body--padded">
+                <div class="dialog__body dialog-section--padded">
                     <h3>{% trans "Sign in" %}</h3>
                     {% if wizard.steps.current == 'auth' %}
                         <p>{% trans "Please enter your email address and password below to login." %}</p>
@@ -63,7 +63,7 @@
                     {% endif %}
                     <input type="hidden" name="next" value="{{ next }}" />
                 </div>
-                <div class="dialog__footer dialog-footer">
+                <div class="dialog__footer dialog-footer dialog-section--padded">
                     <div class="dialog-footer__actions dialog-footer__actions--center">
                         <button class="btn btn--primary btn--full-width" type="submit">
                             {% trans "Sign in" %}
