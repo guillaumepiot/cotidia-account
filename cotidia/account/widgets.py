@@ -97,10 +97,10 @@ class SelectDateWidget(Widget):
         select_html = s.render(self.year_field % name, year_val, local_attrs)
         date_output.append(select_html)
 
-        return mark_safe(u"""<div class="date-select">
-            <div class="form__control form__control--select">%s</div>
-            <div class="form__control form__control--select">%s</div>
-            <div class="form__control form__control--select">%s</div>
+        return mark_safe(u"""<div class="form__row">
+            <div class="form__group"><div class="form__control form__control--select">%s</div></div>
+            <div class="form__group"><div class="form__control form__control--select">%s</div></div>
+            <div class="form__group"><div class="form__control form__control--select">%s</div></div>
             </div>""" % (date_output[0], date_output[1], date_output[2]))
 
     def value_from_datadict(self, data, files, name):
