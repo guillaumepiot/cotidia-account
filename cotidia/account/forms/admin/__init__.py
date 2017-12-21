@@ -218,15 +218,3 @@ class AccountUserChangeForm(forms.ModelForm):
         # This is done here, rather than on the field, because the
         # field does not have access to the initial value
         return self.initial["password"]
-
-
-class GroupForm(forms.ModelForm):
-
-    permissions = forms.ModelMultipleChoiceField(
-        widget=forms.CheckboxSelectMultiple,
-        queryset=Permission.objects.all(),
-        required=False)
-
-    class Meta:
-        model = Group
-        fields = ['name', 'permissions']

@@ -1,8 +1,0 @@
-{% for fieldset in form.fieldsets %}
-    <div class="[ content__inner ] [ box box--padded box--bordered ]">
-    <h3>{{fieldset.description}}</h3>
-    {% for field in fieldset %}
-        {% include "admin/generic/form/form_group.html" %}
-    {% endfor %}
-    </div>
-{% endfor %}

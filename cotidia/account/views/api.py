@@ -1,4 +1,3 @@
-from cotidia.account.conf import settings
 from django.db import transaction
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.tokens import default_token_generator
@@ -8,6 +7,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 
+from cotidia.account import signals
+from cotidia.account.conf import settings
 from cotidia.account.serializers import (
     SignUpSerializer,
     SignInTokenSerializer,
@@ -21,7 +22,6 @@ from cotidia.account.models import User
 from cotidia.account.notices import (
     ResetPasswordNotice
 )
-from cotidia.account import signals
 
 
 class SignUp(APIView):

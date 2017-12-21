@@ -167,7 +167,7 @@ class UserCreate(StaffPermissionRequiredMixin, CreateView):
 
     def get_success_url(self):
         messages.success(self.request, _('User has been created.'))
-        return reverse('account-admin:user_list')
+        return reverse('account-admin:user-list')
 
     def get_form_class(self):
         return self.kwargs.get('user_form') or UserAddForm
@@ -187,7 +187,7 @@ class UserUpdate(StaffPermissionRequiredMixin, UpdateView):
 
     def get_success_url(self):
         messages.success(self.request, _('User details have been updated.'))
-        return reverse('account-admin:user_list')
+        return reverse('account-admin:user-list')
 
     def get_form_class(self):
         return self.kwargs.get('user_form') or UserUpdateForm
@@ -195,7 +195,7 @@ class UserUpdate(StaffPermissionRequiredMixin, UpdateView):
 
 class UserDelete(StaffPermissionRequiredMixin, DeleteView):
     model = User
-    success_url = reverse_lazy('account-admin:user_list')
+    success_url = reverse_lazy('account-admin:user-list')
     slug_field = 'uuid'
     permission_required = 'account.delete_user'
     template_name = 'admin/account/user_confirm_delete.html'
@@ -208,7 +208,7 @@ class UserDelete(StaffPermissionRequiredMixin, DeleteView):
 
     def get_success_url(self):
         messages.success(self.request, _('User has been deleted.'))
-        return reverse('account-admin:user_list')
+        return reverse('account-admin:user-list')
 
 
 @login_required(login_url=settings.ACCOUNT_ADMIN_LOGIN_URL)

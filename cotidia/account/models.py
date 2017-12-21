@@ -35,6 +35,8 @@ class User(AbstractUser):
 
     class Meta:
         ordering = ["first_name", "last_name"]
+        verbose_name = 'User'
+        verbose_name_plural = 'Users'
 
     def __str__(self):
         if self.first_name or self.last_name:
@@ -45,6 +47,10 @@ class User(AbstractUser):
     def token(self):
         token, created = Token.objects.get_or_create(user=self)
         return token
+
+    @property
+    def name(self):
+        return "{} {}".format(self.first_name, self.last_name)
 
     @property
     def has_password(self):

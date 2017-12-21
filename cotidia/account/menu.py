@@ -11,14 +11,12 @@ def admin_menu(context):
             "nav_items": [
                 {
                     "text": "Users",
-                    "icon": "users",
-                    "url": reverse("account-admin:user_list"),
+                    "url": reverse("account-admin:user-list"),
                     "permissions": ["account.add_user", "account.change_user"],
                 },
                 {
                     "text": "Roles",
-                    "icon": "key",
-                    "url": reverse("account-admin:group_list"),
+                    "url": reverse("account-admin:group-list"),
                     "permissions": [
                         "perms.auth.add_group",
                         "perms.auth.change_group"
@@ -39,8 +37,7 @@ def admin_menu(context):
                 },
                 {
                     "text": "Change password",
-                    "icon": "unlock-alt",
-                    "url": reverse("account-admin:password_change"),
+                    "url": reverse("account-admin:password-change"),
                     "permissions": [],
                 },
                 {
