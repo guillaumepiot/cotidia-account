@@ -37,6 +37,7 @@ def admin_menu(context):
                 },
                 {
                     "text": "Change password",
+                    "icon": "key",
                     "url": reverse("account-admin:password-change"),
                     "permissions": [],
                 },

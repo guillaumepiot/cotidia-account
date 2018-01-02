@@ -152,11 +152,13 @@ class AccountUserCreationForm(forms.ModelForm):
     email = forms.EmailField()
 
     password1 = forms.CharField(
-        label="Password"
+        label="Password",
+        widget=forms.PasswordInput
     )
 
     password2 = forms.CharField(
         label="Password confirmation",
+        widget=forms.PasswordInput,
         help_text="Enter the same password twice, for verification."
     )
 

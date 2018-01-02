@@ -2,17 +2,20 @@ import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.urlresolvers import reverse
-from cotidia.account.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 
 from rest_framework.authtoken.models import Token
 from two_factor.utils import default_device
 
+from cotidia.account.conf import settings
 from cotidia.account.notices import (
-    NewUserActivationNotice
+    NewUserActivationNotice,
+    UserInvitationNotice
 )
 from cotidia.account.managers import UserManager
 
@@ -94,6 +97,27 @@ class User(AbstractUser):
                 'url': url,
                 'first_name': self.first_name
             }
+        )
+        notice.send(force_now=True)
+
+    def send_invitation_email(self):
+        uid = urlsafe_base64_encode(force_bytes(self.pk)).decode()
+        token = default_token_generator.make_token(self)
+        url = reverse(
+            'account-admin:password-reset-confirm',
+            kwargs={'uidb64': uid, 'token': token}
+        )
+        context = {
+            'url': settings.SITE_URL + url,
+            'first_name': self.first_name,
+            'site_url': settings.SITE_URL,
+            'site_name': settings.SITE_NAME
+        }
+        notice = UserInvitationNotice(
+            recipients=['{0} <{1}>'.format(
+                self.get_full_name(), self.email
+            )],
+            context=context
         )
         notice.send(force_now=True)
 

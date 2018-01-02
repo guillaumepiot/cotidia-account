@@ -13,7 +13,7 @@ class NewUserActivationNotice(Notice):
     default_context = {
         'url': "url",
         'firstname': "Guillaume"
-        }
+    }
 
 
 class ResetPasswordNotice(Notice):
@@ -26,4 +26,19 @@ class ResetPasswordNotice(Notice):
     default_context = {
         'url': "url",
         'firstname': "Guillaume",
-        }
+    }
+
+
+class UserInvitationNotice(Notice):
+    name = 'User invitation'
+    identifier = 'user-invitation'
+    html_template = 'account/notices/invitation.html'
+    text_template = 'account/notices/invitation.txt'
+    subject = u'%s' % _('You have been invited')
+
+    default_context = {
+        'url': "url",
+        'firstname': "Guillaume",
+        'site_url': "http://localhost:8000",
+        'site_name': "Test website"
+    }

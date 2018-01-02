@@ -5,6 +5,7 @@ import sys
 import django
 
 from django.conf import settings
+from django.test.runner import DiscoverRunner
 
 PACKAGE_ROOT = os.path.abspath(os.path.dirname(__file__))
 
@@ -59,6 +60,7 @@ DEFAULT_SETTINGS = dict(
     },
     SITE_ID=1,
     SITE_URL="http://localhost:8000",
+    SITE_NAME="Test website",
     APP_URL="http://localhost:8000",
     ROOT_URLCONF="cotidia.account.tests.urls",
     SECRET_KEY="notasecret",
@@ -93,14 +95,8 @@ def runtests(*test_args):
     parent = os.path.dirname(os.path.abspath(__file__))
     sys.path.insert(0, parent)
 
-    try:
-        from django.test.runner import DiscoverRunner
-        runner_class = DiscoverRunner
-        test_args = ["cotidia.account.tests"]
-    except ImportError:
-        from django.test.simple import DjangoTestSuiteRunner
-        runner_class = DjangoTestSuiteRunner
-        test_args = ["tests"]
+    runner_class = DiscoverRunner
+    test_args = []
 
     failures = runner_class(
         verbosity=1,

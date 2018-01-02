@@ -14,7 +14,7 @@ from betterforms.forms import BetterModelForm, BetterForm
 from cotidia.account.models import User
 
 
-class UserAddForm(BetterModelForm, UserCreationForm):
+class UserAddForm(BetterModelForm):
 
     email = forms.EmailField(required=True)
 
@@ -81,6 +81,12 @@ class UserUpdateForm(UserAddForm, UserChangeForm):
             "this user's password. <br><a href=\"{}\" class=\"btn btn--small\">Change password</a>".format(
                 reverse("account-admin:user-change-password", args=[instance.id]))
         )
+
+
+class UserInviteForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = []
 
 
 class UserChangePasswordForm(BetterForm, AdminPasswordChangeForm):

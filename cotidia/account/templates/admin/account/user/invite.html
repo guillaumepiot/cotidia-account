@@ -1,0 +1,55 @@
+{% extends "admin/page.html" %}{% load i18n admin_list_tags %}
+{% block title %}
+    {% trans "Delete" %} {{verbose_name}}
+{% endblock title %}
+
+{% block body_class %}
+    {% if template_type == "centered" %}content-centered{% endif %}
+{% endblock body_class %}
+
+{% block toolbar %}
+    <span class="toolbar__breadcrumbs">
+        <a href="{% get_admin_url app_label model_name "list" %}">
+            {{verbose_name_plural}}
+        </a>
+        &nbsp;<span class="fa fa-angle-right"></span>&nbsp;
+        <a href="{% get_admin_url app_label model_name "detail" object %}">
+            {{object}}
+        </a>
+        &nbsp;<span class="fa fa-angle-right"></span>&nbsp;
+        {% trans "Invite" %}
+    </span>
+{% endblock toolbar %}
+
+{% block page_content %}
+<div class="content__delete">
+    <fieldset>
+        <legend>{% blocktrans with verbose_name|lower as verbose_name %}
+            Are you sure to invite the following {{verbose_name}}?
+            {% endblocktrans %}
+        </legend>
+        <div class="form__row">
+            <p>
+                {{object}}
+            </p>
+        </div>
+        <div class="form__row">
+            <p class="text-italic">{% trans "An email will be sent to them with a link to set their password." %}</p>
+        </div>
+    </fieldset>
+
+    {% block form_actions %}
+    <div class="content__inner">
+        <form method="post" action="">
+            {% csrf_token %}
+            <button type="submit" class="btn btn--primary">
+                {% trans "Confirm Invitation" %}
+            </button>
+            <a href="{% get_admin_url app_label model_name "list" %}" class="btn btn--transparent pull-right">
+                {% trans "Cancel" %}
+            </a>
+        </form>
+    </div>
+    {% endblock form_actions %}
+</div>
+{% endblock page_content %}

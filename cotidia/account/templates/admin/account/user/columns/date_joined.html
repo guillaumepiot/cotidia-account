@@ -1,0 +1,7 @@
+{% load i18n %}{% if object.is_active and not object.password %}
+    <a href="{% url 'account-admin:user-invite' object.id %}" class="btn btn--create btn--small">{% trans "Send invitation email" %}</a>
+{% elif not object.is_active %}
+    <span class="label label-danger">{% trans "Inactive" %}</span>
+{% else %}
+    {{object.date_joined}}
+{% endif %}

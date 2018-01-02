@@ -7,6 +7,7 @@ from cotidia.account.views.admin.user import (
     UserUpdate,
     UserDelete,
     UserChangePassword,
+    UserInvite
 )
 
 ure = r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
@@ -31,6 +32,11 @@ urlpatterns = [
         r'^(?P<pk>[\d]+)/update$',
         UserUpdate.as_view(),
         name='user-update'
+    ),
+    url(
+        r'^(?P<pk>[\d]+)/invite$',
+        UserInvite.as_view(),
+        name='user-invite'
     ),
     url(
         r'^(?P<pk>[\d]+)/delete$',

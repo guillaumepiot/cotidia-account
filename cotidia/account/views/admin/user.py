@@ -3,6 +3,7 @@ import django_filters
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.contrib import messages
 
 from cotidia.admin.views import (
     AdminListView,
@@ -15,7 +16,8 @@ from cotidia.account.models import User
 from cotidia.account.forms.admin.user import (
     UserAddForm,
     UserUpdateForm,
-    UserChangePasswordForm
+    UserChangePasswordForm,
+    UserInviteForm
 )
 
 
@@ -115,10 +117,56 @@ class UserCreate(AdminCreateView):
     model = User
     form_class = UserAddForm
 
+    def form_valid(self, form):
+        response = super().form_valid(form)
+
+        if self.object.is_active:
+            self.object.send_invitation_email()
+
+        return response
+
 
 class UserUpdate(AdminUpdateView):
     model = User
     form_class = UserUpdateForm
+
+    def form_valid(self, form):
+        previous_instance = self.get_object()
+        response = super().form_valid(form)
+
+        # If `is_active` change state from False to True, send the invitation
+        if not previous_instance.is_active and self.object.is_active:
+            # Only send if the user was never invited
+            if not self.object.password:
+                self.object.send_invitation_email()
+
+        return response
+
+
+class UserInvite(AdminUpdateView):
+    model = User
+    form_class = UserInviteForm
+
+    def get_template_names(self):
+        return ["admin/account/user/invite.html"]
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+
+        if self.object.is_active and not self.object.password:
+            self.object.send_invitation_email()
+
+        return response
+
+    def get_success_url(self):
+        messages.success(
+            self.request,
+            '{} has been invited. <a href="{}">View</a>'.format(
+                self.model._meta.verbose_name,
+                self.build_detail_url()
+            )
+        )
+        return self.build_success_url()
 
 
 class UserDelete(AdminDeleteView):
@@ -147,27 +195,3 @@ class UserChangePassword(AdminUpdateView):
         del kwargs['instance']
         kwargs['user'] = self.get_object()
         return kwargs
-
-# @login_required(login_url=settings.ACCOUNT_ADMIN_LOGIN_URL)
-# @sensitive_post_parameters()
-# def user_change_password(request, pk):
-
-#     if not request.user.is_superuser:
-#         raise PermissionDenied
-
-#     user = get_object_or_404(User, pk=pk)
-
-#     if user == request.user:
-#         return HttpResponseRedirect(reverse('account-admin:password-change'))
-
-#     if request.method == 'POST':
-#         form = UserChangePassword(user, request.POST)
-#         if form.is_valid():
-#             form.save()
-#             return HttpResponseRedirect('..')
-#     else:
-#         form = UserChangePassword(user)
-
-#     template = 'admin/account/user_change_password.html'
-
-#     return render(request, template, {'form': form})

@@ -1,0 +1,12 @@
+{% load i18n %}<div class="form__group">
+    <label class="form__label">{{label}}</label>
+    <div class="form__control">
+        {% for v in value %}
+        {% with v as value and forloop as queryloop %}
+            {% include "admin/generic/detail/value.html" %}
+        {% endwith %}
+        {% empty %}
+            <span class="text-italic text-grey--medium">{% trans "No roles assigned." %}</span>
+        {% endfor %}
+    </div>
+</div>
