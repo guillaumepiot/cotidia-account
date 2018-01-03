@@ -154,27 +154,6 @@ class UserDetail(AdminDetailView):
             )
         return fieldsets
 
-    def get_fieldsets(self):
-        fieldsets = self.fieldsets.copy()
-
-        obj = self.get_object()
-
-        fieldsets.append(
-            {
-                "legend": "People",
-                "template_name": "admin/account/user/profile.html",
-                "actions": [
-                    {
-                        'label': "Add item",
-                        'url': reverse('example-admin:item-add', kwargs={'user_id': obj.id}),
-                        'class': "btn--create",
-                    }
-                ]
-            }
-        )
-    return fieldsets
-
-
 
 class UserCreate(AdminCreateView):
     model = User
