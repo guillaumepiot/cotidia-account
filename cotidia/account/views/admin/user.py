@@ -4,7 +4,10 @@ from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib import messages
+from django.core.exceptions import ObjectDoesNotExist
+from django.apps import apps
 
+from cotidia.account.conf import settings
 from cotidia.admin.views import (
     AdminListView,
     AdminDetailView,
@@ -111,6 +114,66 @@ class UserDetail(AdminDetailView):
         #     "template_name": "admin/team/team/people.html"
         # }
     ]
+
+    def get_fieldsets(self):
+        fieldsets = self.fieldsets.copy()
+
+        user = self.get_object()
+
+        if settings.ACCOUNT_PROFILE_MODEL:
+            app_label, model_name = settings.ACCOUNT_PROFILE_MODEL.split('.')
+            profile_class = apps.get_model(app_label=app_label, model_name=model_name)
+
+            try:
+                user.profile
+                has_profile = True
+            except ObjectDoesNotExist:
+                has_profile = False
+
+            # profile_app_label
+            if has_profile:
+                label = "Edit profile"
+                url = reverse('{}-admin:profile-update'.format(profile_class._meta.app_label), kwargs={'pk': user.profile.id})
+                action_class = "btn--change"
+            else:
+                label = "Add profile"
+                url = reverse('{}-admin:profile-add'.format(profile_class._meta.app_label), kwargs={'user_id': user.id})
+                action_class = "btn--create"
+            fieldsets.append(
+                {
+                    "legend": "People",
+                    "template_name": "admin/account/user/profile.html",
+                    "actions": [
+                        {
+                            'label': label,
+                            'url': url,
+                            'class': action_class,
+                        }
+                    ]
+                }
+            )
+        return fieldsets
+
+    def get_fieldsets(self):
+        fieldsets = self.fieldsets.copy()
+
+        obj = self.get_object()
+
+        fieldsets.append(
+            {
+                "legend": "People",
+                "template_name": "admin/account/user/profile.html",
+                "actions": [
+                    {
+                        'label': "Add item",
+                        'url': reverse('example-admin:item-add', kwargs={'user_id': obj.id}),
+                        'class': "btn--create",
+                    }
+                ]
+            }
+        )
+    return fieldsets
+
 
 
 class UserCreate(AdminCreateView):

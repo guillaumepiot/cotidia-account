@@ -29,6 +29,7 @@ DEFAULT_SETTINGS = dict(
         "cotidia.mail",
         "rest_framework",
         "rest_framework.authtoken",
+        "cotidia.account.tests.profile"
     ],
     MIDDLEWARE_CLASSES=[
         "django.middleware.common.CommonMiddleware",

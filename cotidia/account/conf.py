@@ -21,5 +21,8 @@ class AccountConf(AppConf):
     # Only applies if `ENABLE_TWO_FACTOR` is set to `True`.
     FORCE_ADMIN_TWO_FACTOR = False
 
+    # Define the profile model to use if any
+    PROFILE_MODEL = None
+
     class Meta:
         prefix = 'account'

@@ -2,6 +2,7 @@ from django.conf.urls import include, url
 
 from cotidia.account.views.admin import dashboard
 
+
 urlpatterns = [
     url(r'^account/', include('cotidia.account.urls.public',
         namespace='account-public')),
@@ -9,6 +10,8 @@ urlpatterns = [
         namespace='account-api')),
     url(r'^admin/account/', include('cotidia.account.urls.admin',
         namespace='account-admin')),
+    url(r'^admin/profile/', include('cotidia.account.tests.profile.urls',
+        namespace='profile-admin')),
     url(r'^admin/mail/', include('cotidia.mail.urls',
         namespace='mail-admin')),
     url(

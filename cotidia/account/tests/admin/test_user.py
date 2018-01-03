@@ -1,79 +1,18 @@
-import re
-
 from django.core import mail
 from django.core.urlresolvers import reverse
-from django.test import TestCase
-from django.test import override_settings
 from django.contrib.auth.models import Group, Permission
 
-from cotidia.account import fixtures
-from cotidia.account.conf import settings
 from cotidia.account.models import User
 from cotidia.account.factory import UserFactory
+from cotidia.account.tests.admin.utils import BaseAdminTestCase
 
 
-class UserAdminTests(TestCase):
-
-    @fixtures.normal_user
-    @fixtures.admin_user
-    @fixtures.superuser
-    def setUp(self):
-        pass
-
-    def get_confirmation_url_from_email(self, email_message):
-        site_url = settings.SITE_URL.replace('/', '\/')
-        exp = r'(' + site_url + '\/([a-z\-\/]+)?account\/activate\/(.*)\/(.*))'
-        m = re.search(exp, email_message)
-        confirmation_url = m.group()
-
-        return confirmation_url
-
-    def check_page_permissions(self, urlname, permission, pk=None):
-        """Check all access permissions for a given page."""
-
-        if pk:
-            url = reverse("account-admin:{}".format(urlname), kwargs={'pk': pk})
-        else:
-            url = reverse("account-admin:{}".format(urlname))
-
-        response = self.client.get(url)
-        self.assertEquals(response['Location'], '/admin/account/login/')
-        self.assertEquals(response.status_code, 302)
-
-        # Normal user
-        self.client.login(
-            username=self.normal_user.email,
-            password=self.normal_user_pwd
-        )
-        response = self.client.get(url)
-        self.assertEquals(response.status_code, 403)
-
-        # Admin user without permission
-        self.client.login(
-            username=self.admin_user.email,
-            password=self.admin_user_pwd
-        )
-        response = self.client.get(url)
-        self.assertEquals(response.status_code, 403)
-
-        # Admin user with permission
-        perm = Permission.objects.get(codename=permission)
-        self.admin_user.user_permissions.add(perm)
-        response = self.client.get(url)
-        self.assertEquals(response.status_code, 200)
-
-        # Superuser
-        self.client.login(
-            username=self.superuser.email,
-            password=self.superuser_pwd
-        )
-        response = self.client.get(url)
-        self.assertEquals(response.status_code, 200)
+class UserAdminTests(BaseAdminTestCase):
 
     def test_user_add(self):
         """Test we can add a user."""
 
-        self.check_page_permissions('user-add', 'add_user')
+        self.check_page_permissions('account-admin', 'user-add', 'add_user')
 
         # Test with minimum data
         data = {
@@ -176,7 +115,8 @@ class UserAdminTests(TestCase):
 
         user = UserFactory.create(**data)
 
-        self.check_page_permissions('user-update', 'change_user', user.pk)
+        urlargs = {'pk': user.pk}
+        self.check_page_permissions('account-admin', 'user-update', 'change_user', urlargs)
 
         self.client.login(
             username=self.superuser.email,
@@ -271,7 +211,8 @@ class UserAdminTests(TestCase):
 
         user = UserFactory.create(**data)
 
-        self.check_page_permissions('user-invite', 'change_user', user.pk)
+        urlargs = {'pk': user.pk}
+        self.check_page_permissions('account-admin', 'user-invite', 'change_user', urlargs)
 
         self.client.login(
             username=self.superuser.email,
