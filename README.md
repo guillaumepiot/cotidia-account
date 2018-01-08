@@ -13,23 +13,23 @@ Install directly from the repository:
 $ pip install -e git+git@code.cotidia.com:cotidia/account.git#egg=cotidia-account
 ```
 
-## Settings
+## Setup
 
 Add `cotidia.account` to your INSTALLED_APPS:
 
 ```python
 INSTALLED_APPS=[
-    "django_otp",
-    "django_otp.plugins.otp_static",
-    "django_otp.plugins.otp_totp",
-    "two_factor",
+    'django_otp',
+    'django_otp.plugins.otp_static',
+    'django_otp.plugins.otp_totp',
+    'two_factor',
 
-    "cotidia.core",
-    "cotidia.admin",
-    "cotidia.account",
-    "cotidia.mail",
-    "rest_framework",
-    "rest_framework.authtoken",
+    'cotidia.core',
+    'cotidia.admin',
+    'cotidia.account',
+    'cotidia.mail',
+    'rest_framework',
+    'rest_framework.authtoken',
 ]
 ```
 
@@ -62,7 +62,7 @@ TEMPLATES = [
         'OPTIONS': {
             'context_processors': [
 
-                "cotidia.account.context_processor.account_settings",
+                'cotidia.account.context_processor.account_settings',
 
             ],
         },
@@ -70,13 +70,8 @@ TEMPLATES = [
 ]
 ```
 
-Migrate the account models
+Specify the user model and auth backend.
 
-```console
-$ python manage.py migrate cotidia.account
-```
-
-Specify the following settings:
 
 ```python
 AUTH_USER_MODEL = "account.User"
@@ -85,49 +80,10 @@ AUTHENTICATION_BACKENDS = (
 )
 ```
 
-By default, the login urls for the admin and the public side are set as follows:
+Migrate the account models
 
-```python
-# Django defaults
-LOGIN_REDIRECT_URL = '/account'
-LOGIN_URL = '/account/login/'
-LOGOUT_URL = '/account/logout/'
-
-# Account public and admin login
-ACCOUNT_ADMIN_LOGIN_URL = '/admin/account/login/'
-ACCOUNT_PUBLIC_LOGIN_URL = '/account/login/'
-```
-
-Force the user to activate their account via email before being allowed to login.
-`True` by default.
-
-```python
-ACCOUNT_FORCE_ACTIVATION = True
-```
-
-You can decide wether you want to allow sign up and sign in independently.
-This settings will disable the URLs make the page and API hook unavailable.
-
-```python
-ACCOUNT_ALLOW_SIGN_IN = True
-ACCOUNT_ALLOW_SIGN_UP = True
-```
-
-Day limit for activation link (Django settings):
-
-```python
-PASSWORD_RESET_TIMEOUT_DAYS = 3
-```
-
-Enable and force the two-factor authentication:
-
-```python
-# Change the standard one-factor authentication workflow to a two-factor
-# workflow.
-ENABLE_TWO_FACTOR = False
-# Force all admin users to sign in using two-factor authentication.
-# Only applies if `ENABLE_TWO_FACTOR` is set to `True`.
-FORCE_ADMIN_TWO_FACTOR = False
+```console
+$ python manage.py migrate cotidia.account
 ```
 
 ## URLs
@@ -158,27 +114,93 @@ urlpatterns = [
 
 > Please note that you must respect the url namespacing for the url reversal to work.
 
-## Add items to the menu
+## Django settings related to account
 
-You will need to register your app menu to the account menu. The register
-function requires the menu name and template url.
+`LOGIN_REDIRECT_URL`
 
-```python
-from cotidia.account.menu import menu
-menu.register("my_menu", "path/to/menu.html", 1)
-```
+- Type: *string*
+- Example: *'/account'*
 
-Example menu (do not forget access permissions):
+Where to redirect the user if not authenticated.
 
-```html
-{% load i18n %}
-<div class="menu__section-header">
-    {% trans "Menu header" %}
-</div>
-{% if perms.app.change_model %}
-<a href="{% url 'admin:path_to_view' %}" class="[ menu__item ] [ menu-item ]">
-    <span class="menu-item__icon fa fa-list"></span>
-    <span class="menu-item__text">{% trans "My menu" %}</span>
-</a>
-{% endif %}
-```
+`LOGIN_URL`
+
+- Type: *string*
+- Example: *'/account/login'*
+
+The public login url specified in the account urls.
+
+`LOGOUT_URL`
+
+- Type: *string*
+- Example: *'/account/logout'*
+
+The public logout url specified in the account urls.
+
+`PASSWORD_RESET_TIMEOUT_DAYS`
+
+- Type: *int*
+- Default: *3*
+
+Day limit for activation link (Django based settings):
+
+## Account settings
+
+`ACCOUNT_ADMIN_LOGIN_URL`
+
+- Type: *string*
+- Example: *'/admin/account/login'*
+
+The admin login url specified in the account urls.
+
+`ACCOUNT_PUBLIC_LOGIN_URL`
+
+- Type: *string*
+- Example: *'/account/logout'*
+
+The public login url specified in the account urls.
+
+`ACCOUNT_FORCE_ACTIVATION`
+
+- Type: *bool*
+- Default: *True*
+
+Force the user to activate their account via email before being allowed to login.
+
+`ACCOUNT_ALLOW_SIGN_IN`
+
+- Type: *bool*
+- Default: *True*
+
+Allow users to sign in.
+
+`ACCOUNT_ALLOW_SIGN_UP`
+
+- Type: *bool*
+- Default: *True*
+
+Allow users to sign up.
+
+`ACCOUNT_ENABLE_TWO_FACTOR`
+
+- Type: *bool*
+- Default: *False*
+
+Enable the two-factor authentication workflow.
+
+`ACCOUNT_FORCE_ADMIN_TWO_FACTOR`
+
+- Type: *bool*
+- Default: *False*
+
+Force the two-factor authentication workflow for staff users.
+
+> Only applies if `ENABLE_TWO_FACTOR` is set to `True`.
+
+`ACCOUNT_AUTO_SEND_INVITATION_EMAIL`
+
+- Type: *bool*
+- Default: *True*
+
+Enable the automatic sending of invitation email when the user is created and
+active. Also, auto send when user is updated from not active to active.
