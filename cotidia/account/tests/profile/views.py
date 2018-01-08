@@ -1,4 +1,4 @@
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from cotidia.account.models import User
 from cotidia.admin.views import (

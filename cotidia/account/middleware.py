@@ -1,5 +1,5 @@
 from django.http import HttpResponseRedirect
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib import messages
 from django.utils.deprecation import MiddlewareMixin
 
@@ -20,7 +20,7 @@ class AccountMiddleware(MiddlewareMixin):
             # - They are authenticated (first step)
             # - They are not verified (second step)
             if settings.ACCOUNT_FORCE_ADMIN_TWO_FACTOR is True \
-                    and request.user.is_authenticated() \
+                    and request.user.is_authenticated \
                     and not request.user.is_verified():
 
                 setup_url = reverse('account-admin:setup')

@@ -12,7 +12,7 @@ class UserCheckMixin(object):
 
     def dispatch(self, request, *args, **kwargs):
         if not self.check_user(request.user):
-            if request.user.is_authenticated():
+            if request.user.is_authenticated:
                 raise PermissionDenied
             else:
                 return redirect(settings.ACCOUNT_ADMIN_LOGIN_URL)

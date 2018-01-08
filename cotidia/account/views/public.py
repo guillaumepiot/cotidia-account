@@ -2,7 +2,7 @@ import hashlib
 
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView as AuthLoginView
@@ -57,7 +57,7 @@ class LoginView(AuthLoginView):
     def get(self, *args, **kwargs):
         if settings.ACCOUNT_ALLOW_SIGN_IN is False:
             raise Http404
-        if self.request.user.is_authenticated():
+        if self.request.user.is_authenticated:
             return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
         return super().get(*args, **kwargs)
 
@@ -85,7 +85,7 @@ def sign_up(
     success_url = request.GET.get('next')
 
     # Redirect to account page if already logged in
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         return HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
 
     if request.method == "POST":
@@ -166,7 +166,7 @@ def activation_pending(request, uuid, template_name):
 
     user = get_object_or_404(User, uuid=uuid)
 
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         return HttpResponseRedirect(reverse('account-public:dashboard'))
 
     return render(request, template_name, {"user": user})

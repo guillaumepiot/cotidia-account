@@ -20,6 +20,8 @@ from cotidia.account.views.admin import (
 
 ure = r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 
+app_name = 'cotidia.account'
+
 urlpatterns = [
     url(r'^$', dashboard, name="dashboard"),
     url(r'user/', include('cotidia.account.urls.admin.user')),

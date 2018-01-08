@@ -4,6 +4,8 @@ from cotidia.account.views import api
 
 ure = r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 
+app_name = 'cotidia.account'
+
 urlpatterns = [
     url(r'^sign-in$', api.SignIn.as_view(), name='sign-in'),
     url(r'^sign-up$', api.SignUp.as_view(), name='sign-up'),
