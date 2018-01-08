@@ -1,38 +1,36 @@
 {% extends "admin/page.html" %}
 {% load i18n two_factor %}
 
+{% block body_class %}content-centered{% endblock body_class %}
+
 {% block title %}
-	{% trans "Disable Two-factor Authentication" %}
+    {% trans "Disable Two-factor Authentication" %}
 {% endblock title %}
 
 {% block toolbar %}
-	<span class="toolbar__breadcrumbs">{% trans "Account Security" %}</span>
+    <span class="toolbar__breadcrumbs">{% trans "Account Security" %}</span>
 {% endblock toolbar %}
 
-{% block content %}
-<form method="post">
+{% block page_content %}
+<form method="post" class="form">
     {% csrf_token %}
-    <div class="[ content__inner ] [ box box--padded box--bordered ]">
-        <fieldset>
-            <legend>{% trans "Disable Two-factor Authentication" %}</legend>
+    <fieldset>
+        <legend>{% trans "Disable Two-factor Authentication" %}</legend>
+        <div class="form__row">
             <p>{% blocktrans %}You are about to disable two-factor authentication. This
-              compromises your account security, are you sure?{% endblocktrans %}</p>
-            <div class="grid">
-              <div class="grid__span-3">
-                  {% with form.password as field %}
-                      {% include "admin/generic/form/form_group.html" %}
-                  {% endwith %}
-              </div>
-              <div class="grid__span-3">
-                  <div class="form__group">
-                      <button class="btn btn--delete" type="submit">{% trans "Disable" %}</button>
-                  </div>
-              </div>
-            </div>
-        </fieldset>
-    </div>
-    <div class="content__inner">
-        <a href="{% url 'account-admin:profile'%}" class="pull-right btn btn--transparent">{% trans "Back to Account Security" %}</a>
+            compromises your account security, are you sure?{% endblocktrans %}</p>
+        </div>
+        <div class="form__row">
+            {% with form.password as field %}
+                    {% include "admin/generic/form/form_group.html" %}
+            {% endwith %}
+        </div>
+    </fieldset>
+    <div class="form__actions">
+        <div class="form__actions-inner">
+            <button class="btn btn--delete" type="submit">{% trans "Disable" %}</button>
+            <a href="{% url 'account-admin:profile'%}" class="pull-right btn btn--transparent">{% trans "Back to Account Security" %}</a>
+        </div>
     </div>
 </form>
 {% endblock %}

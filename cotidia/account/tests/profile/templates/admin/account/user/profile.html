@@ -1,1 +1,9 @@
-profile.html
+<fieldset class="detail">
+    <legend>Profile</legend>
+    {% if object.profile %}
+    <div class="form__row">
+        {% include "admin/generic/detail/field.html" with label="Company" value=object.profile.company %}
+    </div>
+    {% endif %}
+    {% include "admin/generic/detail/fieldset-actions.html" %}
+</fieldset>

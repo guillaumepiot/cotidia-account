@@ -24,5 +24,9 @@ class AccountConf(AppConf):
     # Define the profile model to use if any
     PROFILE_MODEL = None
 
+    # Do we need to send an invitation email when the user is created and
+    # is active?
+    AUTO_SEND_INVITATION_EMAIL = True
+
     class Meta:
         prefix = 'account'

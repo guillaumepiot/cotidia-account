@@ -18,7 +18,9 @@ from cotidia.admin.views import (
 from cotidia.account.models import User
 from cotidia.account.forms.admin.user import (
     UserAddForm,
+    SuperUserAddForm,
     UserUpdateForm,
+    SuperUserUpdateForm,
     UserChangePasswordForm,
     UserInviteForm
 )
@@ -157,20 +159,27 @@ class UserDetail(AdminDetailView):
 
 class UserCreate(AdminCreateView):
     model = User
-    form_class = UserAddForm
+    # form_class = UserAddForm
 
     def form_valid(self, form):
         response = super().form_valid(form)
 
-        if self.object.is_active:
+        if self.object.is_active and \
+                settings.ACCOUNT_AUTO_SEND_INVITATION_EMAIL:
             self.object.send_invitation_email()
 
         return response
 
+    def get_form_class(self):
+        if self.request.user.is_superuser:
+            return SuperUserAddForm
+        else:
+            return UserAddForm
+
 
 class UserUpdate(AdminUpdateView):
     model = User
-    form_class = UserUpdateForm
+    # form_class = UserUpdateForm
 
     def form_valid(self, form):
         previous_instance = self.get_object()
@@ -179,10 +188,17 @@ class UserUpdate(AdminUpdateView):
         # If `is_active` change state from False to True, send the invitation
         if not previous_instance.is_active and self.object.is_active:
             # Only send if the user was never invited
-            if not self.object.password:
+            if not self.object.password and \
+                    settings.ACCOUNT_AUTO_SEND_INVITATION_EMAIL:
                 self.object.send_invitation_email()
 
         return response
+
+    def get_form_class(self):
+        if self.request.user.is_superuser:
+            return SuperUserUpdateForm
+        else:
+            return UserUpdateForm
 
 
 class UserInvite(AdminUpdateView):

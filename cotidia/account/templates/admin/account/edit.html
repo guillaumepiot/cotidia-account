@@ -18,13 +18,16 @@
     <fieldset>
         <legend>{% trans "Contact details" %}</legend>
 
+        <div class="form__row">
         {% with form.first_name as field %}
             {% include "admin/generic/form/form_group.html" %}
         {% endwith %}
         {% with form.last_name as field %}
             {% include "admin/generic/form/form_group.html" %}
         {% endwith %}
+        </div>
 
+        <div class="form__row">
         {% with form.email as field %}
             {% include "admin/generic/form/form_group.html" %}
         {% endwith %}
@@ -32,19 +35,24 @@
         {% with form.username as field %}
             {% include "admin/generic/form/form_group.html" %}
         {% endwith %}
-
-        <a href="{% url 'account-admin:password-change' %}" class="btn btn--transparent btn--small">
-            {% trans "Change Password" %}
-        </a>
+        </div>
+    </fieldset>
+    <fieldset>
+        <legend>{% trans "Security" %}</legend>
+        <div class="form__row">
+            <div class="form__group">
+                <label class="form__label">Password</label>
+                <a href="{% url 'account-admin:password-change' %}" class="btn btn--change btn--small">
+                    {% trans "Change Password" %}
+                </a>
+            </div>
+        </div>
 
         {% if ACCOUNT_ENABLE_TWO_FACTOR %}
-        <div class="grid">
-            <div class="grid__span-2">
-                <span class="form__label--inline">
-                    {% trans "Two Factor Auth" %}
-                </span>
-            </div>
-            <div class="grid__span-8">
+        <div class="form__row">
+
+            <div class="form__group">
+                <label class="form__label">{% trans "Two Factor Auth" %}</label>
                 <div class="form__control">
                     {% if user.two_factor_auth_enabled %}
                         <p><span class="label label--success">Enabled</span></p>
@@ -58,7 +66,7 @@
         </div>
         {% endif %}
     </fieldset>
-    <div class="form__action">
+    <div class="form__actions">
         <div class="form__actions-inner">
             <button type="submit" class="btn btn--primary">
                 {% trans "Save" %}

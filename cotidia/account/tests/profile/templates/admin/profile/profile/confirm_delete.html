@@ -2,8 +2,11 @@
 
 {% block toolbar %}
     <span class="toolbar__breadcrumbs">
-        <a href="{% get_admin_url 'account' 'user' 'detail' user %}">{{object.user}}</a>
+        <a href="{% get_admin_url 'account' 'user' "detail" user %}">{{user}}</a>
         &nbsp;<span class="fa fa-angle-right"></span>&nbsp;
+        <a href="{% get_admin_url 'account' 'user' "detail" object.user %}">
+            {{object}}
+        </a>
         &nbsp;<span class="fa fa-angle-right"></span>&nbsp;
         {% trans "Confirm delete" %}
     </span>
@@ -16,7 +19,7 @@
         <button type="submit" class="btn btn--delete">
             {% trans "Confirm Delete" %}
         </button>
-        <a href="{% get_admin_url 'account' 'user' 'detail' user %}" class="btn btn--transparent pull-right">
+        <a href="{% get_admin_url 'account' 'user' "detail" user %}" class="btn btn--transparent pull-right">
             {% trans "Cancel" %}
         </a>
     </form>

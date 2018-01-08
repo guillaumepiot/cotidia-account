@@ -37,18 +37,68 @@ class UserAddForm(BetterModelForm):
             "username",
             "is_active",
             "is_staff",
+            "groups",
+            "user_permissions",
+        ]
+        fieldsets = (
+            ('info', {'fields': (('first_name', 'last_name'), ('email', 'username'),), 'legend': 'User details'}),
+            ('role', {'fields': ('is_active', 'is_staff', 'groups', 'user_permissions'), 'legend': 'Roles & Permissions'}),
+        )
+
+
+class SuperUserAddForm(UserAddForm):
+    class Meta:
+        model = User
+        fields = [
+            "first_name",
+            "last_name",
+            "email",
+            "username",
+            "is_active",
+            "is_staff",
             "is_superuser",
             "groups",
             "user_permissions",
         ]
         fieldsets = (
             ('info', {'fields': (('first_name', 'last_name'), ('email', 'username'),), 'legend': 'User details'}),
-            # ('security', {'fields': ('password',), 'legend': 'Security'}),
             ('role', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'), 'legend': 'Roles & Permissions'}),
         )
 
 
 class UserUpdateForm(UserAddForm, UserChangeForm):
+
+    password = ReadOnlyPasswordHashField()
+
+    class Meta:
+        model = User
+        fields = [
+            "first_name",
+            "last_name",
+            "email",
+            "username",
+            "is_active",
+            "is_staff",
+            "groups",
+            "user_permissions"
+        ]
+        fieldsets = (
+            ('info', {'fields': (('first_name', 'last_name'), ('email', 'username'),), 'legend': 'User details'}),
+            ('role', {'fields': ('is_active', 'is_staff', 'groups', 'user_permissions'), 'legend': 'Roles & Permissions'}),
+        )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        instance = kwargs["instance"]
+
+        self.fields['password'].help_text = _(
+            "Raw passwords are not stored, so there is no way to see "
+            "this user's password. <br><a href=\"{}\" class=\"btn btn--small\">Change password</a>".format(
+                reverse("account-admin:user-change-password", args=[instance.id]))
+        )
+
+
+class SuperUserUpdateForm(UserAddForm, UserChangeForm):
 
     password = ReadOnlyPasswordHashField()
 

@@ -4,7 +4,7 @@
 {% block title %}{% trans "Enable Two-Factor Authentication" %}{% endblock %}
 
 {% block content %}
-<form method="post" action=".">
+<form method="post" action="">
     {% csrf_token %}
     <div class="dialog dialog--small">
         <div class="dialog__content dialog__content--small">
@@ -12,7 +12,7 @@
                 {% include "admin/account/includes/dialog_header.html" %}
             {% endblock %}
             <div class="dialog__body dialog-section--padded">
-                {% include "admin/includes/messages.html" %}
+                {% include "admin/generic/messages.html" %}
                 <h3>{% trans "Enable Two-Factor Authentication" %}</h3>
                 {% if wizard.steps.current == 'welcome' %}
                     <p>{% blocktrans %}You are about to take your account security to the
@@ -87,12 +87,14 @@
                 <div style="margin-left: -9999px"><input type="submit" value=""/></div>
             </div>
             <div class="dialog__footer dialog-footer dialog-section--padded">
-                <div class="dialog-footer__actions">
-                    <a href="{% url 'account-admin:edit' %}" class="pull-right btn btn--transparent">{% trans "Cancel" %}</a>
+                <div class="dialog-footer__actions dialog-footer__actions--center">
+
                     {% if wizard.steps.prev %}
                       <button name="wizard_goto_step" type="submit"
                               value="{{ wizard.steps.prev }}"
                               class="btn btn-default">{% trans "Back" %}</button>
+                    {% else %}
+                    <a href="{% url 'account-admin:edit' %}" class="pull-right btn btn--transparent">{% trans "Cancel" %}</a>
                     {% endif %}
                     <button type="submit" class="btn btn--primary">{% trans "Next" %}</button>
                 </div>
