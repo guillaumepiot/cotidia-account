@@ -29,11 +29,11 @@ setup(
     namespace_packages=['cotidia'],
     include_package_data=True,
     install_requires=[
-        'django>=1.11.3',
-        'djangorestframework>=3.5.1',
-        'django-two-factor-auth>=1.6',
-        'django-appconf>=1.0.2',
-        'django-formtools>=2.0'
+        'django==2.0.*',
+        'djangorestframework==3.7.*',
+        'django-two-factor-auth==1.7.*',
+        'django-appconf==1.0.*',
+        'django-formtools==2.1.*'
     ],
     classifiers=[
         'Framework :: Django',
