@@ -352,7 +352,7 @@ class UserAdminTests(BaseAdminTestCase):
         # Check that mail is sent
         self.assertEquals(len(mail.outbox), 1)
 
-    def test_staff_can_not_change_user_password(self):
+    def test_staff_can_not_change_superuser_password(self):
         """Test a staff user can't update another user's password."""
 
         # We login as a staff user with no permission
@@ -366,7 +366,28 @@ class UserAdminTests(BaseAdminTestCase):
         self.admin_user.user_permissions.add(perm)
 
         response = self.client.get(
-            reverse('account-admin:user-change-password', kwargs={'pk': self.normal_user.pk})
+            reverse('account-admin:user-change-password', kwargs={'pk': self.superuser.pk})
         )
         self.assertEquals(response.status_code, 403)
+
+    def test_staff_can_change_staff_password(self):
+        """Test a staff user can update another staff user's password."""
+
+        # We login as a staff user with no permission
+        self.client.login(
+            username=self.admin_user.email,
+            password=self.admin_user_pwd
+        )
+
+        self.normal_user.is_staff = True
+        self.normal_user.save()
+
+        # Add the change user permission
+        perm = Permission.objects.get(codename='change_user')
+        self.admin_user.user_permissions.add(perm)
+
+        response = self.client.get(
+            reverse('account-admin:user-change-password', kwargs={'pk': self.normal_user.pk})
+        )
+        self.assertEquals(response.status_code, 200)
 

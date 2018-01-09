@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import path
 
 from .views import (
     ProfileCreate,
@@ -6,19 +6,21 @@ from .views import (
     ProfileDelete,
 )
 
+app_name = 'profile'
+
 urlpatterns = [
-    url(
-        r'^add/(?P<user_id>[\d]+)$',
+    path(
+        'add/<int:user_id>',
         ProfileCreate.as_view(),
         name='profile-add'
     ),
-    url(
-        r'^(?P<pk>[\d]+)/update$',
+    path(
+        '<int:pk>/update',
         ProfileUpdate.as_view(),
         name='profile-update'
     ),
-    url(
-        r'^(?P<pk>[\d]+)/delete$',
+    path(
+        '<int:pk>/delete',
         ProfileDelete.as_view(),
         name='profile-delete'
     )

@@ -239,6 +239,8 @@ class UserChangePassword(AdminUpdateView):
         """Superuser only."""
         if user.is_superuser:
             return True
+        elif user.is_staff and not self.get_object().is_superuser:
+            return True
         return False
 
     def dispatch(self, request, *args, **kwargs):

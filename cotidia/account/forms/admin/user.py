@@ -80,7 +80,8 @@ class UserUpdateForm(UserAddForm, UserChangeForm):
             "is_active",
             "is_staff",
             "groups",
-            "user_permissions"
+            "user_permissions",
+            "password"
         ]
         fieldsets = (
             ('info', {'fields': (('first_name', 'last_name'), ('email', 'username'),), 'legend': 'User details'}),
