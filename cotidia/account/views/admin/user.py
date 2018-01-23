@@ -1,4 +1,5 @@
 import django_filters
+import importlib
 
 from django.db.models import Q
 from django.http import HttpResponseRedirect
@@ -6,6 +7,8 @@ from django.urls import reverse
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.apps import apps
+
+from betterforms.multiform import MultiModelForm
 
 from cotidia.account.conf import settings
 from cotidia.admin.views import (
@@ -170,7 +173,42 @@ class UserCreate(AdminCreateView):
 
         return response
 
-    def get_form_class(self):
+    @property
+    def form_class(self):
+        try:
+            module_name = '.'.join(settings.ACCOUNT_PROFILE_FORM.split('.')[:-1])
+            form_name = settings.ACCOUNT_PROFILE_FORM.split('.')[-1]
+            module = importlib.import_module(module_name)
+
+            class TempMultiForm(MultiModelForm):
+                form_classes = {
+                    'user': self.get_single_form_class(),
+                    'profile': getattr(module, form_name)
+                }
+
+                def save(self, commit=True):
+                    objects = super(TempMultiForm, self).save(commit=False)
+
+                    if commit:
+                        user = objects['user']
+                        user.save()
+                        profile = objects['profile']
+                        profile.user = user
+                        profile.save()
+
+                    return objects.get("user")
+
+            return TempMultiForm
+        except AttributeError as e:
+            # Checks to see the attribute error is raised due to the setting
+            # not existing not due to the module not having the given form
+            if "'ACCOUNT_PROFILE_FORM'" in str(e):
+                return self.get_single_form_class()
+            else:
+                # If the error is not due to a missing setting we fail loudly
+                raise
+
+    def get_single_form_class(self):
         if self.request.user.is_superuser:
             return SuperUserAddForm
         else:
