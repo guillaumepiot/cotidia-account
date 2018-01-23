@@ -176,33 +176,37 @@ class UserCreate(AdminCreateView):
     @property
     def form_class(self):
         try:
-            module_name = '.'.join(settings.ACCOUNT_PROFILE_FORM.split('.')[:-1])
-            form_name = settings.ACCOUNT_PROFILE_FORM.split('.')[-1]
-            module = importlib.import_module(module_name)
+            # This is here to throw an attribute error if it does not exist
+            if settings.ACCOUNT_PROFILE_MODEL:
+                module_name = '.'.join(settings.ACCOUNT_PROFILE_FORM.split('.')[:-1])
+                form_name = settings.ACCOUNT_PROFILE_FORM.split('.')[-1]
+                module = importlib.import_module(module_name)
 
-            class TempMultiForm(MultiModelForm):
-                form_classes = {
-                    'user': self.get_single_form_class(),
-                    'profile': getattr(module, form_name)
-                }
+                class TempMultiForm(MultiModelForm):
+                    form_classes = {
+                        'user': self.get_single_form_class(),
+                        'profile': getattr(module, form_name)
+                    }
 
-                def save(self, commit=True):
-                    objects = super(TempMultiForm, self).save(commit=False)
+                    def save(self, commit=True):
+                        objects = super(TempMultiForm, self).save(commit=False)
 
-                    if commit:
-                        user = objects['user']
-                        user.save()
-                        profile = objects['profile']
-                        profile.user = user
-                        profile.save()
+                        if commit:
+                            user = objects['user']
+                            user.save()
+                            profile = objects['profile']
+                            profile.user = user
+                            profile.save()
 
-                    return objects.get("user")
+                        return objects.get("user")
 
-            return TempMultiForm
+                return TempMultiForm
+            else:
+                return self.get_single_form_class()
         except AttributeError as e:
             # Checks to see the attribute error is raised due to the setting
             # not existing not due to the module not having the given form
-            if "'ACCOUNT_PROFILE_FORM'" in str(e):
+            if "'ACCOUNT_PROFILE_MODEL'" in str(e):
                 return self.get_single_form_class()
             else:
                 # If the error is not due to a missing setting we fail loudly
