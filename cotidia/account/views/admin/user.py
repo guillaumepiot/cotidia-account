@@ -43,7 +43,8 @@ class UserFilter(django_filters.FilterSet):
         return queryset.filter(
             Q(first_name__icontains=value) |
             Q(last_name__icontains=value) |
-            Q(email__icontains=value)
+            Q(email__icontains=value) |
+            Q(uuid=value)
         )
 
 
@@ -83,6 +84,10 @@ class UserDetail(AdminDetailView):
                     {
                         "label": "Username",
                         "field": "username",
+                    },
+                    {
+                        "label": "User ID",
+                        "field": "uuid",
                     }
                 ]
             ]
