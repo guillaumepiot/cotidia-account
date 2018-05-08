@@ -1,5 +1,6 @@
 import django_filters
 import importlib
+import uuid
 
 from django.db.models import Q
 from django.http import HttpResponseRedirect
@@ -40,12 +41,18 @@ class UserFilter(django_filters.FilterSet):
         fields = ['first_name']
 
     def search(self, queryset, name, value):
-        return queryset.filter(
-            Q(first_name__icontains=value) |
-            Q(last_name__icontains=value) |
-            Q(email__icontains=value) |
-            Q(uuid=value)
-        )
+
+        q_objects = Q(first_name__icontains=value) | \
+            Q(last_name__icontains=value) | \
+            Q(email__icontains=value)
+
+        try:
+            val = uuid.UUID(value, version=4)
+            q_objects |= Q(uuid=val)
+        except ValueError:
+            pass
+
+        return queryset.filter(q_objects)
 
 
 class UserList(AdminListView):
