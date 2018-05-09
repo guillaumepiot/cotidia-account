@@ -3,7 +3,7 @@
     {% trans "Dashboard" %}
 {% endblock title %}
 
-{% block toolbar %}<span class="toolbar__breadcrumbs">{% trans "Dashboard" %}</span>{% endblock toolbar %}
+{% block toolbar_title %}{% trans "Dashboard" %}{% endblock toolbar_title %}
 {% block page_content %}
 <div class="content__inner box box--padded box--bordered">
     <p>Welcome to the {{SITE_NAME}} dashboard.</p>
