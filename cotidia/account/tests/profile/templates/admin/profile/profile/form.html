@@ -1,20 +1,18 @@
 {% extends "admin/generic/page/form.html" %}{% load i18n admin_toolbar_tags admin_list_tags %}
 
-{% block toolbar %}
-    <span class="toolbar__breadcrumbs">
-        <a href="{% get_admin_url 'account' 'user' 'detail' user %}">{{user}}</a>
-        &nbsp;<span class="fa fa-angle-right"></span>&nbsp;
-        {% if object %}
-            {% blocktrans with verbose_name as verbose_name %}
-                Edit {{verbose_name}}
-            {% endblocktrans %}
-        {% else %}
-            {% blocktrans with verbose_name as verbose_name %}
-                Add {{verbose_name}}
-            {% endblocktrans %}
-        {% endif %}
-    </span>
-{% endblock toolbar %}
+{% block content_title %}
+    <a href="{% get_admin_url 'account' 'user' 'detail' user %}">{{user}}</a>
+    &nbsp;<span class="fa fa-angle-right"></span>&nbsp;
+    {% if object %}
+        {% blocktrans with verbose_name as verbose_name %}
+            Edit {{verbose_name}}
+        {% endblocktrans %}
+    {% else %}
+        {% blocktrans with verbose_name as verbose_name %}
+            Add {{verbose_name}}
+        {% endblocktrans %}
+    {% endif %}
+{% endblock content_title %}
 
 {% block form_actions %}
 <div class="form__actions">

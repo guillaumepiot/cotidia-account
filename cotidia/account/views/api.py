@@ -1,6 +1,10 @@
 from django.db import transaction
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.contrib.auth.tokens import default_token_generator as token_generator
+from django.urls import reverse
 
 from rest_framework import status
 from rest_framework.views import APIView
@@ -248,16 +252,25 @@ class ResetPassword(APIView):
             token = default_token_generator.make_token(user)
 
             if hasattr(settings, 'APP_URL'):
-                APP_URL = settings.APP_URL
+                url = '{0}/reset-password/{1}/{2}/'.format(
+                    settings.APP_URL,
+                    user.uuid,
+                    token
+                )
             else:
-                APP_URL = settings.SITE_URL
-
-            url = '{0}/reset-password/{1}/{2}/'.format(
-                APP_URL, user.uuid, token)
+                url = settings.SITE_URL + reverse(
+                    'account-public:password_reset_confirm',
+                    kwargs={
+                        'uidb64': urlsafe_base64_encode(force_bytes(user.pk)).decode(),
+                        'token': token_generator.make_token(user)
+                    }
+                )
 
             notice = ResetPasswordNotice(
                 recipients=['%s <%s>' % (user.get_full_name(), user.email)],
                 context={
+                    'debug': settings.DEBUG,
+                    'site_url': settings.SITE_URL,
                     'url': url,
                     'first_name': user.first_name
                 }
