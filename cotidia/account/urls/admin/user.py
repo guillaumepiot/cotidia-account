@@ -1,4 +1,5 @@
 from django.conf.urls import url
+from django.urls import path
 
 from cotidia.account.views.admin.user import (
     UserList,
@@ -23,8 +24,8 @@ urlpatterns = [
         UserCreate.as_view(),
         name='user-add'
     ),
-    url(
-        r'^(?P<pk>[\d]+)$',
+    path(
+        '<pk>',
         UserDetail.as_view(),
         name='user-detail'
     ),
