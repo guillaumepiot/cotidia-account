@@ -1,0 +1,39 @@
+{% extends "admin/generic/page/form.html" %}
+{% block footer_scripts %}
+{{block.super}}
+<script>
+    var isStaffElm = document.getElementById('id_is_staff')
+    if (!isStaffElm) {
+        var isStaffElm = document.getElementById('id_user-is_staff')
+    }
+    var isSuperuserElm = document.getElementById('id_is_superuser')
+    if (!isSuperuserElm) {
+        var isSuperuserElm = document.getElementById('id_user-is_superuser')
+    }
+    var groupsElm = document.getElementById('id_groups')
+    if (!groupsElm) {
+        var groupsElm = document.getElementById('id_user-groups')
+    }
+    var userPermissionsElm = document.getElementById('id_user_permissions')
+    if (!userPermissionsElm) {
+        var userPermissionsElm = document.getElementById('id_user-user_permissions')
+    }
+    isStaffElm.addEventListener('change', function () {
+        togglePermissions()
+    })
+
+    function togglePermissions() {
+        if (isStaffElm.checked) {
+            groupsElm.parentNode.parentNode.parentNode.style.display = 'block';
+            userPermissionsElm.parentNode.parentNode.parentNode.style.display = 'block';
+            isSuperuserElm.parentNode.parentNode.parentNode.style.display = 'block';
+        } else {
+            groupsElm.parentNode.parentNode.parentNode.style.display = 'none';
+            userPermissionsElm.parentNode.parentNode.parentNode.style.display = 'none';
+            isSuperuserElm.parentNode.parentNode.parentNode.style.display = 'none';
+        }
+    }
+
+    togglePermissions();
+</script>
+{% endblock footer_scripts %}
