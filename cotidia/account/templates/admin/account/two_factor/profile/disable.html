@@ -7,9 +7,9 @@
     {% trans "Disable Two-factor Authentication" %}
 {% endblock title %}
 
-{% block toolbar %}
-    <span class="toolbar__breadcrumbs">{% trans "Account Security" %}</span>
-{% endblock toolbar %}
+{% block content_title %}
+    {% trans "Account Security" %}
+{% endblock content_title %}
 
 {% block page_content %}
 <form method="post" class="form">
@@ -29,7 +29,7 @@
     <div class="form__actions">
         <div class="form__actions-inner">
             <button class="btn btn--delete" type="submit">{% trans "Disable" %}</button>
-            <a href="{% url 'account-admin:profile'%}" class="pull-right btn btn--transparent">{% trans "Back to Account Security" %}</a>
+            <a href="{% url 'account-admin:profile'%}" class="pull-right btn btn--cancel">{% trans "Back to Account Security" %}</a>
         </div>
     </div>
 </form>

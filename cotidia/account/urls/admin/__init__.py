@@ -1,7 +1,8 @@
-from django.conf.urls import url, include
+from django.conf.urls import url
+from django.urls import path, include
 from django.contrib.auth import views as auth_views
 
-from cotidia.account.views.two_factor import (
+from cotidia.account.views.admin.two_factor import (
     LoginView
 )
 from cotidia.account.views.admin import login_remember_me
@@ -91,10 +92,13 @@ urlpatterns = [
 if settings.ACCOUNT_ENABLE_TWO_FACTOR is True:
     # Two factor auth pattern
     urlpatterns += [
-        url(r'two-factor/', include('cotidia.account.urls.admin.two_factor')),
-        url(
-            regex=r'^login$',
-            view=LoginView.as_view(),
+        path(
+            'two-factor/',
+            include('cotidia.account.urls.admin.two_factor')
+        ),
+        path(
+            'login',
+            LoginView.as_view(),
             name='login',
         ),
     ]

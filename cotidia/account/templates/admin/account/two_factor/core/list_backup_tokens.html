@@ -7,9 +7,9 @@
     {% trans "Backup Tokens" %}
 {% endblock title %}
 
-{% block toolbar %}
-    <span class="toolbar__breadcrumbs">{% trans "Account Security" %}</span>
-{% endblock toolbar %}
+{% block content_title %}
+    {% trans "Account Security" %}
+{% endblock content_title %}
 
 {% block page_content %}
 <form method="post" action="" class="form">
@@ -55,7 +55,7 @@
     </fieldset>
     <div class="form__actions">
         <div class="form__actions-inner">
-            <a href="{% url 'account-admin:profile'%}" class="pull-right btn btn--transparent">{% trans "Back to Account Security" %}</a>
+            <a href="{% url 'account-admin:profile'%}" class="pull-right btn btn--cancel">{% trans "Back to Account Security" %}</a>
             <a href="{% url 'account-admin:generate_backup_tokens'%}" class="btn btn--create">{% trans "Generate New Tokens" %}</a>
         </div>
     </div>

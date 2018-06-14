@@ -31,7 +31,7 @@ class AccountMiddleware(MiddlewareMixin):
                         request,
                         "You must setup two-factor authentication to access "
                         "the administration panel."
-                        )
+                    )
                     return HttpResponseRedirect(reverse('account-admin:setup'))
 
         return None

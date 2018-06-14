@@ -5,11 +5,13 @@ from django.shortcuts import render, redirect, resolve_url, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
+from django.contrib import messages
 
 from django_otp import devices_for_user, user_has_device
 from django_otp.decorators import otp_required
 from django_otp.plugins.otp_static.models import StaticToken
 
+from two_factor.models import get_available_phone_methods
 from two_factor.views.utils import class_view_decorator
 from two_factor.views.core import (
     LoginView as BaseLoginView,
@@ -229,7 +231,7 @@ class GenerateBackupTokensView(View):
 @class_view_decorator(never_cache)
 @class_view_decorator(login_required)
 class SetupView(BaseSetupView):
-    redirect_url = 'account-admin:setup_complete'
+    success_url = 'account-admin:setup_complete'
     qrcode_url = 'account-admin:qr'
     template_name = 'admin/account/two_factor/core/setup.html'
     form_list = (
@@ -252,15 +254,21 @@ class SetupCompleteView(BaseSetupCompleteView):
 @class_view_decorator(never_cache)
 @class_view_decorator(otp_required)
 class PhoneSetupView(BasePhoneSetupView):
+    success_url = 'account-admin:profile'
     template_name = 'admin/account/two_factor/core/phone_register.html'
     form_list = (
         ('setup', PhoneNumberMethodForm),
         ('validation', DeviceValidationForm),
     )
 
-    def done(self, form_list, **kwargs):
-        self.get_device(user=self.request.user, name='backup').save()
-        return redirect(resolve_url('account-admin:profile'))
+    def get(self, request, *args, **kwargs):
+        if not get_available_phone_methods():
+            messages.warning(
+                self.request,
+                'No phone or SMS method set.'
+            )
+            return redirect(self.success_url)
+        return super().get(request, *args, **kwargs)
 
 
 @class_view_decorator(never_cache)

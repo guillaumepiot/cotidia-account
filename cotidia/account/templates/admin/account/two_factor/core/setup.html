@@ -87,16 +87,15 @@
                 <div style="margin-left: -9999px"><input type="submit" value=""/></div>
             </div>
             <div class="dialog__footer dialog-footer dialog-section--padded">
-                <div class="dialog-footer__actions dialog-footer__actions--center">
-
-                    {% if wizard.steps.prev %}
-                      <button name="wizard_goto_step" type="submit"
-                              value="{{ wizard.steps.prev }}"
-                              class="btn btn-default">{% trans "Back" %}</button>
-                    {% else %}
-                    <a href="{% url 'account-admin:edit' %}" class="pull-right btn btn--transparent">{% trans "Cancel" %}</a>
-                    {% endif %}
+                <div class="dialog-footer__actions">
                     <button type="submit" class="btn btn--primary">{% trans "Next" %}</button>
+                </div>
+                <div class="dialog-footer__actions">
+                    {% if wizard.steps.prev %}
+                    <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}"  class="btn btn--cancel">{% trans "Back" %}</button>
+                    {% else %}
+                    <a href="{% url 'account-admin:edit' %}" class="btn btn--cancel">{% trans "Cancel" %}</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
