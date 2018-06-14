@@ -4,6 +4,7 @@ from django.views import View
 from django.shortcuts import render, redirect, resolve_url, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.urls import reverse
 
 from django_otp import devices_for_user, user_has_device
 from django_otp.decorators import otp_required
@@ -45,6 +46,12 @@ class LoginView(BaseLoginView):
         ('token', AuthenticationTokenForm),
         ('backup', BackupTokenForm),
     )
+
+    def get_context_data(self, form, **kwargs):
+        context = super().get_context_data(form, **kwargs)
+        context['next'] = self.request.GET.get('next') \
+            or reverse('account-admin:dashboard')
+        return context
 
 
 @class_view_decorator(never_cache)
