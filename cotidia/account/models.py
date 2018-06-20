@@ -90,6 +90,7 @@ class User(AbstractUser):
             )
 
         notice = NewUserActivationNotice(
+            sender=settings.DEFAULT_FROM_EMAIL,
             recipients=['{0} <{1}>'.format(
                 self.get_full_name(), self.email
             )],
@@ -114,6 +115,7 @@ class User(AbstractUser):
             'site_name': settings.SITE_NAME
         }
         notice = UserInvitationNotice(
+            sender=settings.DEFAULT_FROM_EMAIL,
             recipients=['{0} <{1}>'.format(
                 self.get_full_name(), self.email
             )],

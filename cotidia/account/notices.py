@@ -1,4 +1,5 @@
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
 from cotidia.mail.notice import Notice
 
@@ -12,7 +13,9 @@ class NewUserActivationNotice(Notice):
 
     default_context = {
         'url': "url",
-        'firstname': "Guillaume"
+        'firstname': "Guillaume",
+        'site_url': settings.SITE_URL,
+        'site_name': settings.SITE_NAME
     }
 
 
@@ -26,6 +29,8 @@ class ResetPasswordNotice(Notice):
     default_context = {
         'url': "url",
         'firstname': "Guillaume",
+        'site_url': settings.SITE_URL,
+        'site_name': settings.SITE_NAME
     }
 
 
@@ -39,6 +44,6 @@ class UserInvitationNotice(Notice):
     default_context = {
         'url': "url",
         'firstname': "Guillaume",
-        'site_url': "http://localhost:8000",
-        'site_name': "Test website"
+        'site_url': settings.SITE_URL,
+        'site_name': settings.SITE_NAME
     }
