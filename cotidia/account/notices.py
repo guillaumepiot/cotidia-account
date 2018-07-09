@@ -15,7 +15,8 @@ class NewUserActivationNotice(Notice):
         'url': "url",
         'firstname': "Guillaume",
         'site_url': settings.SITE_URL,
-        'site_name': settings.SITE_NAME
+        'site_name': settings.SITE_NAME,
+        'debug': settings.DEBUG,
     }
 
 
@@ -30,7 +31,8 @@ class ResetPasswordNotice(Notice):
         'url': "url",
         'firstname': "Guillaume",
         'site_url': settings.SITE_URL,
-        'site_name': settings.SITE_NAME
+        'site_name': settings.SITE_NAME,
+        'debug': settings.DEBUG,
     }
 
 
@@ -45,5 +47,6 @@ class UserInvitationNotice(Notice):
         'url': "url",
         'firstname': "Guillaume",
         'site_url': settings.SITE_URL,
-        'site_name': settings.SITE_NAME
+        'site_name': settings.SITE_NAME,
+        'debug': settings.DEBUG,
     }
