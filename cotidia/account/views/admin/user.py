@@ -8,6 +8,7 @@ from django.urls import reverse
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.apps import apps
+from django import forms
 
 from betterforms.multiform import MultiModelForm
 
@@ -33,7 +34,8 @@ from cotidia.account.forms.admin.user import (
 class UserFilter(django_filters.FilterSet):
     first_name = django_filters.CharFilter(
         label="Search",
-        method="search"
+        method="search",
+        widget=forms.TextInput(attrs={'placeholder': 'Search'})
     )
 
     class Meta:

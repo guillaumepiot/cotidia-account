@@ -3,10 +3,14 @@
     {% trans "Dashboard" %}
 {% endblock title %}
 
+{% block body_class %}content--padded{% endblock body_class %}
+
 {% block content_title %}{% trans "Dashboard" %}{% endblock content_title %}
 
 {% block page_content %}
-<div class="content__inner">
-    <p>Welcome to the {{SITE_NAME}} dashboard.</p>
+<div class="content__body">
+    <div class="content__inner">
+        <p>Welcome to the {{SITE_NAME}} dashboard.</p>
+    </div>
 </div>
 {% endblock page_content %}
