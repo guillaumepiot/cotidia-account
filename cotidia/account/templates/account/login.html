@@ -13,29 +13,29 @@
             <div class="dialog__body dialog-section--padded">
                 <h4>{% trans "Welcome back" %}</h4>
                 <p>{% trans "Please enter your email address and password below to login." %}</p>
-                    {% csrf_token %}
-                    {% if form.non_field_errors %}
-                        <div class="alert alert--error">
-                        {% for error in form.non_field_errors %}
-                            {{error}}<br>
-                        {% endfor %}
-                        </div>
-                    {% endif %}
-
-                    {% with form.username as field %}
-                        {% include 'admin/generic/form/form_group.html' %}
-                    {% endwith %}
-                    {% with form.password as field %}
-                        {% include 'admin/generic/form/form_group.html' %}
-                    {% endwith %}
-                    <div class="form-group">
-                        {{ form.remember_me.errors }}
-                        {{ form.remember_me.label_tag }}
-                        {{ form.remember_me }}
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <div class="alert alert--error">
+                    {% for error in form.non_field_errors %}
+                        {{error}}<br>
+                    {% endfor %}
                     </div>
+                {% endif %}
 
-                    <input type="hidden" name="next" value="{% if next %}{{ next }}{% else %}{% url 'account-public:dashboard' %}{% endif %}" />
-
+                {% with form.username as field %}
+                    {% include 'admin/generic/form/form_group.html' %}
+                {% endwith %}
+                {% with form.password as field %}
+                    {% include 'admin/generic/form/form_group.html' %}
+                {% endwith %}
+                <div class="form-group">
+                    {{ form.remember_me.errors }}
+                    {{ form.remember_me.label_tag }}
+                    {{ form.remember_me }}
+                </div>
+                {% if next %}
+                <input type="hidden" name="next" value="{{ next }}" />
+                {% endif %}
             </div>
             <div class="dialog__footer dialog-footer dialog-section--padded">
                 <div class="dialog-footer__actions">
