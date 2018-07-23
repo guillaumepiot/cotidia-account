@@ -97,9 +97,9 @@ urlpatterns = [
 if settings.ACCOUNT_ALLOW_SIGN_IN:
     urlpatterns += [
         url(
-            r'^login/$',
+            r'^sign-in/$',
             LoginView.as_view(),
-            name='login',
+            name='sign-in',
         ),
     ]
 

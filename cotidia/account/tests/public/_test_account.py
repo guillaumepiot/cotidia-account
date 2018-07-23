@@ -16,7 +16,7 @@ class AccountPublicTests(TestCase):
 
     def get_confirmation_url_from_email(self, email_message):
         site_url = settings.SITE_URL.replace('/', '\/')
-        exp = r'('+site_url+'\/([a-z\-\/]+)?account\/activate\/(.*)\/(.*))'
+        exp = r'(' + site_url + '\/([a-z\-\/]+)?account\/activate\/(.*)\/(.*))'
         m = re.search(exp, email_message)
         confirmation_url = m.group()
 
@@ -41,7 +41,7 @@ class AccountPublicTests(TestCase):
             'username': 'test@test.com',
             'password': 'demo123',
         }
-        response = self.client.post(reverse("account-public:login"), data)
+        response = self.client.post(reverse("account-public:sign-in"), data)
         # Should not redirect as not allowed to login
         self.assertEquals(response.status_code, 200)
 
@@ -71,7 +71,7 @@ class AccountPublicTests(TestCase):
             'username': 'test@test.com',
             'password': 'demo123',
         }
-        response = self.client.post(reverse("account-public:login"), data)
+        response = self.client.post(reverse("account-public:sign-in"), data)
         self.assertEquals(response.status_code, 302)
 
         # test logout
@@ -143,6 +143,6 @@ class AccountPublicTests(TestCase):
             'username': 'TEST@test.com',
             'password': 'demo123',
         }
-        response = self.client.post(reverse("account-public:login"), data)
+        response = self.client.post(reverse("account-public:sign-in"), data)
         # Shoud not redirect as not allowed to login
         self.assertEquals(response.status_code, 200)
