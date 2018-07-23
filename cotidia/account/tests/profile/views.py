@@ -6,6 +6,8 @@ from cotidia.admin.views import (
     AdminUpdateView,
     AdminDeleteView,
 )
+from cotidia.admin.templatetags.admin_list_tags import get_admin_url
+from cotidia.admin.views.mixin import ContextMixin
 
 from .models import Profile
 from .forms import (
@@ -14,7 +16,25 @@ from .forms import (
 )
 
 
-class ProfileCreate(AdminCreateView):
+class ProfileAdminMixin(ContextMixin):
+    def get_list_url(self):
+        if hasattr(self.model, 'SearchProvider'):
+            return reverse(
+                "generic-admin:list",
+                kwargs={
+                    "app_label": "account",
+                    "model": "user"
+                }
+            )
+        else:
+            return get_admin_url(
+                "account",
+                "user",
+                'list'
+            )
+
+
+class ProfileCreate(AdminCreateView, ProfileAdminMixin):
     model = Profile
     form_class = ProfileAddForm
 
@@ -39,7 +59,7 @@ class ProfileCreate(AdminCreateView):
         return context
 
 
-class ProfileUpdate(AdminUpdateView):
+class ProfileUpdate(AdminUpdateView, ProfileAdminMixin):
     model = Profile
     form_class = ProfileUpdateForm
 
@@ -57,7 +77,7 @@ class ProfileUpdate(AdminUpdateView):
         return context
 
 
-class ProfileDelete(AdminDeleteView):
+class ProfileDelete(AdminDeleteView, ProfileAdminMixin):
     model = Profile
 
     def build_success_url(self):
