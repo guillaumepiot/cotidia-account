@@ -14,7 +14,9 @@ from cotidia.account.views.public import (
     sign_up,
     activate,
     activation_pending,
-    resend_activation_link)
+    resend_activation_link,
+    InviteView
+)
 
 u_re = r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 
@@ -69,6 +71,11 @@ urlpatterns = [
             'subject_template_name': 'account/password_reset_subject.txt'
         },
         name='password_reset',
+    ),
+    url(
+        r'^invite/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$',
+        InviteView.as_view(),
+        name='invite',
     ),
     url(
         r'^password/reset/confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$',

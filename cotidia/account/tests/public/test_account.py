@@ -4,8 +4,12 @@ from django.core import mail
 from django.urls import reverse
 from django.test import TestCase
 from django.test import override_settings
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 
 from cotidia.account.conf import settings
+from cotidia.account.factory import UserFactory
 
 
 @override_settings(ACCOUNT_ENABLE_TWO_FACTOR=False)
@@ -146,3 +150,48 @@ class AccountPublicTests(TestCase):
         response = self.client.post(reverse("account-public:sign-in"), data)
         # Shoud not redirect as not allowed to login
         self.assertEquals(response.status_code, 200)
+
+    def test_send_match_email_redirect(self):
+        """
+        We need to cover a scenario when the user reset his password then
+        click again on the invitation link. That link must then redirect to
+        sign in if the user has set his password already.
+        """
+
+        user = UserFactory.create()
+
+        # User access his password the first time
+        uid = urlsafe_base64_encode(force_bytes(user.pk)).decode()
+        token = default_token_generator.make_token(user)
+        invite_url = reverse(
+            'account-public:invite',
+            kwargs={'uidb64': uid, 'token': token}
+        )
+
+        reset_url = reverse(
+            'account-public:password_reset_confirm',
+            kwargs={'uidb64': uid, 'token': token}
+        )
+
+        sign_in_url = reverse('account-public:sign-in')
+
+        # Invite url should redirect to reset password
+        response = self.client.get(invite_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response['Location'],
+            reset_url
+        )
+
+        # Now a user with password should get redirected to sign in
+        user.set_password('demo1234')
+        user.save()
+
+        # Invite url should redirect to reset password
+        response = self.client.get(invite_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response['Location'],
+            sign_in_url
+        )
+

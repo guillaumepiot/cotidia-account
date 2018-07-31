@@ -4,19 +4,26 @@ from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
+from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import LoginView as AuthLoginView
+from django.contrib.auth.views import (
+    LoginView as AuthLoginView,
+    PasswordResetConfirmView
+)
 from django.contrib.auth.views import LogoutView as AuthLogoutView
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib import messages
+from django.views.decorators.debug import sensitive_post_parameters
+from django.views.decorators.cache import never_cache
+
 from cotidia.account.conf import settings
 
 from cotidia.account.forms import (
     UpdateDetailsForm,
     AccountUserCreationForm,
     EmailAuthenticationForm
-    )
+)
 from cotidia.account.models import User
 from cotidia.account import signals
 
@@ -107,7 +114,7 @@ def sign_up(
                 new_user = authenticate(
                     username=user.username,
                     password=form.cleaned_data['password1']
-                    )
+                )
                 auth_login(request, new_user)
                 messages.success(
                     request, _('Your have successfully signed up'))
@@ -127,8 +134,8 @@ def sign_up(
                         'account-public:activation-pending',
                         kwargs={
                             'uuid': user.uuid
-                            })
-                        )
+                        })
+                    )
             elif success_url:
                 return HttpResponseRedirect(success_url)
             else:
@@ -182,8 +189,23 @@ def resend_activation_link(request, uuid):
         request, "The activate link has been resent to your email address.")
 
     return HttpResponseRedirect(
-            reverse(
-                "account-public:activation-pending",
-                kwargs={"uuid": user.uuid}
-            )
+        reverse(
+            "account-public:activation-pending",
+            kwargs={"uuid": user.uuid}
         )
+    )
+
+
+class InviteView(PasswordResetConfirmView):
+    """Invitation landing, redirect to sign in or password reset."""
+
+    def dispatch(self, *args, **kwargs):
+        user = self.get_user(kwargs['uidb64'])
+
+        if user.password:
+            return HttpResponseRedirect(reverse('account-public:sign-in'))
+        else:
+            return HttpResponseRedirect(reverse(
+                'account-public:password_reset_confirm',
+                kwargs={'uidb64': kwargs['uidb64'], 'token': kwargs['token']}
+            ))
