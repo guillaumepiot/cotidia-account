@@ -98,12 +98,12 @@ def sign_up(
     if request.method == "POST":
         form = sign_up_form(request.POST)
         if form.is_valid():
-            user = form.save()
-            user.set_password(form.cleaned_data["password1"])
+            user = form.save(commit=False)
             # Hash the email address to generate a unique username
             m = hashlib.md5()
             m.update(form.cleaned_data["email"].encode('utf-8'))
             user.username = m.hexdigest()[0:30]
+            user.set_password(form.cleaned_data["password1"])
             user.save()
 
             if settings.ACCOUNT_FORCE_ACTIVATION is True:
