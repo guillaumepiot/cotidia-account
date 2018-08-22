@@ -49,7 +49,8 @@ urlpatterns = [
     url(
         r'^password/change/$',
         auth_views.password_change,
-        {'template_name': 'account/password_change_form.html',
+        {
+            'template_name': 'account/password_change_form.html',
             'post_change_redirect': 'account-public:password_change_done',
             'password_change_form': AccountPasswordChangeForm},
         name='password_change',
