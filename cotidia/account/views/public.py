@@ -4,7 +4,6 @@ from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
-from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import (
     LoginView as AuthLoginView,
@@ -14,8 +13,6 @@ from django.contrib.auth.views import LogoutView as AuthLogoutView
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib import messages
-from django.views.decorators.debug import sensitive_post_parameters
-from django.views.decorators.cache import never_cache
 
 from cotidia.account.conf import settings
 
