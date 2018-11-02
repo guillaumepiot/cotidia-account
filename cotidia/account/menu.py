@@ -6,7 +6,8 @@ def admin_menu(context):
     return [
         {
             "icon": "wrench",
-            "text": "Settings",
+            "text": "Account management",
+            "description": "Manage users and roles.",
             "align_right": True,
             "nav_items": [
                 {
