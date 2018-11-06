@@ -21,7 +21,7 @@ urlpatterns = [
         name='user-list'
     ),
     url(
-        r'^admin$',
+        r'^admin/$',
         UserListAdmin.as_view(),
         name='user-list-admin'
     ),

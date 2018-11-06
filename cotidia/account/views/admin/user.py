@@ -85,7 +85,7 @@ class UserList(AdminListView):
     filterset = UserFilter
 
     def get_queryset(self):
-        return User.objects.exclude(
+        return super().get_queryset().exclude(
             Q(is_staff=True) | Q(is_superuser=True)
         )
 
@@ -111,7 +111,7 @@ class UserListAdmin(AdminListView):
             return False
 
     def get_queryset(self):
-        return User.objects.filter(
+        return super().get_queryset().filter(
             Q(is_staff=True) | Q(is_superuser=True)
         )
 
