@@ -12,11 +12,13 @@ def admin_menu(context):
             "nav_items": [
                 {
                     "text": "Users",
+                    "icon": "users",
                     "url": reverse("account-admin:user-list"),
                     "permissions": ["account.add_user", "account.change_user"],
                 },
                 {
                     "text": "Roles",
+                    "icon": "key",
                     "url": reverse("account-admin:group-list"),
                     "permissions": [
                         "perms.auth.add_group",
