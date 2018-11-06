@@ -31,6 +31,21 @@ from cotidia.account.forms.admin.user import (
 )
 
 
+class CheckUserMixin:
+    def check_user(self, user):
+        obj = self.get_object()
+        if obj.is_superuser:
+            if user.is_superuser:
+                return True
+        elif obj.is_staff:
+            if user.is_superuser:
+                return True
+        elif user.is_staff and user.has_perm('account.change_user'):
+            return True
+
+        return False
+
+
 class UserFilter(django_filters.FilterSet):
     first_name = django_filters.CharFilter(
         label="Search",
@@ -61,19 +76,47 @@ class UserList(AdminListView):
     columns = (
         ('Name', 'name'),
         ('Email', 'email'),
-        ('Superuser', 'is_superuser'),
-        ('Staff', 'is_staff'),
         ('Active', 'is_active'),
         ('Date Joined', 'date_joined'),
-
     )
     model = User
     row_click_action = "detail"
     row_actions = ['view']
     filterset = UserFilter
 
+    def get_queryset(self):
+        return User.objects.exclude(
+            Q(is_staff=True) | Q(is_superuser=True)
+        )
 
-class UserDetail(AdminDetailView):
+
+class UserListAdmin(AdminListView):
+    columns = (
+        ('Name', 'name'),
+        ('Email', 'email'),
+        ('Superuser', 'is_superuser'),
+        ('Staff', 'is_staff'),
+        ('Active', 'is_active'),
+        ('Date Joined', 'date_joined'),
+    )
+    model = User
+    row_click_action = "detail"
+    row_actions = ['view']
+    filterset = UserFilter
+
+    def check_user(self, user):
+        if user.is_superuser:
+            return True
+        else:
+            return False
+
+    def get_queryset(self):
+        return User.objects.filter(
+            Q(is_staff=True) | Q(is_superuser=True)
+        )
+
+
+class UserDetail(CheckUserMixin, AdminDetailView):
     model = User
     fieldsets = [
         {
@@ -233,9 +276,8 @@ class UserCreate(AdminCreateView):
             return UserAddForm
 
 
-class UserUpdate(AdminUpdateView):
+class UserUpdate(CheckUserMixin, AdminUpdateView):
     model = User
-    # form_class = UserUpdateForm
 
     def form_valid(self, form):
         previous_instance = self.get_object()
@@ -257,7 +299,7 @@ class UserUpdate(AdminUpdateView):
             return UserUpdateForm
 
 
-class UserInvite(AdminUpdateView):
+class UserInvite(CheckUserMixin, AdminUpdateView):
     model = User
     form_class = UserInviteForm
 
@@ -286,18 +328,23 @@ class UserInvite(AdminUpdateView):
 class UserDelete(AdminDeleteView):
     model = User
 
+    def check_user(self, user):
+        obj = self.get_object()
+        if obj.is_superuser:
+            if user.is_superuser:
+                return True
+        elif obj.is_staff:
+            if user.is_superuser:
+                return True
+        elif user.is_staff and user.has_perm('account.delete_user'):
+            return True
 
-class UserChangePassword(AdminUpdateView):
+        return False
+
+
+class UserChangePassword(CheckUserMixin, AdminUpdateView):
     model = User
     form_class = UserChangePasswordForm
-
-    def check_user(self, user):
-        """Superuser only."""
-        if user.is_superuser:
-            return True
-        elif user.is_staff and not self.get_object().is_superuser:
-            return True
-        return False
 
     def dispatch(self, request, *args, **kwargs):
         if self.get_object() == request.user:

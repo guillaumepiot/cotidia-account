@@ -3,6 +3,7 @@ from django.urls import path
 
 from cotidia.account.views.admin.user import (
     UserList,
+    UserListAdmin,
     UserCreate,
     UserDetail,
     UserUpdate,
@@ -18,6 +19,11 @@ urlpatterns = [
         r'^$',
         UserList.as_view(),
         name='user-list'
+    ),
+    url(
+        r'^admin$',
+        UserListAdmin.as_view(),
+        name='user-list-admin'
     ),
     url(
         r'^add$',

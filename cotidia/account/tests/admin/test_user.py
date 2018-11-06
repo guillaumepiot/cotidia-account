@@ -1,393 +1,487 @@
 from django.core import mail
 from django.urls import reverse
+from django.test import TestCase
 from django.contrib.auth.models import Group, Permission
-from django.test import override_settings
 
-
+from cotidia.account import fixtures
 from cotidia.account.models import User
 from cotidia.account.factory import UserFactory
-from cotidia.account.tests.admin.utils import BaseAdminTestCase
 
 
-class UserAdminTests(BaseAdminTestCase):
+class UserAdminTests(TestCase):
 
-    def test_user_add(self):
-        """Test we can add a user."""
+    @fixtures.normal_user
+    @fixtures.admin_user
+    @fixtures.superuser
+    def setUp(self):
 
-        self.check_page_permissions('account-admin', 'user-add', 'add_user')
+        # Create a new group
+        self.test_group = Group.objects.create(name="Test group")
+        # Get the add user permission
+        self.test_add_user_perm = Permission.objects.get(codename="add_user")
+        self.test_change_user_perm = Permission.objects.get(codename="change_user")
+        self.test_delete_user_perm = Permission.objects.get(codename="delete_user")
 
-        # Test with minimum data
-        data = {
-            'email': 'test@test.com',
-            'username': 'test@test.com',
+        self.test_users = {
+            'superuser': UserFactory.create(
+                first_name="Super",
+                last_name="User",
+                email='jack@user.com',
+                username='jack@user.com',
+                is_active=True,
+                is_staff=True,
+                is_superuser=True
+            ),
+            'staff': UserFactory.create(
+                first_name="Staff",
+                last_name="User",
+                email='staff@user.com',
+                username='staff@user.com',
+                is_active=True,
+                is_staff=True,
+                is_superuser=False
+            ),
+            'normal': UserFactory.create(
+                first_name="Normal",
+                last_name="User",
+                email='normal@user.com',
+                username='normal@user.com',
+                is_active=True,
+                is_staff=False,
+                is_superuser=False
+            )
         }
 
-        response = self.client.post(reverse('account-admin:user-add'), data)
-        self.assertEquals(response.status_code, 302)
+        self.test_users['staff'].groups.add(self.test_group)
+        self.test_users['staff'].user_permissions.add(self.test_add_user_perm)
+        self.test_users['staff'].user_permissions.add(self.test_change_user_perm)
+        self.test_users['staff'].user_permissions.add(self.test_delete_user_perm)
 
-        # Test with all data
-        group = Group.objects.create(name="Test group")
-        perm = Permission.objects.get(codename="add_user")
-
-        data = {
-            'first_name': "Frank",
-            'last_name': "Green",
-            'email': 'test2@test.com',
-            'username': 'test2@test.com',
+        self.data_full = {
+            'first_name': "Jack",
+            'last_name': "Red",
+            'email': 'jack@red.com',
+            'username': 'jack@red.com',
             'is_active': True,
             'is_staff': True,
             'is_superuser': True,
-            'groups': [group.id],
-            'user_permissions': [perm.id]
+            'groups': [self.test_group.id],
+            'user_permissions': [self.test_change_user_perm.id]
         }
 
-        response = self.client.post(reverse('account-admin:user-add'), data)
-        self.assertEquals(response.status_code, 302)
+        # The results we expect to get if a staff user change another staff
+        self.expected_results_partial = {
+            'first_name': "Jack",
+            'last_name': "Red",
+            'email': 'jack@red.com',
+            'username': 'jack@red.com',
+            'is_active': True,
+            'is_staff': False,
+            'is_superuser': False,
+            'groups': [],
+            'user_permissions': []
+        }
 
-        user = User.objects.filter().latest('id')
-        self.assertEquals(user.first_name, data['first_name'])
-        self.assertEquals(user.last_name, data['last_name'])
-        self.assertEquals(user.email, data['email'])
-        self.assertEquals(user.username, data['username'])
-        self.assertEquals(user.is_active, data['is_active'])
-        self.assertEquals(user.is_staff, data['is_staff'])
-        self.assertEquals(user.is_superuser, data['is_superuser'])
-        self.assertEquals(
-            [g.id for g in user.groups.all()],
-            data['groups']
-        )
-        self.assertEquals(
-            [p.id for p in user.user_permissions.all()],
-            data['user_permissions']
-        )
-
-    def test_user_get_invitation_if_active(self):
-        """Test the new active user receives an invitation email."""
-
+    def as_superuser(self):
         self.client.login(
             username=self.superuser.email,
             password=self.superuser_pwd
         )
+        self.user_level = 'superuser'
 
-        data = {
-            'email': 'test@test.com',
-            'username': 'test@test.com',
-            'is_active': True,
-        }
-
-        response = self.client.post(reverse('account-admin:user-add'), data)
-        self.assertEquals(response.status_code, 302)
-
-        # Check that mail is sent
-        self.assertEquals(len(mail.outbox), 1)
-
-    def test_user_no_invitation_if_not_active(self):
-        """Test the new inactive user doesn't get an invitation email."""
-
-        self.client.login(
-            username=self.superuser.email,
-            password=self.superuser_pwd
-        )
-
-        data = {
-            'email': 'test@test.com',
-            'username': 'test@test.com',
-            'is_active': False,
-        }
-
-        response = self.client.post(reverse('account-admin:user-add'), data)
-        self.assertEquals(response.status_code, 302)
-
-        # Check that mail is sent
-        self.assertEquals(len(mail.outbox), 0)
-
-    @override_settings(ACCOUNT_AUTO_SEND_INVITATION_EMAIL=False)
-    def test_user_no_invitation_if_auto_send_disabled(self):
-        """Test the new inactive user doesn't get an invitation email."""
-
-        self.client.login(
-            username=self.superuser.email,
-            password=self.superuser_pwd
-        )
-
-        data = {
-            'email': 'test@test.com',
-            'username': 'test@test.com',
-            'is_active': True,
-        }
-
-        response = self.client.post(reverse('account-admin:user-add'), data)
-        self.assertEquals(response.status_code, 302)
-
-        # Check that mail is sent
-        self.assertEquals(len(mail.outbox), 0)
-
-    def test_user_add_inactive_update_active(self):
-        """Test the change of user active.
-
-        When we first create the user, it is inactive and receives no email.
-        Then, we make them active, sending the invitation email.
-        Finally, when they are active, they should not receive the email again.
-        """
-
-        data = {
-            'email': 'test@test.com',
-            'username': 'test@test.com',
-            'is_active': False,
-        }
-
-        user = UserFactory.create(**data)
-
-        urlargs = {'pk': user.pk}
-        self.check_page_permissions('account-admin', 'user-update', 'change_user', urlargs)
-
-        self.client.login(
-            username=self.superuser.email,
-            password=self.superuser_pwd
-        )
-
-        data = {
-            'email': 'test@test.com',
-            'username': 'test@test.com',
-            'is_active': True,
-        }
-
-        response = self.client.post(
-            reverse('account-admin:user-update', kwargs={'pk': user.pk}),
-            data
-        )
-        self.assertEquals(response.status_code, 302)
-
-        # Check that mail is sent
-        # self.assertEquals(len(mail.outbox), 1)
-
-        user = User.objects.filter().latest('id')
-        self.assertEquals(user.is_active, True)
-        self.assertEquals(user.is_staff, False)
-
-        # User sets the password
-        user.set_password('1234')
-        user.save()
-
-        # If the user has a password, no need to send the invitation email
-
-        mail.outbox = []
-
-        data = {
-            'email': 'test@test.com',
-            'username': 'test@test.com',
-            'is_active': True,
-        }
-
-        response = self.client.post(
-            reverse('account-admin:user-update', kwargs={'pk': user.pk}),
-            data
-        )
-        self.assertEquals(response.status_code, 302)
-
-        # Check that mail is sent
-        self.assertEquals(len(mail.outbox), 0)
-
-        # Make user inactive
-        data = {
-            'email': 'test@test.com',
-            'username': 'test@test.com',
-            'is_active': False,
-        }
-
-        response = self.client.post(
-            reverse('account-admin:user-update', kwargs={'pk': user.pk}),
-            data
-        )
-        self.assertEquals(response.status_code, 302)
-
-        user = User.objects.filter().latest('id')
-        self.assertEquals(user.is_active, False)
-        self.assertEquals(user.is_staff, False)
-
-        # Now the user already have a password, so making it active shouldn't
-        # trigger the invitation email.
-
-        data = {
-            'email': 'test@test.com',
-            'username': 'test@test.com',
-            'is_active': True,
-        }
-
-        response = self.client.post(
-            reverse('account-admin:user-update', kwargs={'pk': user.pk}),
-            data
-        )
-        self.assertEquals(response.status_code, 302)
-
-        # Check that mail is sent
-        self.assertEquals(len(mail.outbox), 0)
-
-    @override_settings(ACCOUNT_AUTO_SEND_INVITATION_EMAIL=False)
-    def test_user_add_inactive_update_active_no_invitation(self):
-        """Test the change of user active.
-
-        When the auto invite is disabled, updating the user to active should
-        not trigger the invitation email.
-        """
-
-        data = {
-            'email': 'test@test.com',
-            'username': 'test@test.com',
-            'is_active': False,
-        }
-
-        user = UserFactory.create(**data)
-
-        self.client.login(
-            username=self.superuser.email,
-            password=self.superuser_pwd
-        )
-
-        data = {
-            'email': 'test@test.com',
-            'username': 'test@test.com',
-            'is_active': True,
-        }
-
-        response = self.client.post(
-            reverse('account-admin:user-update', kwargs={'pk': user.pk}),
-            data
-        )
-        self.assertEquals(response.status_code, 302)
-
-        # Check that mail is not sent
-        self.assertEquals(len(mail.outbox), 0)
-
-    def test_non_superuser_cannot_make_other_superuser(self):
-        """Test the assignment of superuser.
-
-        A user should not be able to upgrade another user to rank above theirs.
-        A non superuser should not be able to make another user a superuser, or
-        make a superuser downgrade to normal user.
-        """
-
-        # We login as a staff user with no permission
+    def as_staff(self):
         self.client.login(
             username=self.admin_user.email,
             password=self.admin_user_pwd
         )
+        self.admin_user.user_permissions.add(self.test_add_user_perm)
+        self.admin_user.user_permissions.add(self.test_change_user_perm)
+        self.admin_user.user_permissions.add(self.test_delete_user_perm)
+        self.user_level = 'staff'
 
-        # Add the change user permission
-        perm = Permission.objects.get(codename='change_user')
-        self.admin_user.user_permissions.add(perm)
-
-        data = {
-            'email': 'test@test.com',
-            'username': 'test@test.com',
-            'is_active': True,
-            'is_staff': True,
-            'is_superuser': True,
-        }
-
-        response = self.client.post(
-            reverse('account-admin:user-update', kwargs={'pk': self.normal_user.pk}),
-            data
-        )
-        self.assertEquals(response.status_code, 302)
-
-        # The normal user should be staff, but not superuser.
-
-        normal_user = User.objects.get(id=self.normal_user.pk)
-        self.assertEquals(normal_user.is_staff, True)
-        self.assertEquals(normal_user.is_superuser, False)
-
-        # We login as a superuser
+    def as_normal(self):
         self.client.login(
-            username=self.superuser.email,
-            password=self.superuser_pwd
+            username=self.normal_user.email,
+            password=self.normal_user_pwd
         )
+        self.user_level = 'normal'
+
+    def assess_list_normal(self, status_code):
+
+        url = reverse('account-admin:user-list')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status_code)
+
+    def assess_list_admin(self, status_code):
+
+        url = reverse('account-admin:user-list-admin')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status_code)
+
+    def assess_add_get(self, status_code):
+
+        url = reverse('account-admin:user-add')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status_code)
+
+    def assess_add_post(self, status_code):
+
+        url = reverse('account-admin:user-add')
+        data = self.data_full.copy()
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status_code)
+
+        if status_code == 302:
+            values_tested = False
+            obj = User.objects.latest('id')
+
+            if self.user_level == 'superuser':
+
+                # A superuser can update all the fields for any user.
+                # Therefore all post data should be applied.
+
+                self.assertEqual(obj.first_name, self.data_full['first_name'])
+                self.assertEqual(obj.last_name, self.data_full['last_name'])
+                self.assertEqual(obj.email, self.data_full['email'])
+                self.assertEqual(obj.username, self.data_full['username'])
+                self.assertEqual(obj.is_active, self.data_full['is_active'])
+                self.assertEqual(obj.is_staff, self.data_full['is_staff'])
+                self.assertEqual(obj.is_superuser, self.data_full['is_superuser'])
+                self.assertEqual([g.id for g in obj.groups.all()], self.data_full['groups'])
+                self.assertEqual([u.id for u in obj.user_permissions.all()], self.data_full['user_permissions'])
+                values_tested = True
+
+            elif self.user_level == 'staff':
+
+                # A staff user can not promote a user to staff or superuser,
+                # and can not assign groups or permission.
+                # Therefore only partial post data should be applied.
+
+                self.assertEqual(obj.first_name, self.expected_results_partial['first_name'])
+                self.assertEqual(obj.last_name, self.expected_results_partial['last_name'])
+                self.assertEqual(obj.email, self.expected_results_partial['email'])
+                self.assertEqual(obj.username, self.expected_results_partial['username'])
+                self.assertEqual(obj.is_active, self.expected_results_partial['is_active'])
+                self.assertEqual(obj.is_staff, self.expected_results_partial['is_staff'])
+                self.assertEqual(obj.is_superuser, self.expected_results_partial['is_superuser'])
+                self.assertEqual(list(obj.groups.all()), self.expected_results_partial['groups'])
+                self.assertEqual(list(obj.user_permissions.all()), self.expected_results_partial['user_permissions'])
+                values_tested = True
+
+            self.assertTrue(values_tested)
+
+    def assess_detail_get(self, status_code, user_type):
+
+        obj = self.test_users[user_type]
+
+        url = reverse('account-admin:user-detail', kwargs={'pk': obj.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status_code)
+
+    def assess_update_get(self, status_code, user_type):
+
+        obj = self.test_users[user_type]
+
+        url = reverse('account-admin:user-update', kwargs={'pk': obj.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status_code)
+
+    def assess_update_post(self, status_code, user_type):
+
+        obj = self.test_users[user_type]
+
+        url = reverse('account-admin:user-update', kwargs={'pk': obj.id})
+        data = self.data_full.copy()
+        response = self.client.post(url, data)
+
+        if response.status_code == 200:
+            print(response.context['form'].errors)
+
+        self.assertEqual(response.status_code, status_code)
+
+        if status_code == 302:
+            values_tested = False
+            obj.refresh_from_db()
+
+            if self.user_level == 'superuser':
+
+                # A superuser can update all the fields for any user.
+                # Therefore all post data should be applied.
+
+                self.assertEqual(obj.first_name, self.data_full['first_name'])
+                self.assertEqual(obj.last_name, self.data_full['last_name'])
+                self.assertEqual(obj.email, self.data_full['email'])
+                self.assertEqual(obj.username, self.data_full['username'])
+                self.assertEqual(obj.is_active, self.data_full['is_active'])
+                self.assertEqual(obj.is_staff, self.data_full['is_staff'])
+                self.assertEqual(obj.is_superuser, self.data_full['is_superuser'])
+                self.assertEqual([g.id for g in obj.groups.all()], self.data_full['groups'])
+                self.assertEqual([u.id for u in obj.user_permissions.all()], self.data_full['user_permissions'])
+                values_tested = True
+
+            elif self.user_level == 'staff':
+
+                # A staff user can not promote a user to staff or superuser,
+                # and can not assign groups or permission.
+                # Therefore only partial post data should be applied.
+
+                self.assertEqual(obj.first_name, self.expected_results_partial['first_name'])
+                self.assertEqual(obj.last_name, self.expected_results_partial['last_name'])
+                self.assertEqual(obj.email, self.expected_results_partial['email'])
+                self.assertEqual(obj.username, self.expected_results_partial['username'])
+                self.assertEqual(obj.is_active, self.expected_results_partial['is_active'])
+                self.assertEqual(obj.is_staff, self.expected_results_partial['is_staff'])
+                self.assertEqual(obj.is_superuser, self.expected_results_partial['is_superuser'])
+                self.assertEqual(list(obj.groups.all()), self.expected_results_partial['groups'])
+                self.assertEqual(list(obj.user_permissions.all()), self.expected_results_partial['user_permissions'])
+                values_tested = True
+
+            self.assertTrue(values_tested)
+
+    def assess_delete_get(self, status_code, user_type):
+
+        obj = self.test_users[user_type]
+
+        url = reverse('account-admin:user-delete', kwargs={'pk': obj.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status_code)
+
+    def assess_delete_post(self, status_code, user_type):
+
+        obj = self.test_users[user_type]
+
+        url = reverse('account-admin:user-delete', kwargs={'pk': obj.id})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status_code)
+
+    def assess_change_password_get(self, status_code, user_type):
+
+        obj = self.test_users[user_type]
+
+        url = reverse('account-admin:user-change-password', kwargs={'pk': obj.pk})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status_code)
+
+    def assess_change_password_post(self, status_code, user_type):
+
+        obj = self.test_users[user_type]
+
+        url = reverse('account-admin:user-change-password', kwargs={'pk': obj.pk})
 
         data = {
-            'email': 'test@test.com',
-            'username': 'test@test.com',
-            'is_active': True,
-            'is_staff': True,
-            'is_superuser': True,
+            'password1': 'demo1234',
+            'password2': 'demo1234',
         }
+        response = self.client.post(url, data)
+        self.assertEquals(response.status_code, status_code)
 
-        response = self.client.post(
-            reverse('account-admin:user-update', kwargs={'pk': self.normal_user.pk}),
-            data
-        )
-        self.assertEquals(response.status_code, 302)
+    def assess_invite_get(self, status_code, user_type):
 
-        # The normal user should be staff, but not superuser.
+        obj = self.test_users[user_type]
 
-        normal_user = User.objects.get(id=self.normal_user.pk)
-        self.assertEquals(normal_user.is_staff, True)
-        self.assertEquals(normal_user.is_superuser, True)
+        url = reverse('account-admin:user-invite', kwargs={'pk': obj.pk})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status_code)
 
-    def test_user_invite_manually(self):
-        """Test that an admin can re-send an invitation email."""
+    def assess_invite_post(self, status_code, user_type):
 
-        data = {
-            'email': 'test@test.com',
-            'username': 'test@test.com',
-            'is_active': True,
-        }
+        obj = self.test_users[user_type]
 
-        user = UserFactory.create(**data)
+        url = reverse('account-admin:user-invite', kwargs={'pk': obj.pk})
 
-        urlargs = {'pk': user.pk}
-        self.check_page_permissions('account-admin', 'user-invite', 'change_user', urlargs)
+        response = self.client.post(url)
 
-        self.client.login(
-            username=self.superuser.email,
-            password=self.superuser_pwd
-        )
-
-        response = self.client.post(
-            reverse('account-admin:user-invite', kwargs={'pk': user.pk}),
-            {}
-        )
-
-        self.assertEquals(response.status_code, 302)
+        self.assertEquals(response.status_code, status_code)
 
         # Check that mail is sent
-        self.assertEquals(len(mail.outbox), 1)
+        if status_code == 302:
+            self.assertEquals(len(mail.outbox), 1)
 
-    def test_staff_can_not_change_superuser_password(self):
-        """Test a staff user can't update another user's password."""
+    # Superuser tests
 
-        # We login as a staff user with no permission
-        self.client.login(
-            username=self.admin_user.email,
-            password=self.admin_user_pwd
-        )
+    def test_superuser_list_normal(self):
+        self.as_superuser()
+        self.assess_list_normal(200)
 
-        # Add the change user permission
-        perm = Permission.objects.get(codename='change_user')
-        self.admin_user.user_permissions.add(perm)
+    def test_superuser_list_admin(self):
+        self.as_superuser()
+        self.assess_list_admin(200)
 
-        response = self.client.get(
-            reverse('account-admin:user-change-password', kwargs={'pk': self.superuser.pk})
-        )
-        self.assertEquals(response.status_code, 403)
+    def test_superuser_add(self):
+        self.as_superuser()
+        self.assess_add_get(200)
+        self.assess_add_post(302)
 
-    def test_staff_can_change_staff_password(self):
-        """Test a staff user can update another staff user's password."""
+    def test_superuser_detail(self):
+        self.as_superuser()
+        self.assess_detail_get(200, 'superuser')
+        self.assess_detail_get(200, 'staff')
+        self.assess_detail_get(200, 'normal')
 
-        # We login as a staff user with no permission
-        self.client.login(
-            username=self.admin_user.email,
-            password=self.admin_user_pwd
-        )
+    def test_superuser_update_superuser(self):
+        self.as_superuser()
+        self.assess_update_get(200, 'superuser')
+        self.assess_update_post(302, 'superuser')
 
-        self.normal_user.is_staff = True
-        self.normal_user.save()
+    def test_superuser_update_staff(self):
+        self.as_superuser()
+        self.assess_update_get(200, 'staff')
+        self.assess_update_post(302, 'staff')
 
-        # Add the change user permission
-        perm = Permission.objects.get(codename='change_user')
-        self.admin_user.user_permissions.add(perm)
+    def test_superuser_update_normal(self):
+        self.as_superuser()
+        self.assess_update_get(200, 'normal')
+        self.assess_update_post(302, 'normal')
 
-        response = self.client.get(
-            reverse('account-admin:user-change-password', kwargs={'pk': self.normal_user.pk})
-        )
-        self.assertEquals(response.status_code, 200)
+    def test_superuser_delete(self):
+        self.as_superuser()
+        self.assess_delete_get(200, 'superuser')
+        self.assess_delete_get(200, 'staff')
+        self.assess_delete_get(200, 'normal')
+        self.assess_delete_post(302, 'superuser')
+        self.assess_delete_post(302, 'staff')
+        self.assess_delete_post(302, 'normal')
 
+    def test_superuser_change_password(self):
+        self.as_superuser()
+        self.assess_change_password_get(200, 'superuser')
+        self.assess_change_password_get(200, 'staff')
+        self.assess_change_password_get(200, 'normal')
+        self.assess_change_password_post(302, 'superuser')
+        self.assess_change_password_post(302, 'staff')
+        self.assess_change_password_post(302, 'normal')
+
+    def test_superuser_invite_superuser(self):
+        self.as_superuser()
+        self.assess_invite_get(200, 'superuser')
+        self.assess_invite_post(302, 'superuser')
+
+    def test_superuser_invite_staff(self):
+        self.as_superuser()
+        self.assess_invite_get(200, 'staff')
+        self.assess_invite_post(302, 'staff')
+
+    def test_superuser_invite_normal(self):
+        self.as_superuser()
+        self.assess_invite_get(200, 'normal')
+        self.assess_invite_post(302, 'normal')
+
+    # Staff tests
+
+    def test_staff_list_normal(self):
+        self.as_staff()
+        self.assess_list_normal(200)
+
+    def test_staff_list_admin(self):
+        self.as_staff()
+        self.assess_list_admin(403)
+
+    def test_staff_add(self):
+        self.as_staff()
+        self.assess_add_get(200)
+        self.assess_add_post(302)
+
+    def test_staff_detail(self):
+        self.as_staff()
+        self.assess_detail_get(403, 'superuser')
+        self.assess_detail_get(403, 'staff')
+        self.assess_detail_get(200, 'normal')
+
+    def test_staff_update_superuser(self):
+        self.as_staff()
+        self.assess_update_get(403, 'superuser')
+        self.assess_update_post(403, 'superuser')
+
+    def test_staff_update_staff(self):
+        self.as_staff()
+        self.assess_update_get(403, 'staff')
+        self.assess_update_post(403, 'staff')
+
+    def test_staff_update_normal(self):
+        self.as_staff()
+        self.assess_update_get(200, 'normal')
+        self.assess_update_post(302, 'normal')
+
+    def test_staff_delete(self):
+        self.as_staff()
+        self.assess_delete_get(403, 'superuser')
+        self.assess_delete_get(403, 'staff')
+        self.assess_delete_get(200, 'normal')
+        self.assess_delete_post(403, 'superuser')
+        self.assess_delete_post(403, 'staff')
+        self.assess_delete_post(302, 'normal')
+
+    def test_staff_change_password(self):
+        self.as_staff()
+        self.assess_change_password_get(403, 'superuser')
+        self.assess_change_password_get(403, 'staff')
+        self.assess_change_password_get(200, 'normal')
+        self.assess_change_password_post(403, 'superuser')
+        self.assess_change_password_post(403, 'staff')
+        self.assess_change_password_post(302, 'normal')
+
+    def test_staff_invite(self):
+        self.as_staff()
+        self.assess_invite_get(403, 'superuser')
+        self.assess_invite_get(403, 'staff')
+        self.assess_invite_get(200, 'normal')
+        self.assess_invite_post(403, 'superuser')
+        self.assess_invite_post(403, 'staff')
+        self.assess_invite_post(302, 'normal')
+
+    # Normal tests
+
+    def test_normal_list_normal(self):
+        self.as_normal()
+        self.assess_list_normal(403)
+
+    def test_normal_list_admin(self):
+        self.as_normal()
+        self.assess_list_admin(403)
+
+    def test_normal_add(self):
+        self.as_normal()
+        self.assess_add_get(403)
+        self.assess_add_post(403)
+
+    def test_normal_detail(self):
+        self.as_normal()
+        self.assess_detail_get(403, 'superuser')
+        self.assess_detail_get(403, 'staff')
+        self.assess_detail_get(403, 'normal')
+
+    def test_normal_update(self):
+        self.as_normal()
+        self.assess_update_get(403, 'superuser')
+        self.assess_update_get(403, 'staff')
+        self.assess_update_get(403, 'normal')
+        self.assess_update_post(403, 'superuser')
+        self.assess_update_post(403, 'staff')
+        self.assess_update_post(403, 'normal')
+
+    def test_normal_delete(self):
+        self.as_normal()
+        self.assess_delete_get(403, 'superuser')
+        self.assess_delete_get(403, 'staff')
+        self.assess_delete_get(403, 'normal')
+        self.assess_delete_post(403, 'superuser')
+        self.assess_delete_post(403, 'staff')
+        self.assess_delete_post(403, 'normal')
+
+    def test_normal_change_password(self):
+        self.as_normal()
+        self.assess_change_password_get(403, 'superuser')
+        self.assess_change_password_get(403, 'staff')
+        self.assess_change_password_get(403, 'normal')
+        self.assess_change_password_post(403, 'superuser')
+        self.assess_change_password_post(403, 'staff')
+        self.assess_change_password_post(403, 'normal')
+
+    def test_normal_invite(self):
+        self.as_normal()
+        self.assess_invite_get(403, 'superuser')
+        self.assess_invite_get(403, 'staff')
+        self.assess_invite_get(403, 'normal')
+        self.assess_invite_post(403, 'superuser')
+        self.assess_invite_post(403, 'staff')
+        self.assess_invite_post(403, 'normal')

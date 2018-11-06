@@ -18,6 +18,22 @@ class UserAddForm(BetterModelForm):
 
     email = forms.EmailField(required=True)
 
+    class Meta:
+        model = User
+        fields = [
+            "first_name",
+            "last_name",
+            "email",
+            "username",
+            "is_active",
+        ]
+        fieldsets = (
+            ('info', {'fields': (('first_name', 'last_name'), ('email', 'username'), 'is_active',), 'legend': 'User details'}),
+        )
+
+
+class SuperUserAddForm(UserAddForm):
+
     groups = forms.ModelMultipleChoiceField(
         widget=forms.CheckboxSelectMultiple,
         queryset=Group.objects.all(),
@@ -28,25 +44,6 @@ class UserAddForm(BetterModelForm):
         queryset=Permission.objects.all(),
         required=False)
 
-    class Meta:
-        model = User
-        fields = [
-            "first_name",
-            "last_name",
-            "email",
-            "username",
-            "is_active",
-            "is_staff",
-            "groups",
-            "user_permissions",
-        ]
-        fieldsets = (
-            ('info', {'fields': (('first_name', 'last_name'), ('email', 'username'),), 'legend': 'User details'}),
-            ('role', {'fields': ('is_active', 'is_staff', 'groups', 'user_permissions'), 'legend': 'Roles & Permissions'}),
-        )
-
-
-class SuperUserAddForm(UserAddForm):
     class Meta:
         model = User
         fields = [
@@ -78,14 +75,10 @@ class UserUpdateForm(UserAddForm, UserChangeForm):
             "email",
             "username",
             "is_active",
-            "is_staff",
-            "groups",
-            "user_permissions",
             "password"
         ]
         fieldsets = (
-            ('info', {'fields': (('first_name', 'last_name'), ('email', 'username'),), 'legend': 'User details'}),
-            ('role', {'fields': ('is_active', 'is_staff', 'groups', 'user_permissions'), 'legend': 'Roles & Permissions'}),
+            ('info', {'fields': (('first_name', 'last_name'), ('email', 'username'), 'is_active',), 'legend': 'User details'}),
         )
 
     def __init__(self, *args, **kwargs):
@@ -146,19 +139,6 @@ class UserChangePasswordForm(BetterForm, AdminPasswordChangeForm):
         super().__init__(user, *args, **kwargs)
 
     class Meta:
-        # model = User
-        # fields = [
-        #     "password1",
-        #     "password2",
-        #     "email",
-        #     "username",
-        #     "is_active",
-        #     "is_staff",
-        #     "is_superuser",
-        #     "groups",
-        #     "user_permissions",
-        #     "password"
-        # ]
         fieldsets = (
             ('info', {'fields': ('password1', 'password2'), 'legend': 'Change password'}),
         )

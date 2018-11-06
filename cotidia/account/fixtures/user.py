@@ -68,9 +68,9 @@ def normal_user(f):
 
         self.normal_user = User.objects.create(
             first_name="Bob",
-            last_name="Green",
-            username="bob@green.com",
-            email="bob@green.com",
+            last_name="Brown",
+            username="bob@brown.com",
+            email="bob@brown.com",
             is_active=True,
             is_staff=False)
         self.normal_user_pwd = "demo1234"

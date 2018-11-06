@@ -17,6 +17,7 @@ DEFAULT_SETTINGS = dict(
         "django.contrib.sites",
         "django.contrib.messages",
         "django.contrib.staticfiles",
+        "django.contrib.humanize",
 
         "django_otp",
         "django_otp.plugins.otp_static",
