@@ -1,5 +1,5 @@
 {% extends "admin/generic/page/list.html" %}
-{% load i18n admin_list_tags %}
+{% load i18n admin_list_tags account_tags %}
 
 {% block content_head %}
 <div class="content__head">
@@ -19,12 +19,14 @@
     {% if request.user.is_superuser %}
     <div class="tabs tabs--borderless">
         <div class="tabs__nav">
-            <a href="{% url 'account-admin:user-list' %}" class="tab__label{% if request.path == '/account/user/' %} tab__label--active{% endif %}">
+            <a href="{% url 'account-admin:user-list' %}" class="tab__label{% if request.path|url_leaf == 'user' %} tab__label--active{% endif %}">
                 Normal users
             </a>
-
-            <a href="{% url 'account-admin:user-list-admin' %}" class="tab__label{% if request.path == '/account/user/admin/' %} tab__label--active{% endif %}">
+            <a href="{% url 'account-admin:user-list-staff' %}" class="tab__label{% if request.path|url_leaf == 'staff' %} tab__label--active{% endif %}">
                 Administrators
+            </a>
+            <a href="{% url 'account-admin:user-list-superuser' %}" class="tab__label{% if request.path|url_leaf == 'superuser' %} tab__label--active{% endif %}">
+                Superusers
             </a>
         </div>
     </div>

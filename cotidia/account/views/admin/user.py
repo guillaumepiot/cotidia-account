@@ -90,7 +90,7 @@ class UserList(AdminListView):
         )
 
 
-class UserListAdmin(AdminListView):
+class UserListStaff(AdminListView):
     columns = (
         ('Name', 'name'),
         ('Email', 'email'),
@@ -112,8 +112,32 @@ class UserListAdmin(AdminListView):
 
     def get_queryset(self):
         return super().get_queryset().filter(
-            Q(is_staff=True) | Q(is_superuser=True)
-        )
+            is_staff=True
+        ).exclude(is_superuser=True)
+
+
+class UserListSuperuser(AdminListView):
+    columns = (
+        ('Name', 'name'),
+        ('Email', 'email'),
+        ('Superuser', 'is_superuser'),
+        ('Staff', 'is_staff'),
+        ('Active', 'is_active'),
+        ('Date Joined', 'date_joined'),
+    )
+    model = User
+    row_click_action = "detail"
+    row_actions = ['view']
+    filterset = UserFilter
+
+    def check_user(self, user):
+        if user.is_superuser:
+            return True
+        else:
+            return False
+
+    def get_queryset(self):
+        return super().get_queryset().filter(is_superuser=True)
 
 
 class UserDetail(CheckUserMixin, AdminDetailView):
