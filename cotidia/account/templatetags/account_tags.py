@@ -7,6 +7,5 @@ register = template.Library()
 def url_leaf(path):
     parts = path.strip('/').split('/')
     if parts:
-        print("return", parts[-1])
         return parts[-1]
     return path

@@ -112,9 +112,15 @@ class UserAdminTests(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status_code)
 
-    def assess_list_admin(self, status_code):
+    def assess_list_staff(self, status_code):
 
-        url = reverse('account-admin:user-list-admin')
+        url = reverse('account-admin:user-list-staff')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status_code)
+
+    def assess_list_superuser(self, status_code):
+
+        url = reverse('account-admin:user-list-superuser')
         response = self.client.get(url)
         self.assertEqual(response.status_code, status_code)
 
@@ -303,9 +309,13 @@ class UserAdminTests(TestCase):
         self.as_superuser()
         self.assess_list_normal(200)
 
-    def test_superuser_list_admin(self):
+    def test_superuser_list_staff(self):
         self.as_superuser()
-        self.assess_list_admin(200)
+        self.assess_list_staff(200)
+
+    def test_superuser_list_superuser(self):
+        self.as_superuser()
+        self.assess_list_superuser(200)
 
     def test_superuser_add(self):
         self.as_superuser()
@@ -372,9 +382,13 @@ class UserAdminTests(TestCase):
         self.as_staff()
         self.assess_list_normal(200)
 
-    def test_staff_list_admin(self):
+    def test_staff_list_staff(self):
         self.as_staff()
-        self.assess_list_admin(403)
+        self.assess_list_staff(403)
+
+    def test_staff_list_superuser(self):
+        self.as_staff()
+        self.assess_list_superuser(403)
 
     def test_staff_add(self):
         self.as_staff()
@@ -435,9 +449,13 @@ class UserAdminTests(TestCase):
         self.as_normal()
         self.assess_list_normal(403)
 
-    def test_normal_list_admin(self):
+    def test_normal_list_staff(self):
         self.as_normal()
-        self.assess_list_admin(403)
+        self.assess_list_staff(403)
+
+    def test_normal_list_superuser(self):
+        self.as_normal()
+        self.assess_list_superuser(403)
 
     def test_normal_add(self):
         self.as_normal()
