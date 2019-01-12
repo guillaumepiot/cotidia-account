@@ -11,32 +11,31 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.utils.http import is_safe_url
 
 from cotidia.account.conf import settings
-from cotidia.account.user_forms import (
-    ProfileForm
-)
+from cotidia.account.forms.admin.user import ProfileForm
 
 
 @sensitive_post_parameters()
 @csrf_protect
 def login_remember_me(
-        request,
-        authentication_form=None,
-        template_name='admin/account/login.html',
-        *args,
-        **kwargs):
+    request,
+    authentication_form=None,
+    template_name="admin/account/login.html",
+    *args,
+    **kwargs
+):
     """Custom login view that enables "remember me" functionality."""
 
     if request.user.is_authenticated:
-        return HttpResponseRedirect(reverse('account-admin:dashboard'))
+        return HttpResponseRedirect(reverse("account-admin:dashboard"))
 
-    if request.method == 'POST':
-        if not request.POST.get('remember_me', None):
+    if request.method == "POST":
+        if not request.POST.get("remember_me", None):
             request.session.set_expiry(0)
 
-    if request.GET.get('next'):
-        redirect_to = request.GET['next']
+    if request.GET.get("next"):
+        redirect_to = request.GET["next"]
     else:
-        redirect_to = reverse('account-admin:dashboard')
+        redirect_to = reverse("account-admin:dashboard")
 
     if request.method == "POST":
         form = authentication_form(request, data=request.POST)
@@ -53,9 +52,7 @@ def login_remember_me(
     else:
         form = authentication_form(request)
 
-    context = {
-        'form': form
-    }
+    context = {"form": form}
 
     return render(request, template_name, context)
 
@@ -66,7 +63,7 @@ def dashboard(request):
     if not request.user.is_staff:
         raise PermissionDenied
 
-    template = 'admin/account/dashboard.html'
+    template = "admin/account/dashboard.html"
     return render(request, template)
 
 
@@ -76,22 +73,15 @@ def edit(request, user_form=ProfileForm):
     if not request.user.is_staff:
         raise PermissionDenied
 
-    template = 'admin/account/edit.html'
+    template = "admin/account/edit.html"
 
     if request.method == "POST":
         form = user_form(instance=request.user, data=request.POST)
         if form.is_valid():
             form.save()
-            messages.success(
-                request,
-                _('Your personal details have been saved')
-            )
-            return HttpResponseRedirect(
-                reverse('account-admin:dashboard')
-            )
+            messages.success(request, _("Your personal details have been saved"))
+            return HttpResponseRedirect(reverse("account-admin:dashboard"))
     else:
         form = user_form(instance=request.user)
 
-    return render(request, template, {'form': form})
-
-
+    return render(request, template, {"form": form})

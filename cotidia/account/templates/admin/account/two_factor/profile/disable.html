@@ -1,17 +1,7 @@
-{% extends "admin/page.html" %}
+{% extends "admin/account/two_factor/base.html" %}
 {% load i18n two_factor %}
 
-{% block body_class %}content-centered{% endblock body_class %}
-
-{% block title %}
-    {% trans "Disable Two-factor Authentication" %}
-{% endblock title %}
-
-{% block content_title %}
-    {% trans "Account Security" %}
-{% endblock content_title %}
-
-{% block page_content %}
+{% block two_factor_content %}
 <form method="post" class="form">
     {% csrf_token %}
     <fieldset>
@@ -29,7 +19,7 @@
     <div class="form__actions">
         <div class="form__actions-inner">
             <button class="btn btn--delete" type="submit">{% trans "Disable" %}</button>
-            <a href="{% url 'account-admin:profile'%}" class="pull-right btn btn--cancel">{% trans "Back to Account Security" %}</a>
+            <a href="{% url 'account-admin:profile'%}" class="pull-right btn btn--cancel">{% trans "Back to account security" %}</a>
         </div>
     </div>
 </form>

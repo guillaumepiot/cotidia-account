@@ -1,75 +1,84 @@
-{% extends "admin/page.html" %}{% load i18n %}
+{% extends "admin/page.html" %}
+{% load i18n admin_toolbar_tags admin_list_tags %}
 {% block title %}{% trans "Profile" %}{% endblock title %}
 
-{% block body_class %}content-centered{% endblock body_class %}
+{% block body_class %}content--centered{% endblock body_class %}
 
 {% block content_title %}
-    <a href="{% url 'account-admin:dashboard' %}">{% trans "Dashboard" %}</a>
-    &nbsp;<span class="fa fa-angle-right"></span>&nbsp;
     {% trans "Profile" %}
 {% endblock content_title %}
 
 {% block page_content %}
-{% include "admin/generic/form/errors.html" %}
-<form action="" method="post" class="form">
-    {% csrf_token %}
-    <fieldset>
-        <legend>{% trans "Contact details" %}</legend>
-
-        <div class="form__row">
-        {% with form.first_name as field %}
-            {% include "admin/generic/form/form_group.html" %}
+<form action="" method="post" class="form form--animate" enctype="multipart/form-data">
+    <div class="content__body">
+        <div class="content__inner">
+        {% csrf_token %}
+        {% with fieldset_template_name="admin/generic/form/fieldset_as_div.html" field_template_name="admin/generic/form/field_as_div.html" %}
+            {% for elm in form %}
+                {% if elm.is_fieldset %}
+                    {% include fieldset_template_name with fieldset=elm %}
+                {% else %}
+                    <div class="form__row">
+                        {% include field_template_name with field=elm %}
+                    </div>
+                {% endif %}
+            {% endfor %}
         {% endwith %}
-        {% with form.last_name as field %}
-            {% include "admin/generic/form/form_group.html" %}
-        {% endwith %}
-        </div>
-
-        <div class="form__row">
-        {% with form.email as field %}
-            {% include "admin/generic/form/form_group.html" %}
-        {% endwith %}
-
-        {% with form.username as field %}
-            {% include "admin/generic/form/form_group.html" %}
-        {% endwith %}
-        </div>
-    </fieldset>
-    <fieldset>
-        <legend>{% trans "Security" %}</legend>
-        <div class="form__row">
-            <div class="form__group">
-                <label class="form__label">Password</label>
-                <a href="{% url 'account-admin:password-change' %}" class="btn btn--change btn--small">
-                    {% trans "Change Password" %}
-                </a>
-            </div>
-        </div>
-
-        {% if ACCOUNT_ENABLE_TWO_FACTOR %}
-        <div class="form__row">
-
-            <div class="form__group">
-                <label class="form__label">{% trans "Two Factor Auth" %}</label>
-                <div class="form__control">
-                    {% if user.two_factor_auth_enabled %}
-                        <p><span class="label label--success">Enabled</span></p>
-                        <p><a href="{% url 'account-admin:profile' %}" class="btn btn--small btn--primary">Manage Two-Factor Authentication</a></p>
-                    {% else %}
-                        <p><a href="{% url 'account-admin:setup' %}" class="btn btn--create btn--small">Enable Two-Factor Authentication</a></p>
-                    {% endif %}
-                    </p>
+        <fieldset>
+            <legend>{% trans "Security" %}</legend>
+            <div class="form__row">
+                <div class="form__group">
+                    <label class="form__label">{% trans "Password" %}</label>
+                    <div class="form__control">
+                        <p><a href="{}" class="btn btn--small btn--change">Change password</a></p>
+                    </div>
                 </div>
             </div>
-        </div>
-        {% endif %}
-    </fieldset>
-    <div class="form__actions">
-        <div class="form__actions-inner">
-            <button type="submit" class="btn btn--primary">
-                {% trans "Save" %}
-            </button>
+            {% if ACCOUNT_ENABLE_TWO_FACTOR %}
+            <div class="form__row">
+                <div class="form__group">
+                    <label class="form__label">{% trans "Two Factor Auth" %}</label>
+                    <div class="form__control">
+                        {% if user.two_factor_auth_enabled %}
+                            <a href="{% url 'account-admin:profile' %}" class="btn btn--create btn--small">Manage Two-Factor Authentication</a></p>
+                        {% else %}
+                            <p><a href="{% url 'account-admin:setup' %}" class="btn btn--create btn--small">Enable Two-Factor Authentication</a></p>
+                        {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </fieldset>
         </div>
     </div>
+    {% block form_actions %}
+    <div class="content__foot">
+        <div class="content__inner content-foot">
+            <div class="content-foot__left">
+                <div class="content__foot-left">
+                    {% block form_actions_left %}
+                    <button type="submit" class="btn btn--primary">
+                        {% trans "Save" %}
+                    </button>
+                    {% endblock form_actions_left %}
+                </div>
+            </div>
+            <div class="content-foot__right">
+                {% block form_actions_right %}
+                {% if object %}
+                    <a href="{% if next %}{{next}}{% else %}{% get_admin_url app_label model_name 'detail' object %}{% endif %}" class="btn btn--cancel pull-right">
+                        {% trans "Cancel" %}
+                    </a>
+                {% else %}
+                    <a href="{% if next %}{{next}}{% elif list_url %}{{list_url}}{% else %}{{http_referer}}{% endif %}" class="btn btn--cancel pull-right">
+                        {% trans "Cancel" %}
+                    </a>
+                {% endif %}
+                {% endblock form_actions_right %}
+            </div>
+        </div>
+    </div>
+    {% endblock form_actions %}
 </form>
 {% endblock page_content %}

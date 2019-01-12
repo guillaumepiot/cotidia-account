@@ -1,7 +1,11 @@
-{% block dialog_header %}
+{% load staticfiles %}{% block dialog_header %}
 <div class="dialog__header dialog-header dialog-section--padded">
     <div class="dialog-header__title dialog-header__title--center">
-        {{SITE_NAME}}
+        {% if ADMIN_SITE_LOGO %}
+            <img src="{% static ADMIN_SITE_LOGO %}" alt="{{SITE_NAME}}" class="dialog-header__logo">
+        {% else %}
+            {{SITE_NAME}}
+        {% endif %}
     </div>
 </div>
 {% endblock %}

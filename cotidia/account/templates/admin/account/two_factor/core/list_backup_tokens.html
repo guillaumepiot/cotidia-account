@@ -1,17 +1,7 @@
-{% extends "admin/page.html" %}
+{% extends "admin/account/two_factor/base.html" %}
 {% load i18n %}
 
-{% block body_class %}content-centered{% endblock body_class %}
-
-{% block title %}
-    {% trans "Backup Tokens" %}
-{% endblock title %}
-
-{% block content_title %}
-    {% trans "Account Security" %}
-{% endblock content_title %}
-
-{% block page_content %}
+{% block two_factor_content %}
 <form method="post" action="" class="form">
     {% csrf_token %}
     <fieldset>
@@ -55,7 +45,7 @@
     </fieldset>
     <div class="form__actions">
         <div class="form__actions-inner">
-            <a href="{% url 'account-admin:profile'%}" class="pull-right btn btn--cancel">{% trans "Back to Account Security" %}</a>
+            <a href="{% url 'account-admin:profile'%}" class="pull-right btn btn--cancel">{% trans "Back to account security" %}</a>
             <a href="{% url 'account-admin:generate_backup_tokens'%}" class="btn btn--create">{% trans "Generate New Tokens" %}</a>
         </div>
     </div>

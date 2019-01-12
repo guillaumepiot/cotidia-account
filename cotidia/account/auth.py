@@ -20,9 +20,8 @@ class EmailBackend(ModelBackend):
     supports_anonymous_user = False
     supports_inactive_user = False
 
-    def authenticate(self, username=None, password=None):
-
-        app_label, model_name = settings.AUTH_USER_MODEL.split('.')
+    def authenticate(self, request=None, username=None, password=None):
+        app_label, model_name = settings.AUTH_USER_MODEL.split(".")
         User = apps.get_model(app_label, model_name)
 
         try:
@@ -31,6 +30,7 @@ class EmailBackend(ModelBackend):
             username_is_email = False
         else:
             username_is_email = True
+
         if username_is_email:
             try:
                 user = User.objects.get(email=username)
@@ -46,7 +46,7 @@ class EmailBackend(ModelBackend):
         return None
 
     def get_user(self, user_id):
-        app_label, model_name = settings.AUTH_USER_MODEL.split('.')
+        app_label, model_name = settings.AUTH_USER_MODEL.split(".")
         User = apps.get_model(app_label, model_name)
         try:
             return User.objects.get(pk=user_id)

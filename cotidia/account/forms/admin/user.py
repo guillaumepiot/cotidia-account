@@ -5,8 +5,9 @@ from django.contrib.auth.forms import (
     UserCreationForm,
     UserChangeForm,
     ReadOnlyPasswordHashField,
-    AdminPasswordChangeForm
+    AdminPasswordChangeForm,
 )
+from django.contrib.auth.models import Group, Permission
 from django.urls import reverse
 
 from betterforms.forms import BetterModelForm, BetterForm
@@ -20,15 +21,19 @@ class UserAddForm(BetterModelForm):
 
     class Meta:
         model = User
-        fields = [
-            "first_name",
-            "last_name",
-            "email",
-            "username",
-            "is_active",
-        ]
+        fields = ["first_name", "last_name", "email", "username", "is_active"]
         fieldsets = (
-            ('info', {'fields': (('first_name', 'last_name'), ('email', 'username'), 'is_active',), 'legend': 'User details'}),
+            (
+                "info",
+                {
+                    "fields": (
+                        ("first_name", "last_name"),
+                        ("email", "username"),
+                        "is_active",
+                    ),
+                    "legend": "User details",
+                },
+            ),
         )
 
 
@@ -37,12 +42,14 @@ class SuperUserAddForm(UserAddForm):
     groups = forms.ModelMultipleChoiceField(
         widget=forms.CheckboxSelectMultiple,
         queryset=Group.objects.all(),
-        required=False)
+        required=False,
+    )
 
     user_permissions = forms.ModelMultipleChoiceField(
         widget=forms.CheckboxSelectMultiple,
         queryset=Permission.objects.all(),
-        required=False)
+        required=False,
+    )
 
     class Meta:
         model = User
@@ -58,8 +65,26 @@ class SuperUserAddForm(UserAddForm):
             "user_permissions",
         ]
         fieldsets = (
-            ('info', {'fields': (('first_name', 'last_name'), ('email', 'username'),), 'legend': 'User details'}),
-            ('role', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'), 'legend': 'Roles & Permissions'}),
+            (
+                "info",
+                {
+                    "fields": (("first_name", "last_name"), ("email", "username")),
+                    "legend": "User details",
+                },
+            ),
+            (
+                "role",
+                {
+                    "fields": (
+                        "is_active",
+                        "is_staff",
+                        "is_superuser",
+                        "groups",
+                        "user_permissions",
+                    ),
+                    "legend": "Roles & Permissions",
+                },
+            ),
         )
 
 
@@ -75,26 +100,44 @@ class UserUpdateForm(UserAddForm, UserChangeForm):
             "email",
             "username",
             "is_active",
-            "password"
+            "password",
         ]
         fieldsets = (
-            ('info', {'fields': (('first_name', 'last_name'), ('email', 'username'), 'is_active',), 'legend': 'User details'}),
+            (
+                "info",
+                {
+                    "fields": (
+                        ("first_name", "last_name"),
+                        ("email", "username"),
+                        "is_active",
+                    ),
+                    "legend": "User details",
+                },
+            ),
         )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         instance = kwargs["instance"]
 
-        self.fields['password'].help_text = _(
+        self.fields["password"].help_text = _(
             "Raw passwords are not stored, so there is no way to see "
-            "this user's password. <br><a href=\"{}\" class=\"btn btn--small\">Change password</a>".format(
-                reverse("account-admin:user-change-password", args=[instance.id]))
+            'this user\'s password. <br><a href="{}" class="btn btn--small">Change password</a>'.format(
+                reverse("account-admin:user-change-password", args=[instance.id])
+            )
         )
 
 
 class SuperUserUpdateForm(UserAddForm, UserChangeForm):
 
     password = ReadOnlyPasswordHashField()
+
+    groups = forms.ModelMultipleChoiceField(
+        widget=forms.CheckboxSelectMultiple, queryset=Group.objects.all()
+    )
+    user_permissions = forms.ModelMultipleChoiceField(
+        widget=forms.CheckboxSelectMultiple, queryset=Permission.objects.all()
+    )
 
     class Meta:
         model = User
@@ -108,22 +151,41 @@ class SuperUserUpdateForm(UserAddForm, UserChangeForm):
             "is_superuser",
             "groups",
             "user_permissions",
-            "password"
+            "password",
         ]
         fieldsets = (
-            ('info', {'fields': (('first_name', 'last_name'), ('email', 'username'),), 'legend': 'User details'}),
-            ('security', {'fields': ('password',), 'legend': 'Security'}),
-            ('role', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'), 'legend': 'Roles & Permissions'}),
+            (
+                "info",
+                {
+                    "fields": (("first_name", "last_name"), ("email", "username")),
+                    "legend": "User details",
+                },
+            ),
+            ("security", {"fields": ("password",), "legend": "Security"}),
+            (
+                "role",
+                {
+                    "fields": (
+                        "is_active",
+                        "is_staff",
+                        "is_superuser",
+                        "groups",
+                        "user_permissions",
+                    ),
+                    "legend": "Roles & Permissions",
+                },
+            ),
         )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         instance = kwargs["instance"]
 
-        self.fields['password'].help_text = _(
+        self.fields["password"].help_text = _(
             "Raw passwords are not stored, so there is no way to see "
-            "this user's password. <br><a href=\"{}\" class=\"btn btn--small\">Change password</a>".format(
-                reverse("account-admin:user-change-password", args=[instance.id]))
+            'this user\'s password. <br><a href="{}" class="btn btn--small">Change password</a>'.format(
+                reverse("account-admin:user-change-password", args=[instance.id])
+            )
         )
 
 
@@ -134,11 +196,28 @@ class UserInviteForm(forms.ModelForm):
 
 
 class UserChangePasswordForm(BetterForm, AdminPasswordChangeForm):
-
     def __init__(self, user, *args, **kwargs):
         super().__init__(user, *args, **kwargs)
 
     class Meta:
         fieldsets = (
-            ('info', {'fields': ('password1', 'password2'), 'legend': 'Change password'}),
+            (
+                "info",
+                {"fields": ("password1", "password2"), "legend": "Change password"},
+            ),
+        )
+
+
+class ProfileForm(BetterModelForm):
+    class Meta:
+        model = User
+        fields = ("username", "email", "first_name", "last_name")
+        fieldsets = (
+            (
+                "info",
+                {
+                    "fields": (("first_name", "last_name"), ("email", "username")),
+                    "legend": "Profile details",
+                },
+            ),
         )

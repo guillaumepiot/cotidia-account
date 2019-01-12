@@ -3,33 +3,37 @@
 
 {% block title %}{% trans "Enable Two-Factor Authentication" %}{% endblock %}
 
+{% block body_class %}content--centered{% endblock body_class %}
+
 {% block content_title %}
 	{% trans "Account Security" %}
 {% endblock content_title %}
 
 {% block page_content %}
-<div class="[ content__inner ] [ box box--padded box--bordered ]">
-    <fieldset>
-        <legend>{% trans "Enable Two-Factor Authentication" %}</legend>
-        <div class="form__row">
-            <p>{% blocktrans %}Congratulations, you've successfully enabled two-factor
-            authentication.{% endblocktrans %}</p>
-        </div>
-        <div class="form__row">
-        {% if not phone_methods %}
-            <p><a href="{% url 'account-admin:profile' %}" class="btn btn-block btn--primary">{% trans "Back to Profile" %}</a></p>
-        {% else %}
-            <p>
-                {% blocktrans %}However, it might happen that you don't have access to
-                your primary token device. To enable account recovery, add a phone
-                number.{% endblocktrans %}
-                <br><br>
-                <a href="{% url 'account-admin:profile' %}" class="pull-right btn btn--transparent">{% trans "Back to Profile" %}</a>
-                <br><br>
-                <a href="{% url 'account-admin:phone_create' %}" class="btn btn--create">{% trans "Add Phone Number" %}</a>
-            </p>
-        {% endif %}
-        </div>
-    </fieldset>
+<div class="content__body">
+    <div class="content__inner">
+        <fieldset>
+            <legend>{% trans "Enable Two-Factor Authentication" %}</legend>
+            <div class="form__row">
+                <p>{% blocktrans %}Congratulations, you've successfully enabled two-factor
+                authentication.{% endblocktrans %}</p>
+            </div>
+            <div class="form__row">
+            {% if not phone_methods %}
+                <p><a href="{% url 'account-admin:profile' %}" class="btn btn-block btn--primary">{% trans "Back to account security" %}</a></p>
+            {% else %}
+                <p>
+                    {% blocktrans %}However, it might happen that you don't have access to
+                    your primary token device. To enable account recovery, add a phone
+                    number.{% endblocktrans %}
+                    <br><br>
+                    <a href="{% url 'account-admin:profile' %}" class="pull-right btn btn--transparent">{% trans "Back to account security" %}</a>
+                    <br><br>
+                    <a href="{% url 'account-admin:phone_create' %}" class="btn btn--create">{% trans "Add phone number" %}</a>
+                </p>
+            {% endif %}
+            </div>
+        </fieldset>
+    </div>
 </div>
 {% endblock page_content %}

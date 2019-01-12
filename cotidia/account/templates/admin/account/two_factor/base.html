@@ -1,0 +1,25 @@
+{% extends "admin/page.html" %}
+{% load i18n %}
+{% block body_class %}content--centered{% endblock body_class %}
+{% block title %}
+    {% trans "Account Security" %}
+{% endblock title %}
+{% block content_title %}
+    {% trans "Account Security" %}
+{% endblock content_title %}
+
+{% block content_actions %}
+<a href="{% url 'account-admin:edit' %}" class="btn btn--cancel btn--small" data-tooltip="Delete">
+    <span class="fa fa-user"></span>
+    Back to profile
+</a>
+{% endblock content_actions %}
+
+{% block page_content %}
+<div class="content__body">
+    <div class="content__inner">
+        {% block two_factor_content %}
+        {% endblock two_factor_content %}
+    </div>
+</div>
+{% endblock page_content %}

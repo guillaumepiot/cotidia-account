@@ -1,21 +1,31 @@
+from django.urls import path
 from django.conf.urls import url
 
+from cotidia.admin.views.generic import DynamicListView
 from cotidia.account.views.admin.group import (
-    GroupList,
     GroupCreate,
     GroupDetail,
     GroupUpdate,
     GroupDelete
 )
+from cotidia.account.serializers.group import GroupAdminSerializer
 
 
 ure = r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 
 urlpatterns = [
-    url(
-        r'^$',
-        GroupList.as_view(),
-        name='group-list'),
+    path(
+        '',
+        DynamicListView.as_view(),
+        {
+            'model': "group",
+            'app_label': "auth",
+            'serializer_class': GroupAdminSerializer,
+            'template_type': 'padded'
+        },
+        name='group-list'
+    ),
+
     url(
         r'^add/$',
         GroupCreate.as_view(),

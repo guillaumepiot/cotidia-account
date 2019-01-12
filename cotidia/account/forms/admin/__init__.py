@@ -7,7 +7,7 @@ from django.contrib.auth.forms import (
     PasswordResetForm,
     SetPasswordForm,
     PasswordChangeForm,
-    ReadOnlyPasswordHashField
+    ReadOnlyPasswordHashField,
 )
 from django.contrib.auth.models import Group, Permission
 
@@ -35,8 +35,9 @@ def generate_username(email):
     """
     try:
         User.objects.get(email=email)
-        raise Exception('Cannot generate new username. A user with this email'
-                        'already exists.')
+        raise Exception(
+            "Cannot generate new username. A user with this email" "already exists."
+        )
     except User.DoesNotExist:
         pass
 
@@ -45,7 +46,7 @@ def generate_username(email):
     while not found_unique_username:
         try:
             User.objects.get(username=username)
-            email = '{0}a'.format(email.lower())
+            email = "{0}a".format(email.lower())
             username = get_md5_hexdigest(email)
         except User.DoesNotExist:
             found_unique_username = True
@@ -53,33 +54,39 @@ def generate_username(email):
 
 
 class EmailAuthenticationForm(AuthenticationForm):
-    required_css_class = 'required'
-    remember_me = forms.BooleanField(
-        required=False,
-        label='Remember me for two weeks',
-    )
+    required_css_class = "required"
 
     def clean_username(self):
         """Prevent case-sensitive erros in email/username."""
-        return self.cleaned_data['username'].lower()
+        return self.cleaned_data["username"].lower()
+
+    def __init__(self, request=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["username"].widget = forms.TextInput(
+            attrs={"autofocus": True, "autocomplete": "email"}
+        )
+        self.fields["password"].widget = forms.PasswordInput(
+            attrs={"autocomplete": "current-password"}
+        )
 
 
 class AccountPasswordResetForm(PasswordResetForm):
-    required_css_class = 'required'
+    required_css_class = "required"
 
     email = forms.EmailField(max_length=256)
 
     def __init__(self, *args, **kwargs):
         super(AccountPasswordResetForm, self).__init__(*args, **kwargs)
         for field in self.fields:
-            self.fields[field].widget.attrs['class'] = 'form__text'
+            self.fields[field].widget.attrs["class"] = "form__text"
 
     def clean_email(self):
-        email = self.cleaned_data['email']
+        email = self.cleaned_data["email"]
 
         user_model = get_user_model()
         active_users = user_model._default_manager.filter(
-            email__iexact=email, is_active=True)
+            email__iexact=email, is_active=True
+        )
         if active_users.count() == 0:
             raise forms.ValidationError(
                 "There are no active accounts associated to this email."
@@ -89,25 +96,24 @@ class AccountPasswordResetForm(PasswordResetForm):
 
     def save(self, *args, **kwargs):
         domain_override = settings.SITE_URL
-        super(AccountPasswordResetForm, self).save(
-            domain_override, *args, **kwargs)
+        super(AccountPasswordResetForm, self).save(domain_override, *args, **kwargs)
 
 
 class AccountSetPasswordForm(SetPasswordForm):
-    required_css_class = 'required'
+    required_css_class = "required"
 
     def __init__(self, *args, **kwargs):
         super(AccountSetPasswordForm, self).__init__(*args, **kwargs)
 
-        self.fields['new_password1'].label = ''
-        self.fields['new_password1'].widget.attrs['placeholder'] = \
-            "New password"
-        self.fields['new_password2'].label = ''
-        self.fields['new_password2'].widget.attrs['placeholder'] = \
-            "New password confirmation"
+        self.fields["new_password1"].label = ""
+        self.fields["new_password1"].widget.attrs["placeholder"] = "New password"
+        self.fields["new_password2"].label = ""
+        self.fields["new_password2"].widget.attrs[
+            "placeholder"
+        ] = "New password confirmation"
 
         for field in self.fields:
-            self.fields[field].widget.attrs['class'] = 'form__text'
+            self.fields[field].widget.attrs["class"] = "form__text"
 
 
 class AccountPasswordChangeForm(PasswordChangeForm):
@@ -118,8 +124,8 @@ class AccountPasswordChangeForm(PasswordChangeForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['new_password1'].widget.attrs['autocomplete'] = "off"
-        self.fields['new_password2'].widget.attrs['autocomplete'] = "off"
+        self.fields["new_password1"].widget.attrs["autocomplete"] = "off"
+        self.fields["new_password2"].widget.attrs["autocomplete"] = "off"
 
 
 class UpdateDetailsForm(forms.ModelForm):
@@ -128,16 +134,18 @@ class UpdateDetailsForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('email',)
+        fields = ("email",)
 
     def __init__(self, *args, **kwargs):
         super(UpdateDetailsForm, self).__init__(*args, **kwargs)
 
     def clean_email(self):
-        email = self.cleaned_data['email']
+        email = self.cleaned_data["email"]
 
-        if User.objects.filter(email=email).count() > 0 \
-                and self.instance.email != email:
+        if (
+            User.objects.filter(email=email).count() > 0
+            and self.instance.email != email
+        ):
             raise forms.ValidationError("This email is already used.")
 
         return email
@@ -146,38 +154,32 @@ class UpdateDetailsForm(forms.ModelForm):
 class AccountUserCreationForm(forms.ModelForm):
     """A form that creates a user, with no privileges."""
 
-    error_messages = {
-        'password_mismatch': "The two password fields didn't match.",
-    }
+    error_messages = {"password_mismatch": "The two password fields didn't match."}
     email = forms.EmailField()
 
-    password1 = forms.CharField(
-        label="Password",
-        widget=forms.PasswordInput
-    )
+    password1 = forms.CharField(label="Password", widget=forms.PasswordInput)
 
     password2 = forms.CharField(
         label="Password confirmation",
         widget=forms.PasswordInput,
-        help_text="Enter the same password twice, for verification."
+        help_text="Enter the same password twice, for verification.",
     )
 
     class Meta:
         model = User
-        fields = ('email', 'password1', 'password2')
+        fields = ("email", "password1", "password2")
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
         password2 = self.cleaned_data.get("password2")
         if password1 and password2 and password1 != password2:
             raise forms.ValidationError(
-                self.error_messages['password_mismatch'],
-                code='password_mismatch',
+                self.error_messages["password_mismatch"], code="password_mismatch"
             )
         return password2
 
     def clean_email(self):
-        email = self.cleaned_data['email']
+        email = self.cleaned_data["email"]
 
         # Force all emails to be lowercase and strip trailing spaces
         email = email.lower().strip()
@@ -194,8 +196,8 @@ class AccountUserChangeForm(forms.ModelForm):
         help_text=(
             "Raw passwords are not stored, so there is no way to see "
             "this user's password, but you can change the password "
-            "using <a href=\"password/\">this form</a>."
-        )
+            'using <a href="password/">this form</a>.'
+        ),
     )
 
     class Meta:
@@ -205,15 +207,15 @@ class AccountUserChangeForm(forms.ModelForm):
     def clean_email(self):
         """Validate that the supplied email address is unique for the site."""
 
-        query = User.objects.filter(email__iexact=self.cleaned_data['email'])
-        query = query.exclude(username=self.cleaned_data['username'])
-        query = query.exclude(username=self.initial['username'])
-        if self.cleaned_data.get('email') and query:
+        query = User.objects.filter(email__iexact=self.cleaned_data["email"])
+        query = query.exclude(username=self.cleaned_data["username"])
+        query = query.exclude(username=self.initial["username"])
+        if self.cleaned_data.get("email") and query:
             raise forms.ValidationError(
                 "This email address is already in use. "
                 "Please supply a different email address."
             )
-        return self.cleaned_data['email']
+        return self.cleaned_data["email"]
 
     def clean_password(self):
         # Regardless of what the user provides, return the initial value.

@@ -29,10 +29,13 @@ setup(
     include_package_data=True,
     install_requires=[
         "django==2.1.*",
-        "djangorestframework==3.7.*",
+        "djangorestframework==3.8.*",
         "django-two-factor-auth==1.7.*",
         "django-appconf==1.0.*",
         "django-formtools==2.1.*",
+        "django-cors-headers==2.4.*",
+        "django-storages==1.7.*",
+        "raven==6.10.*",
     ],
     classifiers=[
         "Framework :: Django",

@@ -41,10 +41,6 @@ class GroupDetail(GroupMixin, AdminDetailView):
                 }
             ]
         },
-        # {
-        #     "legend": "People",
-        #     "template_name": "admin/team/team/people.html"
-        # }
     ]
 
 
