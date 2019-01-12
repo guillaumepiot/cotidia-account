@@ -12,7 +12,8 @@ def package_files(directory):
             paths.append(os.path.join(path, filename))
     return paths
 
-template_files = package_files('cotidia/account/templates')
+
+template_files = package_files("cotidia/account/templates")
 
 setup(
     name="cotidia-account",
@@ -22,24 +23,22 @@ setup(
     author_email="guillaume@cotidia.com",
     url="https://code.cotidia.com/cotidia/account/",
     packages=find_packages(),
-    package_dir={'account': 'account'},
-    package_data={
-        'cotidia.account': template_files
-    },
-    namespace_packages=['cotidia'],
+    package_dir={"account": "account"},
+    package_data={"cotidia.account": template_files},
+    namespace_packages=["cotidia"],
     include_package_data=True,
     install_requires=[
-        'django==2.0.*',
-        'djangorestframework==3.7.*',
-        'django-two-factor-auth==1.7.*',
-        'django-appconf==1.0.*',
-        'django-formtools==2.1.*'
+        "django==2.1.*",
+        "djangorestframework==3.7.*",
+        "django-two-factor-auth==1.7.*",
+        "django-appconf==1.0.*",
+        "django-formtools==2.1.*",
     ],
     classifiers=[
-        'Framework :: Django',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: BSD License',
-        'Operating System :: OS Independent',
-        'Topic :: Software Development',
+        "Framework :: Django",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: BSD License",
+        "Operating System :: OS Independent",
+        "Topic :: Software Development",
     ],
 )
