@@ -1,0 +1,28 @@
+{% extends "admin/generic/page/form.html" %}
+{% load i18n %}
+{% block title %}
+    {% if object %}
+        {% blocktrans %}
+            Edit role
+        {% endblocktrans %}
+    {% else %}
+        {% blocktrans %}
+            Add role
+        {% endblocktrans %}
+    {% endif %}
+{% endblock title %}
+
+{% block content_title %}
+    {% if list_url %}
+    <a href="{{list_url}}" class="btn btn--link tooltip tooltip--bottom-center back-to-list" data-tooltip="Back to list">
+        <span class="fa fa-list"></span>
+    </a>
+    {% endif %}
+    {% if object %}
+        {{object}}
+    {% else %}
+        {% blocktrans %}
+            Add role
+        {% endblocktrans %}
+    {% endif %}
+{% endblock content_title %}

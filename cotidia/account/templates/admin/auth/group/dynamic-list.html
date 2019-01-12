@@ -1,0 +1,11 @@
+{% extends "admin/generic/page/dynamic-list.html" %}
+{% load i18n %}
+{% block title %}Roles{% endblock title %}
+{% block content_title %}Roles{% endblock content_title %}
+{% block content_actions %}
+    {% if add_view %}
+    <a href="{% url 'account-admin:group-add' %}" class="btn btn--cancel btn--small" title="{% trans "Add role" %}">
+        <span class="fa fa-plus"></span>
+    </a>
+    {% endif %}
+{% endblock content_actions %}
