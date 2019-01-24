@@ -4,8 +4,8 @@ from appconf import AppConf
 
 
 class AccountConf(AppConf):
-    ADMIN_LOGIN_URL = '/admin/account/login/'
-    PUBLIC_LOGIN_URL = '/account/login/'
+    ADMIN_LOGIN_URL = "/admin/account/login"
+    PUBLIC_LOGIN_URL = "/account/sign-in/"
 
     # Force the user to activate their account via email before being allowed
     # to login
@@ -29,4 +29,4 @@ class AccountConf(AppConf):
     AUTO_SEND_INVITATION_EMAIL = True
 
     class Meta:
-        prefix = 'account'
+        prefix = "account"
