@@ -46,7 +46,7 @@ urlpatterns = [
     url(r"^logout/$", LogoutView.as_view(), name="logout"),
     url(
         r"^password/change/$",
-        auth_views.password_change,
+        auth_views.PasswordChangeView.as_view(),
         {
             "template_name": "account/password_change_form.html",
             "post_change_redirect": "account-public:password_change_done",
@@ -56,13 +56,13 @@ urlpatterns = [
     ),
     url(
         r"^password/change/done/$",
-        auth_views.password_change_done,
+        auth_views.PasswordChangeDoneView.as_view(),
         {"template_name": "account/password_change_done.html"},
         name="password_change_done",
     ),
     url(
         r"^password/reset/$",
-        auth_views.password_reset,
+        auth_views.PasswordResetView.as_view(),
         {
             "template_name": "account/password_reset_form.html",
             "post_reset_redirect": "account-public:password_reset_done",
@@ -79,7 +79,7 @@ urlpatterns = [
     ),
     url(
         r"^password/reset/confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$",
-        auth_views.password_reset_confirm,
+        auth_views.PasswordResetConfirmView.as_view(),
         {
             "template_name": "account/password_reset_confirm.html",
             "post_reset_redirect": "account-public:password_reset_complete",
@@ -89,13 +89,13 @@ urlpatterns = [
     ),
     url(
         r"^password/reset/complete/$",
-        auth_views.password_reset_complete,
+        auth_views.PasswordResetCompleteView.as_view(),
         {"template_name": "account/password_reset_complete.html"},
         name="password_reset_complete",
     ),
     url(
         r"^password/reset/done/$",
-        auth_views.password_reset_done,
+        auth_views.PasswordResetDoneView.as_view(),
         {"template_name": "account/password_reset_done.html"},
         name="password_reset_done",
     ),
