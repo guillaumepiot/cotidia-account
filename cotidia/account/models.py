@@ -13,37 +13,32 @@ from rest_framework.authtoken.models import Token
 from two_factor.utils import default_device
 
 from cotidia.account.conf import settings
-from cotidia.account.notices import (
-    NewUserActivationNotice,
-    UserInvitationNotice
-)
+from cotidia.account.notices import NewUserActivationNotice, UserInvitationNotice
 from cotidia.account.managers import UserManager
 
 
 class User(AbstractUser):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     email = models.EmailField(
-        _('email address'),
+        _("email address"),
         blank=True,
         unique=True,
-        error_messages={
-            'unique': _("A user with that email already exists."),
-        }
+        error_messages={"unique": _("A user with that email already exists.")},
     )
     objects = UserManager()
 
     # Used in createsuperuser manage command
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name']
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["first_name", "last_name"]
 
     class Meta:
         ordering = ["first_name", "last_name"]
-        verbose_name = 'User'
-        verbose_name_plural = 'Users'
+        verbose_name = "User"
+        verbose_name_plural = "Users"
 
     def __str__(self):
         if self.first_name or self.last_name:
-            return '%s %s' % (self.first_name, self.last_name)
+            return "%s %s" % (self.first_name, self.last_name)
         return self.username
 
     @property
@@ -70,7 +65,7 @@ class User(AbstractUser):
 
     def get_absolute_url(self):
         """Create the absolute url to the admin user detail view."""
-        return reverse('account-admin:user_detail', kwargs={'slug': self.uuid})
+        return reverse("account-admin:user_detail", kwargs={"slug": self.uuid})
 
     def send_activation_link(self, app=False):
         """Create a new activation notice and send it straight away."""
@@ -78,26 +73,20 @@ class User(AbstractUser):
         token = default_token_generator.make_token(self)
 
         if app is True and hasattr(settings, "APP_URL"):
-            url = '{0}/activate/{1}/{2}/'.format(
-                settings.APP_URL, self.uuid, token)
+            url = "{0}/activate/{1}/{2}/".format(settings.APP_URL, self.uuid, token)
         else:
-            url = '{0}{1}'.format(
+            url = "{0}{1}".format(
                 settings.SITE_URL,
-                reverse('account-public:activate', kwargs={
-                    'uuid': self.uuid,
-                    'token': token
-                })
+                reverse(
+                    "account-public:activate",
+                    kwargs={"uuid": self.uuid, "token": token},
+                ),
             )
 
         notice = NewUserActivationNotice(
             sender=settings.DEFAULT_FROM_EMAIL,
-            recipients=['{0} <{1}>'.format(
-                self.get_full_name(), self.email
-            )],
-            context={
-                'url': url,
-                'first_name': self.first_name
-            }
+            recipients=["{0} <{1}>".format(self.get_full_name(), self.email)],
+            context={"url": url, "first_name": self.first_name},
         )
         notice.send(force_now=True)
 
@@ -105,21 +94,14 @@ class User(AbstractUser):
         uid = urlsafe_base64_encode(force_bytes(self.pk)).decode()
         token = default_token_generator.make_token(self)
         url = reverse(
-            'account-admin:password-reset-confirm',
-            kwargs={'uidb64': uid, 'token': token}
+            "account-admin:password-reset-confirm",
+            kwargs={"uidb64": uid, "token": token},
         )
-        context = {
-            'url': settings.SITE_URL + url,
-            'first_name': self.first_name,
-            'site_url': settings.SITE_URL,
-            'site_name': settings.SITE_NAME
-        }
+        context = {"url": settings.SITE_URL + url, "first_name": self.first_name}
         notice = UserInvitationNotice(
             sender=settings.DEFAULT_FROM_EMAIL,
-            recipients=['{0} <{1}>'.format(
-                self.get_full_name(), self.email
-            )],
-            context=context
+            recipients=["{0} <{1}>".format(self.get_full_name(), self.email)],
+            context=context,
         )
         notice.send(force_now=True)
 

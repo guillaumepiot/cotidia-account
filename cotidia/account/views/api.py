@@ -20,12 +20,10 @@ from cotidia.account.serializers import (
     UserSerializer,
     ResetPasswordSerializer,
     SetPasswordSerializer,
-    ChangePasswordSerializer
+    ChangePasswordSerializer,
 )
 from cotidia.account.models import User
-from cotidia.account.notices import (
-    ResetPasswordNotice
-)
+from cotidia.account.notices import ResetPasswordNotice
 
 
 class SignUp(APIView):
@@ -43,8 +41,7 @@ class SignUp(APIView):
 
         if settings.ACCOUNT_ALLOW_SIGN_UP is False:
             return Response(
-                {"message": "SIGN_UP_DISABLED"},
-                status=status.HTTP_400_BAD_REQUEST
+                {"message": "SIGN_UP_DISABLED"}, status=status.HTTP_400_BAD_REQUEST
             )
 
         if serializer_class is None:
@@ -64,7 +61,7 @@ class SignUp(APIView):
 
             token, created = Token.objects.get_or_create(user=user)
 
-            data = {'token': token.key}
+            data = {"token": token.key}
             data.update(user_serializer_class(token.user).data)
 
             signals.user_sign_up.send(sender=None, request=request, user=user)
@@ -89,8 +86,7 @@ class SignIn(APIView):
 
         if settings.ACCOUNT_ALLOW_SIGN_IN is False:
             return Response(
-                {"message": "Sign in disabled."},
-                status=status.HTTP_400_BAD_REQUEST
+                {"message": "Sign in disabled."}, status=status.HTTP_400_BAD_REQUEST
             )
 
         if serializer_class is None:
@@ -104,14 +100,13 @@ class SignIn(APIView):
         if serializer.is_valid():
 
             user = authenticate(
-                username=serializer.data['email'],
-                password=serializer.data['password']
+                username=serializer.data["email"], password=serializer.data["password"]
             )
             auth_login(request, user)
 
             token, created = Token.objects.get_or_create(user=user)
 
-            data = {'token': token.key}
+            data = {"token": token.key}
             user = user_serializer_class(token.user)
             data.update(user.data)
 
@@ -133,14 +128,12 @@ class Activate(APIView):
             user = User.objects.get(uuid=uuid)
         except User.DoesNotExist:
             return Response(
-                {"message": "USER_INVALID"},
-                status=status.HTTP_400_BAD_REQUEST
+                {"message": "USER_INVALID"}, status=status.HTTP_400_BAD_REQUEST
             )
 
         if not default_token_generator.check_token(user, token):
             return Response(
-                {"message": "TOKEN_INVALID"},
-                status=status.HTTP_400_BAD_REQUEST
+                {"message": "TOKEN_INVALID"}, status=status.HTTP_400_BAD_REQUEST
             )
 
         # Activate now
@@ -148,10 +141,7 @@ class Activate(APIView):
         user.save()
 
         # Send the activation signals
-        signals.user_activate.send(
-            sender=None,
-            request=request,
-            user=user)
+        signals.user_activate.send(sender=None, request=request, user=user)
 
         return Response({"message": "ACTIVATED"}, status=status.HTTP_200_OK)
 
@@ -159,7 +149,7 @@ class Activate(APIView):
 class ResendActivationLink(APIView):
     """Resend the link to activate a user."""
 
-    http_method_names = ['post']
+    http_method_names = ["post"]
     authentication_classes = ()
     permission_classes = ()
 
@@ -170,21 +160,17 @@ class ResendActivationLink(APIView):
             user = User.objects.get(uuid=uuid)
         except User.DoesNotExist:
             return Response(
-                {"message": "USER_INVALID"},
-                status=status.HTTP_400_BAD_REQUEST
+                {"message": "USER_INVALID"}, status=status.HTTP_400_BAD_REQUEST
             )
 
         if user.is_active:
             return Response(
-                {"message": "USER_ACTIVE"},
-                status=status.HTTP_400_BAD_REQUEST
+                {"message": "USER_ACTIVE"}, status=status.HTTP_400_BAD_REQUEST
             )
 
         user.send_activation_link(app=True)
 
-        return Response(
-            {"message": "ACTIVATION_SENT"},
-            status=status.HTTP_200_OK)
+        return Response({"message": "ACTIVATION_SENT"}, status=status.HTTP_200_OK)
 
 
 class Authenticate(APIView):
@@ -204,16 +190,16 @@ class Authenticate(APIView):
 
         if serializer.is_valid():
             try:
-                token = Token.objects.get(key=serializer.data['token'])
+                token = Token.objects.get(key=serializer.data["token"])
             except Token.DoesNotExist:
                 return Response(
-                    {"message": "TOKEN_INVALID"},
-                    status=status.HTTP_400_BAD_REQUEST)
+                    {"message": "TOKEN_INVALID"}, status=status.HTTP_400_BAD_REQUEST
+                )
 
             if not token.user.is_active:
                 return Response(
-                    {"message": "USER_INACTIVE"},
-                    status=status.HTTP_400_BAD_REQUEST)
+                    {"message": "USER_INACTIVE"}, status=status.HTTP_400_BAD_REQUEST
+                )
 
             user = user_serializer_class(token.user)
 
@@ -235,7 +221,7 @@ class ResetPassword(APIView):
         serializer.is_valid(raise_exception=True)
 
         try:
-            user = User.objects.get(email=serializer.data['email'])
+            user = User.objects.get(email=serializer.data["email"])
         except User.DoesNotExist:
             user = None
 
@@ -243,44 +229,32 @@ class ResetPassword(APIView):
 
             if not user.is_active:
                 return Response(
-                    {
-                        "non_field_errors": ["Your account is not active."]
-                    },
-                    status=status.HTTP_400_BAD_REQUEST
+                    {"non_field_errors": ["Your account is not active."]},
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
 
             token = default_token_generator.make_token(user)
 
-            if hasattr(settings, 'APP_URL'):
-                url = '{0}/reset-password/{1}/{2}/'.format(
-                    settings.APP_URL,
-                    user.uuid,
-                    token
+            if hasattr(settings, "APP_URL"):
+                url = "{0}/reset-password/{1}/{2}/".format(
+                    settings.APP_URL, user.uuid, token
                 )
             else:
                 url = settings.SITE_URL + reverse(
-                    'account-public:password_reset_confirm',
+                    "account-public:password_reset_confirm",
                     kwargs={
-                        'uidb64': urlsafe_base64_encode(force_bytes(user.pk)).decode(),
-                        'token': token_generator.make_token(user)
-                    }
+                        "uidb64": urlsafe_base64_encode(force_bytes(user.pk)).decode(),
+                        "token": token_generator.make_token(user),
+                    },
                 )
 
             notice = ResetPasswordNotice(
-                recipients=['%s <%s>' % (user.get_full_name(), user.email)],
-                context={
-                    'debug': settings.DEBUG,
-                    'site_url': settings.SITE_URL,
-                    'url': url,
-                    'first_name': user.first_name
-                }
+                recipients=["%s <%s>" % (user.get_full_name(), user.email)],
+                context={"url": url, "first_name": user.first_name},
             )
             notice.send(force_now=True)
 
-        return Response(
-            {"message": "PASSWORD_RESET"},
-            status=status.HTTP_200_OK
-        )
+        return Response({"message": "PASSWORD_RESET"}, status=status.HTTP_200_OK)
 
 
 class ResetPasswordValidate(APIView):
@@ -296,13 +270,13 @@ class ResetPasswordValidate(APIView):
             user = User.objects.get(uuid=uuid)
         except User.DoesNotExist:
             return Response(
-                {"message": "USER_INVALID"},
-                status=status.HTTP_400_BAD_REQUEST)
+                {"message": "USER_INVALID"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
         if not default_token_generator.check_token(user, token):
             return Response(
-                {"message": "TOKEN_INVALID"},
-                status=status.HTTP_400_BAD_REQUEST)
+                {"message": "TOKEN_INVALID"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
         return Response({"message": "TOKEN_VALID"}, status=status.HTTP_200_OK)
 
@@ -320,19 +294,19 @@ class SetPassword(APIView):
             user = User.objects.get(uuid=uuid)
         except User.DoesNotExist:
             return Response(
-                {"message": "USER_INVALID"},
-                status=status.HTTP_400_BAD_REQUEST)
+                {"message": "USER_INVALID"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
         if not default_token_generator.check_token(user, token):
             return Response(
-                {"message": "TOKEN_INVALID"},
-                status=status.HTTP_400_BAD_REQUEST)
+                {"message": "TOKEN_INVALID"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
         serializer = SetPasswordSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         # Set the new password
-        user.set_password(serializer.data['password1'])
+        user.set_password(serializer.data["password1"])
         user.save()
 
         return Response({"message": "PASSWORD_SET"}, status=status.HTTP_200_OK)
@@ -363,14 +337,11 @@ class ChangePassword(APIView):
     @transaction.atomic
     def post(self, request):
 
-        serializer = ChangePasswordSerializer(
-            data=request.data,
-            user=request.user
-        )
+        serializer = ChangePasswordSerializer(data=request.data, user=request.user)
         serializer.is_valid(raise_exception=True)
 
         # Set the new password
-        request.user.set_password(serializer.data['password1'])
+        request.user.set_password(serializer.data["password1"])
         request.user.save()
 
         return Response({"message": "PASSWORD_CHANGED"}, status=status.HTTP_200_OK)
