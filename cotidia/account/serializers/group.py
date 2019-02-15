@@ -1,3 +1,5 @@
+from rest_framework import serializers
+
 from django.urls import reverse
 from django.contrib.auth.models import Group
 
@@ -5,6 +7,8 @@ from cotidia.admin.serializers import BaseDynamicListSerializer
 
 
 class GroupAdminSerializer(BaseDynamicListSerializer):
+    uuid = serializers.CharField(source="id")
+
     class Meta:
         model = Group
         exclude = ["id", "permissions"]
