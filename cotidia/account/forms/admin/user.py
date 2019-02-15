@@ -133,10 +133,14 @@ class SuperUserUpdateForm(UserAddForm, UserChangeForm):
     password = ReadOnlyPasswordHashField()
 
     groups = forms.ModelMultipleChoiceField(
-        widget=forms.CheckboxSelectMultiple, queryset=Group.objects.all()
+        widget=forms.CheckboxSelectMultiple,
+        queryset=Group.objects.all(),
+        required=False,
     )
     user_permissions = forms.ModelMultipleChoiceField(
-        widget=forms.CheckboxSelectMultiple, queryset=Permission.objects.all()
+        widget=forms.CheckboxSelectMultiple,
+        queryset=Permission.objects.all(),
+        required=False,
     )
 
     class Meta:
