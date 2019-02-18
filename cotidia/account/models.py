@@ -95,19 +95,25 @@ class User(AbstractUser):
         if self.is_staff or self.is_superuser:
             uid = urlsafe_base64_encode(force_bytes(self.pk)).decode()
             token = default_token_generator.make_token(self)
-            url = reverse(
+            url = settings.SITE_URL + reverse(
                 "account-admin:password-reset-confirm",
                 kwargs={"uidb64": uid, "token": token},
             )
         else:
             uid = urlsafe_base64_encode(force_bytes(self.pk)).decode()
             token = default_token_generator.make_token(self)
-            url = reverse(
-                "account-public:password_reset_confirm",
-                kwargs={"uidb64": uid, "token": token},
-            )
 
-        context = {"url": settings.SITE_URL + url, "first_name": self.first_name}
+            if hasattr(settings, "APP_URL"):
+                url = "{0}/reset-password/{1}/{2}/".format(
+                    settings.APP_URL, self.uuid, token
+                )
+            else:
+                url = settings.SITE_URL + reverse(
+                    "account-public:password_reset_confirm",
+                    kwargs={"uidb64": uid, "token": token},
+                )
+
+        context = {"url": url, "first_name": self.first_name}
         notice = UserInvitationNotice(
             sender=settings.DEFAULT_FROM_EMAIL,
             recipients=["{0} <{1}>".format(self.get_full_name(), self.email)],

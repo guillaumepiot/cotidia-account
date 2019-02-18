@@ -281,7 +281,7 @@ class UserUpdate(CheckUserMixin, AdminUpdateView):
         if (
             not previous_instance.is_active
             and self.object.is_active
-            and self.objects.is_staff
+            and self.object.is_staff
         ):
             # Only send if the user was never invited
             if not self.object.password and settings.ACCOUNT_AUTO_SEND_INVITATION_EMAIL:
