@@ -91,12 +91,22 @@ class User(AbstractUser):
         notice.send(force_now=True)
 
     def send_invitation_email(self):
-        uid = urlsafe_base64_encode(force_bytes(self.pk)).decode()
-        token = default_token_generator.make_token(self)
-        url = reverse(
-            "account-admin:password-reset-confirm",
-            kwargs={"uidb64": uid, "token": token},
-        )
+
+        if self.is_staff or self.is_superuser:
+            uid = urlsafe_base64_encode(force_bytes(self.pk)).decode()
+            token = default_token_generator.make_token(self)
+            url = reverse(
+                "account-admin:password-reset-confirm",
+                kwargs={"uidb64": uid, "token": token},
+            )
+        else:
+            uid = urlsafe_base64_encode(force_bytes(self.pk)).decode()
+            token = default_token_generator.make_token(self)
+            url = reverse(
+                "account-public:password_reset_confirm",
+                kwargs={"uidb64": uid, "token": token},
+            )
+
         context = {"url": settings.SITE_URL + url, "first_name": self.first_name}
         notice = UserInvitationNotice(
             sender=settings.DEFAULT_FROM_EMAIL,

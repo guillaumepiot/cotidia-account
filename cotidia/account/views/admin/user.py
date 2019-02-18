@@ -27,7 +27,7 @@ from cotidia.account.forms.admin.user import (
     UserUpdateForm,
     SuperUserUpdateForm,
     UserChangePasswordForm,
-    UserInviteForm
+    UserInviteForm,
 )
 
 
@@ -40,7 +40,7 @@ class CheckUserMixin:
         elif obj.is_staff:
             if user.is_superuser:
                 return True
-        elif user.is_staff and user.has_perm('account.change_user'):
+        elif user.is_staff and user.has_perm("account.change_user"):
             return True
 
         return False
@@ -50,18 +50,20 @@ class UserFilter(django_filters.FilterSet):
     first_name = django_filters.CharFilter(
         label="Search",
         method="search",
-        widget=forms.TextInput(attrs={'placeholder': 'Search'})
+        widget=forms.TextInput(attrs={"placeholder": "Search"}),
     )
 
     class Meta:
         model = User
-        fields = ['first_name']
+        fields = ["first_name"]
 
     def search(self, queryset, name, value):
 
-        q_objects = Q(first_name__icontains=value) | \
-            Q(last_name__icontains=value) | \
-            Q(email__icontains=value)
+        q_objects = (
+            Q(first_name__icontains=value)
+            | Q(last_name__icontains=value)
+            | Q(email__icontains=value)
+        )
 
         try:
             val = uuid.UUID(value, version=4)
@@ -74,34 +76,32 @@ class UserFilter(django_filters.FilterSet):
 
 class UserList(AdminListView):
     columns = (
-        ('Name', 'name'),
-        ('Email', 'email'),
-        ('Active', 'is_active'),
-        ('Date Joined', 'date_joined'),
+        ("Name", "name"),
+        ("Email", "email"),
+        ("Active", "is_active"),
+        ("Date Joined", "date_joined"),
     )
     model = User
     row_click_action = "detail"
-    row_actions = ['view']
+    row_actions = ["view"]
     filterset = UserFilter
 
     def get_queryset(self):
-        return super().get_queryset().exclude(
-            Q(is_staff=True) | Q(is_superuser=True)
-        )
+        return super().get_queryset().exclude(Q(is_staff=True) | Q(is_superuser=True))
 
 
 class UserListStaff(AdminListView):
     columns = (
-        ('Name', 'name'),
-        ('Email', 'email'),
-        ('Superuser', 'is_superuser'),
-        ('Staff', 'is_staff'),
-        ('Active', 'is_active'),
-        ('Date Joined', 'date_joined'),
+        ("Name", "name"),
+        ("Email", "email"),
+        ("Superuser", "is_superuser"),
+        ("Staff", "is_staff"),
+        ("Active", "is_active"),
+        ("Date Joined", "date_joined"),
     )
     model = User
     row_click_action = "detail"
-    row_actions = ['view']
+    row_actions = ["view"]
     filterset = UserFilter
 
     def check_user(self, user):
@@ -111,23 +111,21 @@ class UserListStaff(AdminListView):
             return False
 
     def get_queryset(self):
-        return super().get_queryset().filter(
-            is_staff=True
-        ).exclude(is_superuser=True)
+        return super().get_queryset().filter(is_staff=True).exclude(is_superuser=True)
 
 
 class UserListSuperuser(AdminListView):
     columns = (
-        ('Name', 'name'),
-        ('Email', 'email'),
-        ('Superuser', 'is_superuser'),
-        ('Staff', 'is_staff'),
-        ('Active', 'is_active'),
-        ('Date Joined', 'date_joined'),
+        ("Name", "name"),
+        ("Email", "email"),
+        ("Superuser", "is_superuser"),
+        ("Staff", "is_staff"),
+        ("Active", "is_active"),
+        ("Date Joined", "date_joined"),
     )
     model = User
     row_click_action = "detail"
-    row_actions = ['view']
+    row_actions = ["view"]
     filterset = UserFilter
 
     def check_user(self, user):
@@ -147,53 +145,26 @@ class UserDetail(CheckUserMixin, AdminDetailView):
             "legend": "User details",
             "fields": [
                 [
-                    {
-                        "label": "Name",
-                        "field": "name",
-                    },
-                    {
-                        "label": "Email",
-                        "field": "email",
-                    }
+                    {"label": "Name", "field": "name"},
+                    {"label": "Email", "field": "email"},
                 ],
                 [
-                    {
-                        "label": "Username",
-                        "field": "username",
-                    },
-                    {
-                        "label": "User ID",
-                        "field": "uuid",
-                    }
-                ]
-            ]
+                    {"label": "Username", "field": "username"},
+                    {"label": "User ID", "field": "uuid"},
+                ],
+            ],
         },
         {
             "legend": "Roles & Permissions",
             "fields": [
                 [
-                    {
-                        "label": "Active",
-                        "field": "is_active",
-                    },
-                    {
-                        "label": "Staff",
-                        "field": "is_staff",
-                    },
-                    {
-                        "label": "Superuser",
-                        "field": "is_superuser",
-                    }
+                    {"label": "Active", "field": "is_active"},
+                    {"label": "Staff", "field": "is_staff"},
+                    {"label": "Superuser", "field": "is_superuser"},
                 ],
-                {
-                    "label": "Roles",
-                    "field": "groups",
-                },
-                {
-                    "label": "Permissions",
-                    "field": "user_permissions",
-                }
-            ]
+                {"label": "Roles", "field": "groups"},
+                {"label": "Permissions", "field": "user_permissions"},
+            ],
         },
         # {
         #     "legend": "People",
@@ -207,7 +178,7 @@ class UserDetail(CheckUserMixin, AdminDetailView):
         user = self.get_object()
 
         if settings.ACCOUNT_PROFILE_MODEL:
-            app_label, model_name = settings.ACCOUNT_PROFILE_MODEL.split('.')
+            app_label, model_name = settings.ACCOUNT_PROFILE_MODEL.split(".")
             profile_class = apps.get_model(app_label=app_label, model_name=model_name)
 
             try:
@@ -219,23 +190,23 @@ class UserDetail(CheckUserMixin, AdminDetailView):
             # profile_app_label
             if has_profile:
                 label = "Edit profile"
-                url = reverse('{}-admin:profile-update'.format(profile_class._meta.app_label), kwargs={'pk': user.profile.id})
+                url = reverse(
+                    "{}-admin:profile-update".format(profile_class._meta.app_label),
+                    kwargs={"pk": user.profile.id},
+                )
                 action_class = "btn--change"
             else:
                 label = "Add profile"
-                url = reverse('{}-admin:profile-add'.format(profile_class._meta.app_label), kwargs={'user_id': user.id})
+                url = reverse(
+                    "{}-admin:profile-add".format(profile_class._meta.app_label),
+                    kwargs={"user_id": user.id},
+                )
                 action_class = "btn--create"
             fieldsets.append(
                 {
                     "legend": "People",
                     "template_name": "admin/account/user/profile.html",
-                    "actions": [
-                        {
-                            'label': label,
-                            'url': url,
-                            'class': action_class,
-                        }
-                    ]
+                    "actions": [{"label": label, "url": url, "class": action_class}],
                 }
             )
         return fieldsets
@@ -248,8 +219,7 @@ class UserCreate(AdminCreateView):
     def form_valid(self, form):
         response = super().form_valid(form)
 
-        if self.object.is_active and \
-                settings.ACCOUNT_AUTO_SEND_INVITATION_EMAIL:
+        if self.object.is_active and settings.ACCOUNT_AUTO_SEND_INVITATION_EMAIL:
             self.object.send_invitation_email()
 
         return response
@@ -259,23 +229,23 @@ class UserCreate(AdminCreateView):
         try:
             # This is here to throw an attribute error if it does not exist
             if settings.ACCOUNT_PROFILE_MODEL:
-                module_name = '.'.join(settings.ACCOUNT_PROFILE_FORM.split('.')[:-1])
-                form_name = settings.ACCOUNT_PROFILE_FORM.split('.')[-1]
+                module_name = ".".join(settings.ACCOUNT_PROFILE_FORM.split(".")[:-1])
+                form_name = settings.ACCOUNT_PROFILE_FORM.split(".")[-1]
                 module = importlib.import_module(module_name)
 
                 class TempMultiForm(MultiModelForm):
                     form_classes = {
-                        'user': self.get_single_form_class(),
-                        'profile': getattr(module, form_name)
+                        "user": self.get_single_form_class(),
+                        "profile": getattr(module, form_name),
                     }
 
                     def save(self, commit=True):
                         objects = super(TempMultiForm, self).save(commit=False)
 
                         if commit:
-                            user = objects['user']
+                            user = objects["user"]
                             user.save()
-                            profile = objects['profile']
+                            profile = objects["profile"]
                             profile.user = user
                             profile.save()
 
@@ -308,10 +278,13 @@ class UserUpdate(CheckUserMixin, AdminUpdateView):
         response = super().form_valid(form)
 
         # If `is_active` change state from False to True, send the invitation
-        if not previous_instance.is_active and self.object.is_active:
+        if (
+            not previous_instance.is_active
+            and self.object.is_active
+            and self.objects.is_staff
+        ):
             # Only send if the user was never invited
-            if not self.object.password and \
-                    settings.ACCOUNT_AUTO_SEND_INVITATION_EMAIL:
+            if not self.object.password and settings.ACCOUNT_AUTO_SEND_INVITATION_EMAIL:
                 self.object.send_invitation_email()
 
         return response
@@ -342,9 +315,8 @@ class UserInvite(CheckUserMixin, AdminUpdateView):
         messages.success(
             self.request,
             '{} has been invited. <a href="{}">View</a>'.format(
-                self.model._meta.verbose_name,
-                self.build_detail_url()
-            )
+                self.model._meta.verbose_name, self.build_detail_url()
+            ),
         )
         return self.build_success_url()
 
@@ -360,7 +332,7 @@ class UserDelete(AdminDeleteView):
         elif obj.is_staff:
             if user.is_superuser:
                 return True
-        elif user.is_staff and user.has_perm('account.delete_user'):
+        elif user.is_staff and user.has_perm("account.delete_user"):
             return True
 
         return False
@@ -372,13 +344,11 @@ class UserChangePassword(CheckUserMixin, AdminUpdateView):
 
     def dispatch(self, request, *args, **kwargs):
         if self.get_object() == request.user:
-            return HttpResponseRedirect(
-                reverse('account-admin:password-change')
-            )
+            return HttpResponseRedirect(reverse("account-admin:password-change"))
         return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        del kwargs['instance']
-        kwargs['user'] = self.get_object()
+        del kwargs["instance"]
+        kwargs["user"] = self.get_object()
         return kwargs

@@ -6,7 +6,6 @@ from cotidia.account import fixtures
 
 
 class BaseAdminTestCase(TestCase):
-
     @fixtures.normal_user
     @fixtures.admin_user
     @fixtures.superuser
@@ -22,22 +21,18 @@ class BaseAdminTestCase(TestCase):
             url = reverse("{}:{}".format(namespace, urlname))
 
         response = self.client.get(url)
-        self.assertEquals(response['Location'], '/admin/account/login/')
+        self.assertEquals(response["Location"], "/admin/account/login")
         self.assertEquals(response.status_code, 302)
 
         # Normal user
         self.client.login(
-            username=self.normal_user.email,
-            password=self.normal_user_pwd
+            username=self.normal_user.email, password=self.normal_user_pwd
         )
         response = self.client.get(url)
         self.assertEquals(response.status_code, 403)
 
         # Admin user without permission
-        self.client.login(
-            username=self.admin_user.email,
-            password=self.admin_user_pwd
-        )
+        self.client.login(username=self.admin_user.email, password=self.admin_user_pwd)
         response = self.client.get(url)
         self.assertEquals(response.status_code, 403)
 
@@ -48,9 +43,6 @@ class BaseAdminTestCase(TestCase):
         self.assertEquals(response.status_code, 200)
 
         # Superuser
-        self.client.login(
-            username=self.superuser.email,
-            password=self.superuser_pwd
-        )
+        self.client.login(username=self.superuser.email, password=self.superuser_pwd)
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
