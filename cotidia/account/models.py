@@ -115,6 +115,7 @@ class User(AbstractUser):
 
         context = {"url": url, "first_name": self.first_name}
         notice = UserInvitationNotice(
+            subject=f"Welcome to {settings.SITE_NAME}",
             sender=settings.DEFAULT_FROM_EMAIL,
             recipients=["{0} <{1}>".format(self.get_full_name(), self.email)],
             context=context,

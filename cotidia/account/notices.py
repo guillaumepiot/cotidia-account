@@ -41,7 +41,7 @@ class UserInvitationNotice(Notice):
     identifier = "user-invitation"
     html_template = "account/notices/invitation.html"
     text_template = "account/notices/invitation.txt"
-    subject = u"%s" % _("You have been invited")
+    subject = "Welcome"
 
     default_context = {
         "url": "url",
