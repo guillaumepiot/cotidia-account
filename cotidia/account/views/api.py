@@ -32,23 +32,23 @@ class SignUp(APIView):
     authentication_classes = ()
     permission_classes = ()
     serializer_class = SignUpSerializer
+    user_serializer_class = UserSerializer
 
     def get_serializer_class(self):
         return self.serializer_class
 
-    @transaction.atomic
-    def post(self, request, serializer_class=None, user_serializer_class=None):
+    def get_user_serializer_class(self):
+        return self.user_serializer_class
 
+    @transaction.atomic
+    def post(self, request):
         if settings.ACCOUNT_ALLOW_SIGN_UP is False:
             return Response(
                 {"message": "SIGN_UP_DISABLED"}, status=status.HTTP_400_BAD_REQUEST
             )
 
-        if serializer_class is None:
-            serializer_class = self.get_serializer_class()
-
-        if user_serializer_class is None:
-            user_serializer_class = UserSerializer
+        serializer_class = self.get_serializer_class()
+        user_serializer_class = self.get_user_serializer_class()
 
         serializer = serializer_class(data=request.data)
 
@@ -76,24 +76,25 @@ class SignIn(APIView):
     authentication_classes = ()
     permission_classes = ()
     serializer_class = SignInTokenSerializer
+    user_serializer_class = UserSerializer
     model = Token
 
     def get_serializer_class(self):
         return self.serializer_class
 
+    def get_user_serializer_class(self):
+        return self.user_serializer_class
+
     @transaction.atomic
-    def post(self, request, serializer_class=None, user_serializer_class=None):
+    def post(self, request):
 
         if settings.ACCOUNT_ALLOW_SIGN_IN is False:
             return Response(
                 {"message": "Sign in disabled."}, status=status.HTTP_400_BAD_REQUEST
             )
 
-        if serializer_class is None:
-            serializer_class = self.get_serializer_class()
-
-        if user_serializer_class is None:
-            user_serializer_class = UserSerializer
+        serializer_class = self.get_serializer_class()
+        user_serializer_class = self.get_user_serializer_class()
 
         serializer = serializer_class(data=request.data)
 
