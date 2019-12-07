@@ -28,7 +28,7 @@ setup(
     namespace_packages=["cotidia"],
     include_package_data=True,
     install_requires=[
-        "django==2.1.*",
+        "django>=2.1,<2.1",
         "djangorestframework==3.8.*",
         "django-two-factor-auth==1.8.*",
         "django-appconf==1.0.*",
