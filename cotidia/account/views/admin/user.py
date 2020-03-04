@@ -166,10 +166,6 @@ class UserDetail(CheckUserMixin, AdminDetailView):
                 {"label": "Permissions", "field": "user_permissions"},
             ],
         },
-        # {
-        #     "legend": "People",
-        #     "template_name": "admin/team/team/people.html"
-        # }
     ]
 
     def get_fieldsets(self):
@@ -208,6 +204,15 @@ class UserDetail(CheckUserMixin, AdminDetailView):
                     "template_name": "admin/account/user/profile.html",
                     "actions": [{"label": label, "url": url, "class": action_class}],
                 }
+            )
+        if (
+            settings.ACCOUNT_ENABLE_TWO_FACTOR
+            and self.request.user.is_superuser
+            and self.request.user.is_verified()
+        ):
+            # Show OTP options
+            fieldsets.append(
+                {"legend": "Security", "template_name": "admin/account/user/otp.html"}
             )
         return fieldsets
 

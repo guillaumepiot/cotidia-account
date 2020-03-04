@@ -1,0 +1,19 @@
+{% load i18n %}
+<fieldset class="detail">
+    <legend>{% trans "Security" %}</legend>
+    {% if ACCOUNT_ENABLE_TWO_FACTOR %}
+    <div class="form__row">
+        <div class="form__group">
+            <label class="form__label">{% trans "Two Factor Auth" %}</label>
+            <div class="form__control">
+                {% if user.two_factor_auth_enabled %}
+                    <p><span class="fa fa-check text-green"></span> Two-Factor Authentication enabled</p>
+                    <p><a href="{% url 'account-admin:user-disable' user.uuid %}" class="btn btn--delete btn--small">Disable Two-Factor Authentication</a></p>
+                {% else %}
+                    <p><span class="fa fa-times text-red"></span> Two-Factor Authentication not enabled</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</fieldset>

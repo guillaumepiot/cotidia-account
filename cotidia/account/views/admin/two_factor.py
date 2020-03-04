@@ -124,7 +124,7 @@ class UserDisableView(View):
         user = self.get_user(uuid)
 
         if not user_has_device(user):
-            return redirect(resolve_url("account-admin:user_detail", slug=uuid))
+            return redirect(resolve_url("account-admin:user-detail", slug=uuid))
 
         form = self.form_class(user=request.user)
         return render(request, self.template_name, {"form": form})
@@ -145,7 +145,7 @@ class UserDisableView(View):
             for device in devices_for_user(user):
                 device.delete()
 
-            return redirect(resolve_url("account-admin:user_detail", slug=uuid))
+            return redirect(resolve_url("account-admin:user-detail", slug=uuid))
 
         return render(request, self.template_name, {"form": form})
 
