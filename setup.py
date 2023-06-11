@@ -29,7 +29,7 @@ setup(
     include_package_data=True,
     install_requires=[
         "django==2.2",
-        "djangorestframework==3.8.2",
+        "djangorestframework==3.13.1",
         "django-two-factor-auth==1.8.0",
         "django-appconf==1.0.3",
         "django-formtools==2.1",
