@@ -29,7 +29,7 @@ setup(
     include_package_data=True,
     install_requires=[
         "django==5.0.*",
-        "djangorestframework==3.15.*",
+        "djangorestframework>=3.15,<3.19",
         "django-two-factor-auth==1.16.*",
         "django-appconf==1.0.*",
         "django-cors-headers==4.3.*",
